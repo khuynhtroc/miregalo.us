@@ -4,7 +4,10 @@ import { localDriver } from './local';
 import { supabaseDriver } from './supabase';
 
 export function getDriver(): Driver {
-  return process.env.DB_DRIVER === 'supabase' ? supabaseDriver : localDriver;
+  if (process.env.DB_DRIVER === 'local') {
+    return localDriver;
+  }
+  return supabaseDriver;
 }
 
 export const db = new Proxy({} as Driver, {

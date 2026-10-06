@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import type { Post } from '@/lib/types';
@@ -33,6 +34,17 @@ export async function PUT(
     }
 
     const updated = await db.update('posts', id, patch);
+
+    try {
+      revalidatePath('/', 'layout');
+      if (updated?.slug) {
+        revalidatePath(`/${updated.slug}/`);
+        revalidatePath(`/blog/${updated.slug}/`);
+      }
+    } catch (e) {
+      console.warn('revalidatePath warning:', e);
+    }
+
     return NextResponse.json(updated);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';

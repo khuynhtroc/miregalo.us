@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import type { Post } from '@/lib/types';
@@ -61,6 +62,16 @@ export async function POST(req: NextRequest) {
       og_image: body.og_image || '',
       published_at: body.status === 'published' ? (body.published_at || new Date().toISOString()) : null,
     });
+
+    try {
+      revalidatePath('/', 'layout');
+      if (post?.slug) {
+        revalidatePath(`/${post.slug}/`);
+        revalidatePath(`/blog/${post.slug}/`);
+      }
+    } catch (e) {
+      console.warn('revalidatePath warning:', e);
+    }
 
     return NextResponse.json(post, { status: 201 });
   } catch (err: unknown) {

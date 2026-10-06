@@ -4,6 +4,8 @@ import { getSettings } from '@/lib/repo';
 import { orgSchema, websiteSchema } from '@/lib/seo';
 import { JsonLd } from '@/components/JsonLd';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return {
@@ -58,14 +60,36 @@ export default async function RootLayout({
             />
           </>
         )}
-        {settings.head_scripts && (
-          <script
-            id="site-custom-head-scripts"
-            dangerouslySetInnerHTML={{
-              __html: settings.head_scripts.replace(/<\/?script[^>]*>/gi, ''),
-            }}
-          />
-        )}
+        {settings.head_scripts && (() => {
+          const raw = settings.head_scripts.trim();
+          if (!raw) return null;
+
+          const metaTags = raw.match(/<meta\s+[^>]+>/gi) || [];
+          const cleanJs = raw
+            .replace(/<!--[\s\S]*?-->/g, '')
+            .replace(/<meta\s+[^>]+>/gi, '')
+            .replace(/<\/?script[^>]*>/gi, '')
+            .trim();
+
+          return (
+            <>
+              {metaTags.map((tag, idx) => {
+                const name = tag.match(/name=["']([^"']+)["']/i)?.[1];
+                const content = tag.match(/content=["']([^"']+)["']/i)?.[1];
+                const property = tag.match(/property=["']([^"']+)["']/i)?.[1];
+                if (name && content) return <meta key={`m-${idx}`} name={name} content={content} />;
+                if (property && content) return <meta key={`m-${idx}`} property={property} content={content} />;
+                return null;
+              })}
+              {cleanJs ? (
+                <script
+                  id="site-custom-head-scripts"
+                  dangerouslySetInnerHTML={{ __html: cleanJs }}
+                />
+              ) : null}
+            </>
+          );
+        })()}
       </head>
       <body>
         {children}

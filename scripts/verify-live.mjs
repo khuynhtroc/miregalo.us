@@ -5,8 +5,10 @@ async function main() {
   console.log('Status:', res.status);
   console.log('Includes Miregalo in Title:', html.includes('Miregalo'));
   console.log('Includes miregalo-logo.png:', html.includes('miregalo-logo.png'));
-  console.log('Includes loveable-logo.png:', html.includes('loveable-logo.png'));
   console.log('Includes favicon.png:', html.includes('favicon.png'));
+  console.log('Includes google-site-verification:', html.includes('q3ZACanWRjwIhlEdAb7fksnumlaM9OHH829aq6STcnc'));
+  console.log('Includes GA4 G-WRGWXTNWV3:', html.includes('G-WRGWXTNWV3'));
+  console.log('Includes GTM GTM-NLLPRRXN:', html.includes('GTM-NLLPRRXN'));
 
   const faqsRes = await fetch('https://www.miregalo.us/faqs/', { cache: 'no-store' });
   const faqsHtml = await faqsRes.text();

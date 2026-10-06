@@ -7,12 +7,16 @@ import type { Driver } from './driver';
  * (public pages read published rows; RLS policies in supabase/migrations also allow anon reads).
  */
 
+import { localDriver } from './local';
+
+const DEFAULT_SUPABASE_URL = 'https://tvgipyhvvtovgttnyivw.supabase.co';
+const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2Z2lweWh2dnRvdmd0dG55aXZ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MTI0Mzg2OCwiZXhwIjoyMTA2ODE5ODY4fQ.n03zTL69UhHEk524ItXwcOtqu1MtvL1iu9uOoXH-oi0';
+
 let client: SupabaseClient | null = null;
 function sb(): SupabaseClient {
   if (client) return client;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
-  if (!url || !key) throw new Error('DB_DRIVER=supabase but SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are missing');
+  const url = process.env.SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || DEFAULT_SUPABASE_KEY;
   client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
   return client;
 }
@@ -90,18 +94,30 @@ export const supabaseDriver: Driver = {
     fail(error, `increment ${table}.${field}`);
   },
   async getSetting(key) {
-    const { data, error } = await sb().from('settings').select('value').eq('key', key).maybeSingle();
-    if (error) {
-      if (isTableMissingError(error)) return null as never;
-      fail(error, `getSetting ${key}`);
+    try {
+      const { data, error } = await sb().from('settings').select('value').eq('key', key).maybeSingle();
+      if (!error && data?.value) {
+        return data.value as never;
+      }
+    } catch (err) {
+      console.warn(`[supabase] getSetting ${key} error, falling back to localDriver:`, err);
     }
-    return (data?.value ?? null) as never;
+    try {
+      return await localDriver.getSetting(key);
+    } catch {
+      return null as never;
+    }
   },
   async setSetting(key, value) {
     const { error } = await sb()
       .from('settings')
       .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
     fail(error, `setSetting ${key}`);
+    try {
+      await localDriver.setSetting(key, value);
+    } catch {
+      // non-fatal in serverless
+    }
   },
   async upsertBatch(table, rows, keyFields = ['id']) {
     if (!rows.length) return;

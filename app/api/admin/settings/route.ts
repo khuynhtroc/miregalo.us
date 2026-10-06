@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { getSettings } from '@/lib/repo';
@@ -22,6 +23,13 @@ export async function POST(req: NextRequest) {
     const merged = { ...current, ...payload };
 
     await db.setSetting('site', merged);
+
+    try {
+      revalidatePath('/', 'layout');
+    } catch (e) {
+      console.warn('revalidatePath warning:', e);
+    }
+
     return NextResponse.json(merged);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
