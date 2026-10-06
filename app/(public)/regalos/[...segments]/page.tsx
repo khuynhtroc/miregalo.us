@@ -182,7 +182,7 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
 
         {/* ── SECCIÓN 1: PRODUCTOS SELECCIONADOS ── */}
         <section style={{ marginBottom: '56px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
             <div>
               <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#1e293b', margin: '0 0 4px' }}>
                 Ideas y Regalos Destacados
@@ -191,16 +191,17 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
                 Recomendaciones con precios en tiempo real y disponibilidad inmediata
               </p>
             </div>
-            <span style={{ fontSize: '0.85rem', color: '#0284c7', background: '#f0f9ff', padding: '4px 10px', borderRadius: '6px', fontWeight: 500 }}>
-              {matchedProducts.length} opciones seleccionadas
+            <span style={{ fontSize: '0.85rem', color: '#0284c7', background: '#f0f9ff', padding: '6px 14px', borderRadius: '999px', border: '1px solid #dbeafe', fontWeight: 600 }}>
+              ✨ {matchedProducts.length} opciones seleccionadas
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+          <div className="catalog-product-grid">
             {matchedProducts.map((product, idx) => (
               <ProductCard
                 key={product.id}
                 index={idx}
+                variant="card"
                 productSlug={product.slug}
                 item={{
                   heading: product.name,
@@ -217,20 +218,20 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
         </section>
 
         {/* ── SECCIÓN 2: CONSEJOS Y GUÍA DEL COMPRADOR ── */}
-        <section style={{ marginBottom: '56px', background: '#fafaf9', border: '1px solid #e7e5e4', padding: '36px', borderRadius: '16px' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1c1917', marginBottom: '20px' }}>
+        <section style={{ marginBottom: '56px', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '36px', borderRadius: '16px' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>
             Consejos para Acertar al 100%
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
             {content.tips.map((tip, idx) => (
-              <div key={idx} style={{ background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #e7e5e4' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#fef2f2', color: '#e11d48', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, marginBottom: '12px' }}>
+              <div key={idx} style={{ background: '#ffffff', padding: '22px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+                <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: '#fee2e2', color: '#e11d48', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.95rem', marginBottom: '14px' }}>
                   {idx + 1}
                 </div>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#292524', margin: '0 0 8px' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', margin: '0 0 8px' }}>
                   {tip.title}
                 </h3>
-                <p style={{ margin: 0, color: '#57534e', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                <p style={{ margin: 0, color: '#475569', fontSize: '0.9rem', lineHeight: 1.55 }}>
                   {tip.desc}
                 </p>
               </div>
@@ -239,23 +240,34 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
         </section>
 
         {/* ── SECCIÓN 3: PREGUNTAS FRECUENTES (FAQ) ── */}
-        <section style={{ marginBottom: '56px' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '20px' }}>
-            Preguntas Frecuentes ({content.faqs.length})
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {content.faqs.map((faq, i) => (
-              <div key={i} style={{ background: '#ffffff', padding: '20px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#0f172a', margin: '0 0 8px' }}>
-                  {faq.q}
-                </h3>
-                <p style={{ margin: 0, color: '#475569', lineHeight: 1.6, fontSize: '0.92rem' }}>
-                  {faq.a}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
+        {content.faqs && content.faqs.length > 0 && (
+          <section style={{ marginBottom: '56px' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>
+              Preguntas Frecuentes ({content.faqs.length})
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {content.faqs.map((faq, i) => (
+                <details
+                  key={i}
+                  style={{
+                    background: '#ffffff',
+                    padding: '16px 20px',
+                    borderRadius: '12px',
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                  }}
+                >
+                  <summary style={{ fontWeight: 600, fontSize: '1.02rem', color: '#0f172a', cursor: 'pointer' }}>
+                    {faq.q}
+                  </summary>
+                  <p style={{ margin: '12px 0 0', color: '#475569', lineHeight: 1.65, fontSize: '0.92rem' }}>
+                    {faq.a}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── SECCIÓN 4: ENLACES INTERNOS Y OTRAS GUÍAS RELACIONADAS ── */}
         <section style={{ marginBottom: '48px', borderTop: '1px solid #e2e8f0', paddingTop: '36px' }}>

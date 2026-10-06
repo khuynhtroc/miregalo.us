@@ -437,12 +437,13 @@ export default async function DynamicSlugPage({ params }: PageProps) {
 
           {/* Numbered Product List */}
           {post.items && post.items.length > 0 && (
-            <div className="article-content prose">
+            <div className="article-content">
               {post.items.map((item, idx) => (
                 <ProductCard
                   key={idx}
                   item={item}
                   index={idx}
+                  variant="row"
                 />
               ))}
             </div>

@@ -714,3 +714,441 @@
     height: 180px;
   }
 }
+
+/* ==========================================================================
+   MODERN UNIFIED PRODUCT CARDS (CATALOG GRID & ARTICLE ROW)
+   ========================================================================== */
+
+/* ── 1. Vertical Product Card (Catalog Grids) ── */
+.product-card.product-card-vertical {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 100% !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease !important;
+  position: relative !important;
+}
+
+.product-card.product-card-vertical:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Media Area (Top of vertical card) */
+.product-card-vertical .product-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  overflow: hidden;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.product-card-vertical .product-media-link {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.product-card-vertical .product-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-card.product-card-vertical:hover .product-img {
+  transform: scale(1.06);
+}
+
+/* Floating Badges */
+.product-card-vertical .product-badge-number {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  letter-spacing: 0.02em;
+}
+
+.product-card-vertical .product-badge-merchant {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #0369a1;
+  border: 1px solid #e0f2fe;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Body Area */
+.product-card-vertical .product-card-body {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.product-card-vertical .product-card-title {
+  margin: 0 0 10px !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.8em;
+}
+
+.product-card-vertical .product-card-title a {
+  color: #0f172a;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.product-card-vertical .product-card-title a:hover {
+  color: #e11d48;
+}
+
+/* Price & Merchant Row */
+.product-card-vertical .product-card-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.product-card-vertical .product-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #059669;
+  letter-spacing: -0.02em;
+}
+
+.product-card-vertical .product-status-tag {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #0284c7;
+  background: #f0f9ff;
+  border: 1px solid #e0f2fe;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+/* Description */
+.product-card-vertical .product-card-desc {
+  font-size: 0.88rem;
+  color: #475467;
+  line-height: 1.55;
+  margin: 0 0 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 4.1em;
+}
+
+/* Mini Pros */
+.product-card-vertical .product-card-pros {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.product-card-vertical .product-card-pros li {
+  font-size: 0.8rem;
+  color: #334155;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 1.35;
+}
+
+.product-card-vertical .product-card-pros .pro-icon {
+  color: #10b981;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* Pinned Actions */
+.product-card-vertical .product-card-actions {
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+/* Button CTA */
+.product-cta-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 0.92rem !important;
+  padding: 11px 18px !important;
+  border-radius: 10px !important;
+  text-decoration: none !important;
+  box-shadow: 0 2px 4px rgba(225, 29, 72, 0.15) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.product-cta-btn:hover {
+  background: linear-gradient(135deg, #be123c 0%, #9f1239 100%) !important;
+  box-shadow: 0 6px 16px rgba(225, 29, 72, 0.3) !important;
+  transform: translateY(-1px) !important;
+  color: #ffffff !important;
+}
+
+.product-cta-btn .cta-arrow {
+  transition: transform 0.2s ease;
+}
+
+.product-cta-btn:hover .cta-arrow {
+  transform: translateX(3px);
+}
+
+/* ── 2. Horizontal Product Card (Editorial Articles) ── */
+.product-card.product-card-horizontal {
+  display: block !important;
+  grid-template-columns: none !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  padding: 24px 26px !important;
+  margin: 36px 0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+.product-horizontal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.product-horizontal-number {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.88rem;
+  flex-shrink: 0;
+}
+
+.product-horizontal-title {
+  margin: 0 !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+}
+
+.product-horizontal-title a {
+  color: #0f172a;
+  text-decoration: none;
+}
+
+.product-horizontal-title a:hover {
+  color: #e11d48;
+}
+
+.product-horizontal-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.product-horizontal-media {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.product-horizontal-media a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.product-horizontal-media .product-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.product-horizontal-media:hover .product-img {
+  transform: scale(1.05);
+}
+
+.product-horizontal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-horizontal-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.product-horizontal-meta .product-price {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #059669;
+}
+
+.product-horizontal-meta .product-merchant-pill {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #0284c7;
+  background: #f0f9ff;
+  border: 1px solid #e0f2fe;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.product-horizontal-desc {
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+
+.product-horizontal-pros {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+
+.product-horizontal-pros .pros-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #166534;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.product-horizontal-pros ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.product-horizontal-pros li {
+  font-size: 0.88rem;
+  color: #15803d;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.product-horizontal-pros .pro-icon {
+  font-weight: 800;
+}
+
+.product-horizontal-cta {
+  display: inline-block;
+  max-width: 260px;
+}
+
+/* ── 3. Catalog Grid Layouts & Page Enhancements ── */
+.catalog-product-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)) !important;
+  gap: 28px !important;
+}
+
+@media (max-width: 900px) {
+  .catalog-product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
+    gap: 20px !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .catalog-product-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  .product-horizontal-body {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .product-horizontal-media {
+    max-width: 260px;
+    margin: 0 auto;
+  }
+  .product-horizontal-cta {
+    max-width: 100%;
+  }
+}

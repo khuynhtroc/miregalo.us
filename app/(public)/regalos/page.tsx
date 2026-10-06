@@ -198,11 +198,12 @@ export default async function RegalosSiloPage() {
           <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#1e293b', marginBottom: '20px' }}>
             Destacados del Mes: Los Regalos Más Populares
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+          <div className="catalog-product-grid">
             {productsRes.rows.map((product, idx) => (
               <ProductCard
                 key={product.id}
                 index={idx}
+                variant="card"
                 productSlug={product.slug}
                 item={{
                   heading: product.name,
@@ -219,20 +220,29 @@ export default async function RegalosSiloPage() {
         </section>
 
         {/* ── SECCIÓN 5: FAQ ACCORDION ── */}
-        <section style={{ background: '#f8fafc', padding: '36px', borderRadius: '16px', marginBottom: '48px' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b', marginBottom: '24px' }}>
+        <section style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '36px', borderRadius: '16px', marginBottom: '48px' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>
             Preguntas Frecuentes sobre el Catálogo de Regalos
           </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {faqs.map((faq, i) => (
-              <div key={i} style={{ background: '#ffffff', padding: '20px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#0f172a', margin: '0 0 8px' }}>
+              <details
+                key={i}
+                style={{
+                  background: '#ffffff',
+                  padding: '16px 20px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                }}
+              >
+                <summary style={{ fontWeight: 600, fontSize: '1.02rem', color: '#0f172a', cursor: 'pointer' }}>
                   {faq.q}
-                </h3>
-                <p style={{ margin: 0, color: '#475569', lineHeight: 1.6, fontSize: '0.95rem' }}>
+                </summary>
+                <p style={{ margin: '12px 0 0', color: '#475569', lineHeight: 1.65, fontSize: '0.92rem' }}>
                   {faq.a}
                 </p>
-              </div>
+              </details>
             ))}
           </div>
         </section>
