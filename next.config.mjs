@@ -18,6 +18,18 @@ const nextConfig = {
     return [
       { source: '/all-gifts', destination: '/regalos/', permanent: true },
       { source: '/gift-guides', destination: '/regalos/', permanent: true },
+      { source: '/contact', destination: '/contacto/', permanent: true },
+      { source: '/faq', destination: '/faqs/', permanent: true },
+      { source: '/privacy', destination: '/politica-de-privacidad/', permanent: true },
+      { source: '/privacy-policy', destination: '/politica-de-privacidad/', permanent: true },
+      { source: '/terms', destination: '/terminos-y-condiciones/', permanent: true },
+      { source: '/terms-and-conditions', destination: '/terminos-y-condiciones/', permanent: true },
+      { source: '/cookies', destination: '/politica-de-cookies/', permanent: true },
+      { source: '/cookie-policy', destination: '/politica-de-cookies/', permanent: true },
+      { source: '/about', destination: '/sobre-nosotros/', permanent: true },
+      { source: '/about-us', destination: '/sobre-nosotros/', permanent: true },
+      { source: '/affiliate', destination: '/divulgacion-de-afiliados/', permanent: true },
+      { source: '/affiliate-disclosure', destination: '/divulgacion-de-afiliados/', permanent: true },
     ];
   },
   async headers() {

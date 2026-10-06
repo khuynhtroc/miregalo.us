@@ -53,7 +53,7 @@ export function Header({ settings, categories }: HeaderProps) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             className="brand-logo"
-            src={settings.logo_url || '/images/loveable-logo.png'}
+            src={settings.logo_url || '/images/miregalo-logo.png'}
             alt={settings.site_name}
             width={1720}
             height={520}
@@ -238,11 +238,9 @@ export function Header({ settings, categories }: HeaderProps) {
           {/* Shop button */}
           <a
             className="button nav-shop"
-            href={settings.shop_url || 'https://loveable.us'}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={settings.shop_url || '/regalos/'}
           >
-            {settings.shop_label || 'Shop Loveable'}
+            {settings.shop_label || 'Explorar Regalos'}
           </a>
         </nav>
       </div>

@@ -14,7 +14,11 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: settings.site_description,
     icons: {
-      icon: settings.favicon_url || '/favicon.ico',
+      icon: [
+        { url: settings.favicon_url || '/favicon.png' },
+        { url: '/favicon.ico' },
+      ],
+      apple: '/apple-touch-icon.png',
     },
     verification: {
       google: settings.gsc_verification || undefined,
@@ -33,6 +37,8 @@ export default async function RootLayout({
   return (
     <html lang={settings.locale || 'es'}>
       <head>
+        <link rel="icon" type="image/png" href={settings.favicon_url || '/favicon.png'} />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <JsonLd data={[websiteSchema(settings), orgSchema(settings)]} />
         {settings.ga4_id && (
           <>

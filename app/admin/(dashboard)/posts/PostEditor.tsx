@@ -1113,7 +1113,7 @@ export function PostEditor({
               type="text"
               value={seoTitle}
               onChange={(e) => setSeoTitle(e.target.value)}
-              placeholder="Defaults to: Title | Loveable Blog"
+              placeholder="Defaults to: Title | Miregalo"
             />
           </div>
 

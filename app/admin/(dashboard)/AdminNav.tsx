@@ -21,6 +21,7 @@ export function AdminNav() {
     { href: '/admin/gsc/', label: 'GSC & SEO Opportunities', icon: '📈' },
     { href: '/admin/jobs/', label: 'Content Jobs Queue', icon: '⚙️' },
     { href: '/admin/posts/', label: 'Articles & Guides', icon: '📝' },
+    { href: '/admin/pages/', label: 'Pages (FAQs, Policy...)', icon: '📄' },
     { href: '/admin/media/', label: 'Media & Cloud Storage', icon: '📁' },
     { href: '/admin/affiliate-links/', label: 'Affiliate Networks & Sync', icon: '🔗' },
     { href: '/admin/products/', label: 'Affiliate Products', icon: '🛍️' },

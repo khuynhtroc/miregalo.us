@@ -20,7 +20,7 @@ export default async function AdminDashboardLayout({
       <aside className="admin-sidebar">
         <div className="admin-brand">
           <div>
-            <strong>Loveable Blog</strong>
+            <strong>Miregalo</strong>
           </div>
           <span>Admin</span>
         </div>

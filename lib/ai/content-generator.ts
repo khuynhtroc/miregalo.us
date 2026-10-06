@@ -121,7 +121,7 @@ function generateWithTemplateEngine(
       url: '/go/leather-travel-wallet/',
       button_label: 'Ver en Tienda',
       price: '55,00 €',
-      merchant: 'Loveable Store',
+      merchant: 'Miregalo Store',
       description_html: `<p>El equilibrio perfecto entre funcionalidad y elegancia. Fabricado en piel genuina suave con costuras reforzadas para durar muchos años.</p>`,
       pros: ['Piel auténtica de primera calidad', 'Múltiples compartimentos prácticos', 'Envejece ganando belleza y carácter'],
     },
@@ -131,14 +131,14 @@ function generateWithTemplateEngine(
       url: '/go/photo-memory-blanket/',
       button_label: 'Ver en Tienda',
       price: '49,90 €',
-      merchant: 'Loveable Store',
+      merchant: 'Miregalo Store',
       description_html: `<p>Un abrazo cálido en forma de regalo. Esta manta de felpa de tacto sedoso es perfecta para las tardes de relax en el sofá.</p>`,
       pros: ['Tejido extrasuave y transpirable', 'Lavable a máquina sin perder color', 'Mensaje emotivo impreso en alta definición'],
     },
     {
       heading: `Set de Experiencias Gourmet para Degustación`,
       image: 'https://storage.googleapis.com/loveable.appspot.com/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
-      url: 'https://loveable.us',
+      url: 'https://miregalo.us',
       button_label: 'Ver en Tienda',
       price: '59,00 €',
       merchant: 'Gourmet Selection',
@@ -185,7 +185,7 @@ function generateWithTemplateEngine(
     content_html,
     items: isGift ? items : [],
     faqs,
-    seo_title: `${title.slice(0, 55)} | Loveable Blog`,
+    seo_title: `${title.slice(0, 55)} | Miregalo`,
     seo_description: excerpt.slice(0, 155),
     hero_image: items[0]?.image || 'https://storage.googleapis.com/loveable.appspot.com/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
     hero_alt: title,
@@ -235,7 +235,7 @@ export async function generateContent(req: GenerationRequest): Promise<Generated
 
   // 3. Try Gemini API generation if key is configured
   const prompt = `
-Eres un editor senior y experto en SEO y redacción de contenidos en español para la web "Loveable Blog".
+Eres un editor senior y experto en SEO y redacción de contenidos en español para la web "Miregalo".
 Tu tarea es generar un artículo de regalo (Gift Guide o Blog Post) de altísima calidad en ESPAÑOL NATIVO.
 
 DATOS DE ENTRADA:
@@ -255,7 +255,7 @@ REGLAS ESTRICTAS:
    - "description_html": Párrafo de reseña en español explicando por qué es genial.
    - "pros": Array de 3 a 4 ventajas en español.
    - "price": Precio estimado en euros (ej: "39,99 €").
-   - "merchant": Nombre de tienda ("Loveable Store", "Amazon", "Etsy", etc.).
+   - "merchant": Nombre de tienda ("Miregalo Store", "Amazon", "Etsy", etc.).
    - "button_label": "Ver en Tienda" o "Comprar ahora".
 6. CONTENT_HTML: Sección de guía de compra en HTML (etiquetas <h2>, <h3>, <p>, <ul>, <li>) con consejos expertos.
 7. FAQS: 3 preguntas frecuentes con respuestas útiles en español.
@@ -287,7 +287,7 @@ DEVUELVE ÚNICAMENTE UN OBJETO JSON VÁLIDO con la siguiente estructura:
   try {
     const aiText = await callGemini({
       prompt,
-      systemInstruction: 'Eres un redactor experto en SEO y regalos para la plataforma Loveable Blog. Respondes siempre en JSON válido en español.',
+      systemInstruction: 'Eres un redactor experto en SEO y regalos para la plataforma Miregalo. Respondes siempre en JSON válido en español.',
       responseMimeType: 'application/json',
     });
 
@@ -299,7 +299,7 @@ DEVUELVE ÚNICAMENTE UN OBJETO JSON VÁLIDO con la siguiente estructura:
           slug,
           type: postType,
           excerpt: parsed.excerpt || '',
-          seo_title: parsed.seo_title || `${parsed.title.slice(0, 55)} | Loveable Blog`,
+          seo_title: parsed.seo_title || `${parsed.title.slice(0, 55)} | Miregalo`,
           seo_description: parsed.seo_description || parsed.excerpt?.slice(0, 155),
           intro_html: parsed.intro_html || '',
           content_html: parsed.content_html || '',
@@ -323,7 +323,7 @@ DEVUELVE ÚNICAMENTE UN OBJETO JSON VÁLIDO con la siguiente estructura:
       description_html: `<p>${it.description}</p>`,
       pros: it.pros.length > 0 ? it.pros : ['Diseño exclusivo y de calidad', 'Personalización garantizada', 'Envío rápido'],
       price: it.price || '45,00 €',
-      merchant: it.merchant || 'Loveable Store',
+      merchant: it.merchant || 'Miregalo Store',
       button_label: 'Ver en Tienda',
     }));
 

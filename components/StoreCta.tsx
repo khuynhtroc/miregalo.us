@@ -6,8 +6,8 @@ interface StoreCtaProps {
 }
 
 export function StoreCta({ settings, variant = 'banner' }: StoreCtaProps) {
-  const shopUrl = settings.shop_url || 'https://loveable.us';
-  const shopLabel = settings.shop_label || 'Tienda Loveable';
+  const shopUrl = settings.shop_url || '/regalos/';
+  const shopLabel = settings.shop_label || 'Explorar Catálogo';
 
   if (variant === 'in-article') {
     return (

@@ -62,8 +62,8 @@ export default function AdminLoginPage() {
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/loveable-logo.png"
-            alt="Loveable Blog"
+            src="/images/miregalo-logo.png"
+            alt="Miregalo"
             style={{ height: '44px', margin: '0 auto 14px' }}
           />
           <h2 style={{ margin: 0, fontSize: '1.4rem', color: '#171a35' }}>Admin Portal</h2>

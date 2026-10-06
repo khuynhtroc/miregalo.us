@@ -8,7 +8,7 @@ interface FooterProps {
 
 export function Footer({ settings, categories }: FooterProps) {
   const currentYear = new Date().getFullYear().toString();
-  const copyright = (settings.copyright || '© {year} Loveable LLC').replace('{year}', currentYear);
+  const copyright = (settings.copyright || '© {year} Miregalo. Todos los derechos reservados.').replace('{year}', currentYear);
 
   const recipients = categories.filter((c) => c.group === 'recipients' && c.show_in_footer).slice(0, 6);
   const occasions = categories.filter((c) => c.group === 'occasions' && c.show_in_footer).slice(0, 6);
@@ -22,21 +22,19 @@ export function Footer({ settings, categories }: FooterProps) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               className="brand-logo footer-logo"
-              src={settings.logo_url || '/images/loveable-logo.png'}
+              src={settings.logo_url || '/images/miregalo-logo.png'}
               alt={settings.site_name}
               width={1720}
               height={520}
             />
           </Link>
-          <p>{settings.footer_about || 'Ideas y guías de regalos para cada persona, relación y momento significativo.'}</p>
-          <a
+          <p>{settings.footer_about || 'Miregalo es tu portal de referencia para encontrar regalos originales, personalizados y emotivos para cada ocasión especial.'}</p>
+          <Link
             className="footer-store-link"
-            href={settings.shop_url || 'https://loveable.us'}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={settings.shop_url || '/regalos/'}
           >
-            Visitar Tienda Loveable <span aria-hidden="true">→</span>
-          </a>
+            {settings.shop_label || 'Explorar Catálogo de Regalos'} <span aria-hidden="true">→</span>
+          </Link>
         </div>
 
         <div className="footer-column">
@@ -73,19 +71,26 @@ export function Footer({ settings, categories }: FooterProps) {
         </div>
 
         <div className="footer-column">
-          <span className="footer-heading">Explorar</span>
-          <Link href="/regalos/">Catálogo de Regalos</Link>
-          <Link href="/intereses/">Intereses</Link>
-          <Link href="/search/">Buscar</Link>
-          <Link href="/rss.xml">Canal RSS</Link>
-          <a href={settings.contact_url || 'https://loveable.us/pages/contact-us'} target="_blank" rel="noopener noreferrer">
-            Contacto
-          </a>
+          <span className="footer-heading">Miregalo</span>
+          <Link href="/sobre-nosotros/">Sobre Nosotros</Link>
+          <Link href="/contacto/">Contacto</Link>
+          <Link href="/faqs/">Preguntas Frecuentes</Link>
+          <Link href="/politica-de-privacidad/">Política de Privacidad</Link>
+          <Link href="/terminos-y-condiciones/">Términos y Condiciones</Link>
+          <Link href="/politica-de-cookies/">Política de Cookies</Link>
+          <Link href="/divulgacion-de-afiliados/">Aviso de Afiliados</Link>
         </div>
       </div>
 
       <div className="container footer-bottom">
         <span>{copyright}</span>
+        <div style={{ display: 'flex', gap: '16px', fontSize: '0.82rem', flexWrap: 'wrap' }}>
+          <Link href="/politica-de-privacidad/">Privacidad</Link>
+          <Link href="/terminos-y-condiciones/">Términos</Link>
+          <Link href="/faqs/">FAQs</Link>
+          <Link href="/contacto/">Contacto</Link>
+          <Link href="/search/">Buscar</Link>
+        </div>
         <span>{settings.footer_tagline || 'Ideas desde el corazón, hechas para compartir.'}</span>
       </div>
     </footer>

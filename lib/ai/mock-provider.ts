@@ -62,11 +62,11 @@ export class MockAiProvider implements AiProvider {
           heading: 'Set Experiencia Gourmet Relajación y Bienestar',
           image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&auto=format&fit=crop&q=80',
           price: '45,00 €',
-          merchant: 'Loveable Store',
-          url: 'https://loveable.us?ref=blog-es',
+          merchant: 'Miregalo Store',
+          url: 'https://miregalo.us?ref=blog-es',
           description_html: '<p>Pack completo de autocuidado y relajación con aromas naturales y aceites esenciales de primera calidad.</p>',
           pros: ['Aromaterapia 100% natural', 'Caja regalo de madera', 'Valoración 4.9/5'],
-          button_label: 'Ver en Loveable Store',
+          button_label: 'Ver en Miregalo Store',
         },
       ],
       faqs: [
@@ -80,7 +80,7 @@ export class MockAiProvider implements AiProvider {
         },
         {
           q: `¿Se puede incluir una tarjeta con mensaje personalizado?`,
-          a: `Sí, tanto Amazon como las tiendas colaboradoras permiten añadir envoltorio para regalo y tarjeta con dedicatoria personalizada.`,
+          a: `Sí, tanto Amazon como las tiendas colaboradoras permiten añadir envoltorio para regalo và tarjeta con dedicatoria personalizada.`,
         },
       ],
       internal_links: [
@@ -93,7 +93,7 @@ export class MockAiProvider implements AiProvider {
           target_url: '/regalos/originales/',
         },
       ],
-      seo_title: `${title.slice(0, 55)} | Loveable Blog`,
+      seo_title: `${title.slice(0, 55)} | Miregalo`,
       seo_description: excerpt.slice(0, 155),
       hero_image: 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=1200&auto=format&fit=crop&q=80',
       hero_alt: `Guía de ${keyword}`,

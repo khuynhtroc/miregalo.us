@@ -9,8 +9,8 @@ export default function NotFound() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               className="brand-logo"
-              src="/images/loveable-logo.png"
-              alt="Loveable Blog"
+              src="/images/miregalo-logo.png"
+              alt="Miregalo"
               width={1720}
               height={520}
             />

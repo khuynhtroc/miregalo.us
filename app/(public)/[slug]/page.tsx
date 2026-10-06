@@ -29,6 +29,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Pagination } from '@/components/Pagination';
 import { StoreCta } from '@/components/StoreCta';
 import { JsonLd } from '@/components/JsonLd';
+import { ContactForm } from '@/components/ContactForm';
 import { fmtDate } from '@/lib/format';
 
 interface PageProps {
@@ -218,19 +219,124 @@ export default async function DynamicSlugPage({ params }: PageProps) {
 
   // 2A: STATIC PAGE
   if (post.type === 'page') {
+    const isContactPage = post.slug === 'contacto' || post.slug === 'contact';
+    const staticNavPages = [
+      { slug: 'sobre-nosotros', title: 'Sobre Nosotros', icon: '✨' },
+      { slug: 'contacto', title: 'Contacto', icon: '✉️' },
+      { slug: 'faqs', title: 'Preguntas Frecuentes', icon: '❓' },
+      { slug: 'politica-de-privacidad', title: 'Política de Privacidad', icon: '🔒' },
+      { slug: 'terminos-y-condiciones', title: 'Términos y Condiciones', icon: '📜' },
+      { slug: 'politica-de-cookies', title: 'Política de Cookies', icon: '🍪' },
+      { slug: 'divulgacion-de-afiliados', title: 'Divulgación de Afiliados', icon: '⚖️' },
+    ];
+
+    const breadcrumbs = [{ name: 'Inicio', path: '/' }, { name: post.title }];
+
     return (
       <>
         <JsonLd
           data={[
-            breadcrumbSchema([{ name: post.title }]),
+            breadcrumbSchema(breadcrumbs),
             blogPostingSchema(settings, post, null),
-          ]}
+            post.faqs && post.faqs.length > 0 ? faqSchema(post.faqs) : null,
+          ].filter(Boolean)}
         />
-        <Breadcrumbs crumbs={[{ name: post.title }]} />
-        <article className="container static-page" style={{ paddingBottom: '80px' }}>
-          <h1>{post.title}</h1>
-          <div className="prose" style={{ marginTop: '24px' }} dangerouslySetInnerHTML={{ __html: post.content_html }} />
-        </article>
+        <Breadcrumbs crumbs={breadcrumbs} />
+        <div className="container article-layout" style={{ paddingTop: '28px', paddingBottom: '80px' }}>
+          <article className="article-main" data-pagefind-body>
+            <header className="article-header" style={{ marginBottom: '28px' }}>
+              <span className="eyebrow">Miregalo · Información y Legal</span>
+              <h1 data-pagefind-meta="title" style={{ margin: '8px 0 16px' }}>
+                {post.title}
+              </h1>
+              {post.excerpt && <p className="article-deck">{post.excerpt}</p>}
+              <div className="article-date" style={{ color: 'var(--muted)', marginTop: '8px' }}>
+                Actualizado el {fmtDate(post.updated_at || post.published_at || post.created_at)}
+              </div>
+            </header>
+
+            {post.intro_html && (
+              <div
+                className="article-content prose"
+                style={{ marginBottom: '28px' }}
+                dangerouslySetInnerHTML={{ __html: post.intro_html }}
+              />
+            )}
+
+            {isContactPage && <ContactForm />}
+
+            {post.content_html && (
+              <div
+                className="article-content prose"
+                style={{ marginTop: isContactPage ? '36px' : '0' }}
+                dangerouslySetInnerHTML={{ __html: post.content_html }}
+              />
+            )}
+
+            {post.faqs && post.faqs.length > 0 && (
+              <section style={{ marginTop: '48px' }}>
+                <h2>Preguntas Frecuentes</h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
+                  {post.faqs.map((faq, idx) => (
+                    <details
+                      key={idx}
+                      style={{
+                        border: '1px solid var(--line)',
+                        borderRadius: '12px',
+                        padding: '16px 20px',
+                        background: '#fff',
+                      }}
+                    >
+                      <summary style={{ fontWeight: 600, cursor: 'pointer', color: 'var(--ink)' }}>
+                        {faq.q}
+                      </summary>
+                      <div
+                        style={{ marginTop: '10px', color: 'var(--muted)', fontSize: '0.94rem' }}
+                        dangerouslySetInnerHTML={{ __html: faq.a }}
+                      />
+                    </details>
+                  ))}
+                </div>
+              </section>
+            )}
+          </article>
+
+          {/* Static Pages Navigation Sidebar */}
+          <aside className="article-aside">
+            <div className="aside-related" style={{ padding: '20px' }}>
+              <p className="aside-title" style={{ fontSize: '0.95rem' }}>
+                Páginas de Miregalo
+              </p>
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '6px', listStyle: 'none', padding: 0 }}>
+                {staticNavPages.map((pg) => {
+                  const isCurrent = post.slug === pg.slug;
+                  return (
+                    <li key={pg.slug}>
+                      <Link
+                        href={`/${pg.slug}/`}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          fontWeight: isCurrent ? 700 : 500,
+                          background: isCurrent ? 'var(--wash, #fff8f9)' : 'transparent',
+                          color: isCurrent ? 'var(--pink-dark, #c92f49)' : 'var(--ink, #20212a)',
+                          textDecoration: 'none',
+                          border: isCurrent ? '1px solid #ffd6dc' : '1px solid transparent',
+                        }}
+                      >
+                        <span>{pg.icon}</span>
+                        <span>{pg.title}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </aside>
+        </div>
         <StoreCta settings={settings} />
       </>
     );

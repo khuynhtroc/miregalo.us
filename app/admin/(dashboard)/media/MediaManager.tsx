@@ -919,7 +919,7 @@ export function MediaManager({
                         cloudflare: { ...settingsForm.cloudflare!, public_domain: e.target.value },
                       })
                     }
-                    placeholder="https://cdn.loveable.us"
+                    placeholder="https://cdn.miregalo.us"
                     className="form-input"
                   />
                 </div>

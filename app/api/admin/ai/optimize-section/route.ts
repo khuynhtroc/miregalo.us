@@ -153,7 +153,7 @@ export async function POST(req: Request) {
 
       case 'seo_meta': {
         const cleanTopic = baseTopic.slice(0, 35);
-        const seoTitle = `${title.slice(0, 48)} | Loveable Blog`.slice(0, 60);
+        const seoTitle = `${title.slice(0, 48)} | Miregalo`.slice(0, 60);
         const seoDescription = `Descubre los mejores regalos para ${cleanTopic}. Guía probada con ideas originales, detalles personalizados y precios actualizados en EUR.`.slice(0, 155);
         const resolvedKeyword = focusKeyword || `regalos ${cleanTopic}`.toLowerCase().slice(0, 35);
 
