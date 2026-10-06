@@ -17,6 +17,11 @@ function sb(): SupabaseClient {
   return client;
 }
 
+function isTableMissingError(error: any): boolean {
+  if (!error) return false;
+  return error.code === 'PGRST205' || (typeof error.message === 'string' && error.message.includes('Could not find the table'));
+}
+
 function fail(error: { message: string } | null, ctx: string) {
   if (error) throw new Error(`[supabase] ${ctx}: ${error.message}`);
 }
@@ -39,14 +44,26 @@ export const supabaseDriver: Driver = {
       query = query.range(from, from + q.limit - 1);
     }
     const { data, error, count } = await query;
-    fail(error, `find ${table}`);
+    if (error) {
+      if (isTableMissingError(error)) {
+        console.warn(`[supabase] Warning: Table "${table}" not found in schema cache. Returning empty list.`);
+        return { rows: [] as never, total: 0 };
+      }
+      fail(error, `find ${table}`);
+    }
     return { rows: (data ?? []) as never, total: count ?? 0 };
   },
   async findOne(table, eq) {
     let query = sb().from(table).select('*');
     for (const [k, v] of Object.entries(eq)) query = query.eq(k, v);
     const { data, error } = await query.limit(1).maybeSingle();
-    fail(error, `findOne ${table}`);
+    if (error) {
+      if (isTableMissingError(error)) {
+        console.warn(`[supabase] Warning: Table "${table}" not found in schema cache. Returning null.`);
+        return null as never;
+      }
+      fail(error, `findOne ${table}`);
+    }
     return (data ?? null) as never;
   },
   async insert(table, row) {
@@ -74,7 +91,10 @@ export const supabaseDriver: Driver = {
   },
   async getSetting(key) {
     const { data, error } = await sb().from('settings').select('value').eq('key', key).maybeSingle();
-    fail(error, `getSetting ${key}`);
+    if (error) {
+      if (isTableMissingError(error)) return null as never;
+      fail(error, `getSetting ${key}`);
+    }
     return (data?.value ?? null) as never;
   },
   async setSetting(key, value) {

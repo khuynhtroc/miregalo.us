@@ -33,7 +33,13 @@ async function upsert(table, rows, onConflict = 'id', batchSize = 200) {
   for (let i = 0; i < rows.length; i += batchSize) {
     const chunk = rows.slice(i, i + batchSize);
     const { error } = await sb.from(table).upsert(chunk, { onConflict });
-    if (error) throw new Error(`${table} [${i}..${i + chunk.length}]: ${error.message}`);
+    if (error) {
+      if (error.code === 'PGRST205' || error.message.includes('Could not find the table')) {
+        console.warn(`   ⚠️ Table "${table}" does not exist in Supabase schema cache yet. Skipping.`);
+        return;
+      }
+      throw new Error(`${table} [${i}..${i + chunk.length}]: ${error.message}`);
+    }
     process.stdout.write(`\r   Progress: ${Math.min(i + batchSize, rows.length)}/${rows.length}`);
   }
   console.log(`\n✓ ${table}: ${rows.length} rows synced successfully`);
@@ -148,6 +154,21 @@ const sanitizedRedirects = (data.redirects || []).map(r => {
   return pick(row, REDIRECT_COLS);
 });
 
+// 8. Admin & Catalog tables
+const CATALOG_URL_COLS = ['id', 'url', 'page_title', 'url_type', 'parent_url', 'priority', 'status', 'notes', 'meta_description', 'h1', 'created_at', 'updated_at'];
+const MERCHANT_COLS = ['id', 'name', 'slug', 'website_url', 'affiliate_network', 'affiliate_param', 'commission_rate', 'active', 'created_at', 'updated_at'];
+const GSC_OPP_COLS = ['id', 'type', 'query', 'page', 'impressions', 'clicks', 'current_position', 'expected_ctr', 'actual_ctr', 'potential_clicks', 'action_recommended', 'status', 'created_at', 'updated_at'];
+const MEDIA_COLS = ['id', 'name', 'original_name', 'url', 'storage_provider', 'size_bytes', 'mime_type', 'width', 'height', 'alt_text', 'remote_key', 'synced_to_cloud', 'used_in', 'created_at', 'updated_at'];
+const STORAGE_COLS = ['id', 'provider', 'cloudflare', 'supabase', 'auto_sync', 'last_synced_at', 'created_at', 'updated_at'];
+const ANALYTICS_COLS = ['id', 'period', 'total_sessions', 'total_users', 'total_pageviews', 'bounce_rate', 'avg_session_duration', 'ga4_measurement_id', 'gsc_property', 'last_updated', 'channels', 'top_landing_pages', 'device_split', 'geo_split', 'created_at', 'updated_at'];
+
+const sanitizedCatalogUrls = (data.catalog_urls || []).map(c => pick(c, CATALOG_URL_COLS));
+const sanitizedMerchants = (data.merchants || []).map(m => pick(m, MERCHANT_COLS));
+const sanitizedGscOpps = (data.gsc_opportunities || []).map(g => pick(g, GSC_OPP_COLS));
+const sanitizedMedia = (data.media || []).map(m => pick(m, MEDIA_COLS));
+const sanitizedStorage = (data.storage_settings || []).map(s => pick(s, STORAGE_COLS));
+const sanitizedAnalytics = (data.analytics || []).map(a => pick(a, ANALYTICS_COLS));
+
 // Execute in foreign-key dependency order
 await upsert('authors', sanitizedAuthors, 'id', 100);
 await upsert('categories', sanitizedCategories, 'id', 100);
@@ -155,6 +176,13 @@ await upsert('products', sanitizedProducts, 'id', 300);
 await upsert('posts', sanitizedPosts, 'id', 50);
 await upsert('redirects', sanitizedRedirects, 'id', 500);
 await upsert('keywords', sanitizedKeywords, 'id', 200);
+await upsert('catalog_urls', sanitizedCatalogUrls, 'id', 200);
+await upsert('merchants', sanitizedMerchants, 'id', 100);
+await upsert('gsc_opportunities', sanitizedGscOpps, 'id', 100);
+await upsert('media', sanitizedMedia, 'id', 100);
+await upsert('storage_settings', sanitizedStorage, 'id', 10);
+await upsert('analytics', sanitizedAnalytics, 'id', 10);
+
 for (const [k, v] of Object.entries(data.settings ?? {})) {
   const { error } = await sb.from('settings').upsert({ key: k, value: v }, { onConflict: 'key' });
   if (error) throw new Error(`settings: ${error.message}`);
