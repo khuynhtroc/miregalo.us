@@ -54,6 +54,24 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const updated = await saveAffiliateSettings(body);
+
+    // Keep SiteSettings in sync
+    try {
+      const site = await db.getSetting<any>('site');
+      if (site) {
+        await db.setSetting('site', {
+          ...site,
+          amazon_associates_tag: updated.platforms?.amazon?.tagOrId ?? site.amazon_associates_tag,
+          awin_affiliate_id: updated.platforms?.awin?.tagOrId ?? site.awin_affiliate_id,
+          ebay_campaign_id: updated.platforms?.ebay?.tagOrId ?? site.ebay_campaign_id,
+          walmart_partner_id: updated.platforms?.walmart?.tagOrId ?? site.walmart_partner_id,
+          default_affiliate_strategy: updated.defaultStrategy ?? site.default_affiliate_strategy,
+        });
+      }
+    } catch (e) {
+      console.warn('Sync site settings error:', e);
+    }
+
     return NextResponse.json({ success: true, settings: updated });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Invalid request';

@@ -227,6 +227,11 @@ export interface SiteSettings {
   robots_extra: string;
   noindex_site: boolean;
   google_search_cx?: string;
+  amazon_associates_tag?: string;
+  awin_affiliate_id?: string;
+  ebay_campaign_id?: string;
+  walmart_partner_id?: string;
+  default_affiliate_strategy?: string;
 }
 
 export interface ContentJob {

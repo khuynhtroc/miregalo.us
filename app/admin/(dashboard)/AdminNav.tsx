@@ -23,14 +23,12 @@ export function AdminNav() {
     { href: '/admin/posts/', label: 'Articles & Guides', icon: '📝' },
     { href: '/admin/pages/', label: 'Pages (FAQs, Policy...)', icon: '📄' },
     { href: '/admin/media/', label: 'Media & Cloud Storage', icon: '📁' },
-    { href: '/admin/affiliate-links/', label: 'Affiliate Networks & Sync', icon: '🔗' },
     { href: '/admin/products/', label: 'Affiliate Products', icon: '🛍️' },
-    { href: '/admin/merchants/', label: 'Merchants & Networks', icon: '🏪' },
     { href: '/admin/generator/', label: 'AI Generator Studio', icon: '⚡' },
     { href: '/admin/categories/', label: 'Categories', icon: '🗂️' },
     { href: '/admin/authors/', label: 'Authors', icon: '✍️' },
     { href: '/admin/redirects/', label: 'Redirects', icon: '🔀' },
-    { href: '/admin/settings/', label: 'Settings', icon: '⚙️' },
+    { href: '/admin/settings/', label: 'Settings (All Configurations)', icon: '⚙️' },
   ];
 
   return (

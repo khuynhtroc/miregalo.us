@@ -155,7 +155,7 @@ export function ProductManager({ initialProducts, merchants = [], totalCount }: 
 
         <div style={{ display: 'flex', gap: '10px' }}>
           <Link
-            href="/admin/affiliate-links/"
+            href="/admin/settings/?tab=affiliate"
             className="btn-secondary"
             style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
           >
