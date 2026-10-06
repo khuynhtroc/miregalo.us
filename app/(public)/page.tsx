@@ -54,7 +54,10 @@ export default async function HomePage() {
   // Blog topic grouping for the 5 columns
   const blogPostsByCat = new Map<string, Post[]>();
   for (const bp of blogRes.rows) {
-    for (const cid of bp.category_ids) {
+    const cids = Array.isArray(bp.category_ids) && bp.category_ids.length > 0
+      ? bp.category_ids
+      : (bp.primary_category_id ? [bp.primary_category_id] : []);
+    for (const cid of cids) {
       const list = blogPostsByCat.get(cid) || [];
       list.push(bp);
       blogPostsByCat.set(cid, list);

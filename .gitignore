@@ -8,6 +8,8 @@ next-env.d.ts
 data/db.json
 data/seed.json
 data/scraped-cache.json
+data/full-scraped-articles.json
+data/translated-articles-cache.json
 scratch/
 npm-debug.log*
 .DS_Store

@@ -92,10 +92,7 @@ function buildIndexes(db: DB): LocalDbIndexes {
   for (const a of (db.authors || [])) {
     if (a.id) indexes.authorsById.set(String(a.id), a);
   }
-  for (const prod of (db.products || [])) {
-    if (prod.id) indexes.productsById.set(String(prod.id), prod);
-    if (prod.slug) indexes.productsBySlug.set(String(prod.slug), prod);
-  }
+  // Products are indexed lazily on demand to keep heap memory small
 
   g.__indexes = indexes;
   return indexes;

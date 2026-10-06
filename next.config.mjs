@@ -15,7 +15,6 @@ const nextConfig = {
     return [
       { source: '/all-gifts', destination: '/regalos/', permanent: true },
       { source: '/gift-guides', destination: '/regalos/', permanent: true },
-      { source: '/blog', destination: '/regalos/', permanent: true },
     ];
   },
   async headers() {

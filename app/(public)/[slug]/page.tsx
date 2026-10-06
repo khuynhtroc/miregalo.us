@@ -57,6 +57,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (post) {
     return postMetadata(settings, post);
   }
+  const blogPost = await getPublishedPost('blog', slug);
+  if (blogPost) {
+    return postMetadata(settings, blogPost);
+  }
 
   return {};
 }
@@ -194,6 +198,10 @@ export default async function DynamicSlugPage({ params }: PageProps) {
   // ─────────────────────────────────────────────────────────────
   const post = await getPublishedPost(['gift', 'page'], slug);
   if (!post) {
+    const blogPost = await getPublishedPost('blog', slug);
+    if (blogPost) {
+      return permanentRedirect(`/blog/${slug}/`);
+    }
     const redirectRule =
       (await db.findOne('redirects', { source: `/${slug}/`, active: true })) ||
       (await db.findOne('redirects', { source: `/${slug}`, active: true }));
