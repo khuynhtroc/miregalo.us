@@ -39,13 +39,122 @@ async function upsert(table, rows, onConflict = 'id', batchSize = 200) {
   console.log(`\n✓ ${table}: ${rows.length} rows synced successfully`);
 }
 
-// order matters for foreign keys
-await upsert('authors', data.authors, 'id', 100);
-await upsert('categories', data.categories, 'id', 100);
-await upsert('products', data.products, 'id', 150);
-await upsert('posts', data.posts, 'id', 40);
-await upsert('redirects', data.redirects, 'id', 400);
-await upsert('keywords', data.keywords, 'id', 200);
+// 1. Whitelist helper
+function pick(obj, keys) {
+  const res = {};
+  for (const k of keys) {
+    if (obj[k] !== undefined) res[k] = obj[k];
+  }
+  return res;
+}
+
+const AUTHOR_COLS = ['id', 'slug', 'name', 'entity_type', 'job_title', 'bio_html', 'avatar', 'email', 'website', 'same_as', 'created_at', 'updated_at'];
+const CATEGORY_COLS = ['id', 'slug', 'name', 'group', 'eyebrow', 'short_intro', 'description_html', 'hero_image', 'seo_title', 'seo_description', 'sort_order', 'show_in_nav', 'show_in_footer', 'quick_link', 'created_at', 'updated_at'];
+const PRODUCT_COLS = ['id', 'slug', 'name', 'url', 'merchant', 'image', 'price', 'currency', 'description', 'tags', 'clicks', 'active', 'created_at', 'updated_at'];
+const POST_COLS = ['id', 'type', 'slug', 'title', 'excerpt', 'intro_html', 'content_html', 'items', 'faqs', 'hero_image', 'hero_alt', 'primary_category_id', 'category_ids', 'author_id', 'status', 'featured', 'editor_pick', 'focus_keyword', 'seo_title', 'seo_description', 'canonical_url', 'robots', 'og_image', 'published_at', 'created_at', 'updated_at'];
+const REDIRECT_COLS = ['id', 'source', 'destination', 'code', 'hits', 'active', 'created_at', 'updated_at'];
+const KEYWORD_COLS = ['id', 'keyword', 'target_path', 'post_type', 'cluster', 'intent', 'volume', 'difficulty', 'priority', 'status', 'post_id', 'notes', 'created_at', 'updated_at'];
+
+// 2. Authors
+const defaultAuthorId = data.authors?.[0]?.id || '4fc3159d-3e02-4d51-8929-68c3818776b8';
+const authorIds = new Set(data.authors?.map(a => a.id) || []);
+const rawAuthors = [...(data.authors || [])];
+if (!authorIds.has('a91e5d32-949f-43e6-95b2-3e28406f0e4b')) {
+  rawAuthors.push({
+    ...rawAuthors[0],
+    id: 'a91e5d32-949f-43e6-95b2-3e28406f0e4b',
+    slug: 'equipo-editorial'
+  });
+}
+const sanitizedAuthors = rawAuthors.map(a => pick(a, AUTHOR_COLS));
+
+// 3. Categories
+const sanitizedCategories = (data.categories || []).map(c => pick(c, CATEGORY_COLS));
+
+// 4. Products
+const sanitizedProducts = (data.products || []).map(p => {
+  const row = {
+    ...p,
+    currency: p.currency || 'EUR',
+    price: p.price || '',
+    url: p.url || '',
+    merchant: p.merchant || '',
+    image: p.image || '',
+    description: p.description || '',
+    tags: Array.isArray(p.tags) ? p.tags : [],
+    clicks: typeof p.clicks === 'number' ? p.clicks : 0,
+    active: p.active !== false,
+  };
+  return pick(row, PRODUCT_COLS);
+});
+
+// 5. Posts (Deduplicate by type:slug)
+const validAuthorIds = new Set(sanitizedAuthors.map(a => a.id));
+const postsMap = new Map();
+for (const p of (data.posts || [])) {
+  const author_id = validAuthorIds.has(p.author_id) ? p.author_id : defaultAuthorId;
+  const row = {
+    ...p,
+    author_id,
+    excerpt: p.excerpt || '',
+    intro_html: p.intro_html || '',
+    content_html: p.content_html || '',
+    items: Array.isArray(p.items) ? p.items : [],
+    faqs: Array.isArray(p.faqs) ? p.faqs : [],
+    hero_image: p.hero_image || '',
+    hero_alt: p.hero_alt || '',
+    category_ids: Array.isArray(p.category_ids) ? p.category_ids : [],
+    featured: !!p.featured,
+    editor_pick: !!p.editor_pick,
+    focus_keyword: p.focus_keyword || '',
+    seo_title: p.seo_title || '',
+    seo_description: p.seo_description || '',
+    canonical_url: p.canonical_url || '',
+    robots: p.robots || 'index,follow',
+    og_image: p.og_image || '',
+  };
+  const key = `${row.type || 'gift'}:${row.slug}`;
+  postsMap.set(key, pick(row, POST_COLS));
+}
+const sanitizedPosts = Array.from(postsMap.values());
+
+// 6. Keywords
+const postIds = new Set(sanitizedPosts.map(p => p.id));
+const sanitizedKeywords = (data.keywords || []).map(k => {
+  const post_id = k.post_id && postIds.has(k.post_id) ? k.post_id : null;
+  const row = {
+    ...k,
+    post_id,
+    target_path: k.target_path || '',
+    cluster: k.cluster || '',
+    intent: k.intent || '',
+    volume: typeof k.volume === 'number' ? k.volume : 0,
+    difficulty: typeof k.difficulty === 'number' ? k.difficulty : 0,
+    priority: typeof k.priority === 'number' ? k.priority : 0,
+    status: k.status || 'planned',
+    notes: k.notes || '',
+  };
+  return pick(row, KEYWORD_COLS);
+});
+
+// 7. Redirects
+const sanitizedRedirects = (data.redirects || []).map(r => {
+  const row = {
+    ...r,
+    code: r.code || 301,
+    hits: typeof r.hits === 'number' ? r.hits : 0,
+    active: r.active !== false,
+  };
+  return pick(row, REDIRECT_COLS);
+});
+
+// Execute in foreign-key dependency order
+await upsert('authors', sanitizedAuthors, 'id', 100);
+await upsert('categories', sanitizedCategories, 'id', 100);
+await upsert('products', sanitizedProducts, 'id', 300);
+await upsert('posts', sanitizedPosts, 'id', 50);
+await upsert('redirects', sanitizedRedirects, 'id', 500);
+await upsert('keywords', sanitizedKeywords, 'id', 200);
 for (const [k, v] of Object.entries(data.settings ?? {})) {
   const { error } = await sb.from('settings').upsert({ key: k, value: v }, { onConflict: 'key' });
   if (error) throw new Error(`settings: ${error.message}`);
