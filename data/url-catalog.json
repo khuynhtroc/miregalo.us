@@ -1,0 +1,830 @@
+[
+  {
+    "URL ID": "URL-001",
+    "URL": "/",
+    "Page Title": "Home",
+    "URL Type": "ROOT",
+    "Parent URL": "-",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-002",
+    "URL": "/regalos/",
+    "Page Title": "Regalos",
+    "URL Type": "SILO",
+    "Parent URL": "/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-003",
+    "URL": "/regalos/para-mama/",
+    "Page Title": "Regalos para Mamá",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-004",
+    "URL": "/regalos/para-papa/",
+    "Page Title": "Regalos para Papá",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-005",
+    "URL": "/regalos/para-novia/",
+    "Page Title": "Regalos para Novia",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-006",
+    "URL": "/regalos/para-novio/",
+    "Page Title": "Regalos para Novio",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-007",
+    "URL": "/regalos/para-esposa/",
+    "Page Title": "Regalos para Esposa",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-008",
+    "URL": "/regalos/para-esposo/",
+    "Page Title": "Regalos para Esposo",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-009",
+    "URL": "/regalos/para-abuela/",
+    "Page Title": "Regalos para Abuela",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-010",
+    "URL": "/regalos/para-abuelo/",
+    "Page Title": "Regalos para Abuelo",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-011",
+    "URL": "/regalos/para-hermana/",
+    "Page Title": "Regalos para Hermana",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-012",
+    "URL": "/regalos/para-hermano/",
+    "Page Title": "Regalos para Hermano",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-013",
+    "URL": "/regalos/para-hija/",
+    "Page Title": "Regalos para Hija",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-014",
+    "URL": "/regalos/para-hijo/",
+    "Page Title": "Regalos para Hijo",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-015",
+    "URL": "/regalos/para-amiga/",
+    "Page Title": "Regalos para Amiga",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-016",
+    "URL": "/regalos/para-amigo/",
+    "Page Title": "Regalos para Amigo",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-017",
+    "URL": "/regalos/para-suegra/",
+    "Page Title": "Regalos para Suegra",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-018",
+    "URL": "/regalos/para-suegro/",
+    "Page Title": "Regalos para Suegro",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-019",
+    "URL": "/regalos/para-cunada/",
+    "Page Title": "Regalos para Cuñada",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-020",
+    "URL": "/regalos/para-cunado/",
+    "Page Title": "Regalos para Cuñado",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-021",
+    "URL": "/regalos/para-maestra/",
+    "Page Title": "Regalos para Maestra",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-022",
+    "URL": "/regalos/para-maestro/",
+    "Page Title": "Regalos para Maestro",
+    "URL Type": "RECIPIENT",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-023",
+    "URL": "/regalos/para-mama/personalizados/",
+    "Page Title": "Regalos personalizados para Mamá",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-mama/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-024",
+    "URL": "/regalos/para-papa/personalizados/",
+    "Page Title": "Regalos personalizados para Papá",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-papa/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-025",
+    "URL": "/regalos/para-novia/personalizados/",
+    "Page Title": "Regalos personalizados para Novia",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-novia/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-026",
+    "URL": "/regalos/para-novio/personalizados/",
+    "Page Title": "Regalos personalizados para Novio",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-novio/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-027",
+    "URL": "/regalos/para-esposa/personalizados/",
+    "Page Title": "Regalos personalizados para Esposa",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-esposa/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-028",
+    "URL": "/regalos/para-esposo/personalizados/",
+    "Page Title": "Regalos personalizados para Esposo",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-esposo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-029",
+    "URL": "/regalos/para-abuela/personalizados/",
+    "Page Title": "Regalos personalizados para Abuela",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-abuela/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-030",
+    "URL": "/regalos/para-abuelo/personalizados/",
+    "Page Title": "Regalos personalizados para Abuelo",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-abuelo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-031",
+    "URL": "/regalos/para-hermana/personalizados/",
+    "Page Title": "Regalos personalizados para Hermana",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-hermana/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-032",
+    "URL": "/regalos/para-hermano/personalizados/",
+    "Page Title": "Regalos personalizados para Hermano",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-hermano/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-033",
+    "URL": "/regalos/para-hija/personalizados/",
+    "Page Title": "Regalos personalizados para Hija",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-hija/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-034",
+    "URL": "/regalos/para-hijo/personalizados/",
+    "Page Title": "Regalos personalizados para Hijo",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-hijo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-035",
+    "URL": "/regalos/para-amiga/personalizados/",
+    "Page Title": "Regalos personalizados para Amiga",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-amiga/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-036",
+    "URL": "/regalos/para-amigo/personalizados/",
+    "Page Title": "Regalos personalizados para Amigo",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-amigo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-037",
+    "URL": "/regalos/para-suegra/personalizados/",
+    "Page Title": "Regalos personalizados para Suegra",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-suegra/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-038",
+    "URL": "/regalos/para-suegro/personalizados/",
+    "Page Title": "Regalos personalizados para Suegro",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-suegro/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-039",
+    "URL": "/regalos/para-cunada/personalizados/",
+    "Page Title": "Regalos personalizados para Cuñada",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-cunada/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-040",
+    "URL": "/regalos/para-cunado/personalizados/",
+    "Page Title": "Regalos personalizados para Cuñado",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-cunado/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-041",
+    "URL": "/regalos/para-maestra/personalizados/",
+    "Page Title": "Regalos personalizados para Maestra",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-maestra/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-042",
+    "URL": "/regalos/para-maestro/personalizados/",
+    "Page Title": "Regalos personalizados para Maestro",
+    "URL Type": "RECIPIENT_ATTRIBUTE",
+    "Parent URL": "/regalos/para-maestro/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-043",
+    "URL": "/regalos/para-mama/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Mamá que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-mama/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-044",
+    "URL": "/regalos/para-papa/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Papá que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-papa/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-045",
+    "URL": "/regalos/para-novia/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Novia que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-novia/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-046",
+    "URL": "/regalos/para-novio/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Novio que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-novio/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-047",
+    "URL": "/regalos/para-esposa/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Esposa que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-esposa/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-048",
+    "URL": "/regalos/para-esposo/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Esposo que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-esposo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-049",
+    "URL": "/regalos/para-abuela/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Abuela que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-abuela/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-050",
+    "URL": "/regalos/para-abuelo/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Abuelo que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-abuelo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-051",
+    "URL": "/regalos/para-hermana/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Hermana que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-hermana/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-052",
+    "URL": "/regalos/para-hermano/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Hermano que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-hermano/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-053",
+    "URL": "/regalos/para-hija/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Hija que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-hija/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-054",
+    "URL": "/regalos/para-hijo/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Hijo que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-hijo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-055",
+    "URL": "/regalos/para-amiga/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Amiga que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-amiga/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-056",
+    "URL": "/regalos/para-amigo/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Amigo que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-amigo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-057",
+    "URL": "/regalos/para-suegra/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Suegra que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-suegra/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-058",
+    "URL": "/regalos/para-suegro/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Suegro que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-suegro/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-059",
+    "URL": "/regalos/para-cunada/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Cuñada que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-cunada/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-060",
+    "URL": "/regalos/para-cunado/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Cuñado que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-cunado/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-061",
+    "URL": "/regalos/para-maestra/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Maestra que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-maestra/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-062",
+    "URL": "/regalos/para-maestro/que-lo-tiene-todo/",
+    "Page Title": "Regalos para Maestro que lo tiene todo",
+    "URL Type": "RECIPIENT_PROBLEM",
+    "Parent URL": "/regalos/para-maestro/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-063",
+    "URL": "/regalos/para-mama/ultima-hora/",
+    "Page Title": "Regalos de última hora para Mamá",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-mama/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-064",
+    "URL": "/regalos/para-papa/ultima-hora/",
+    "Page Title": "Regalos de última hora para Papá",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-papa/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-065",
+    "URL": "/regalos/para-novia/ultima-hora/",
+    "Page Title": "Regalos de última hora para Novia",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-novia/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-066",
+    "URL": "/regalos/para-novio/ultima-hora/",
+    "Page Title": "Regalos de última hora para Novio",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-novio/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-067",
+    "URL": "/regalos/para-esposa/ultima-hora/",
+    "Page Title": "Regalos de última hora para Esposa",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-esposa/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-068",
+    "URL": "/regalos/para-esposo/ultima-hora/",
+    "Page Title": "Regalos de última hora para Esposo",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-esposo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-069",
+    "URL": "/regalos/para-abuela/ultima-hora/",
+    "Page Title": "Regalos de última hora para Abuela",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-abuela/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-070",
+    "URL": "/regalos/para-abuelo/ultima-hora/",
+    "Page Title": "Regalos de última hora para Abuelo",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-abuelo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-071",
+    "URL": "/regalos/para-hermana/ultima-hora/",
+    "Page Title": "Regalos de última hora para Hermana",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-hermana/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-072",
+    "URL": "/regalos/para-hermano/ultima-hora/",
+    "Page Title": "Regalos de última hora para Hermano",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-hermano/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-073",
+    "URL": "/regalos/para-hija/ultima-hora/",
+    "Page Title": "Regalos de última hora para Hija",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-hija/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-074",
+    "URL": "/regalos/para-hijo/ultima-hora/",
+    "Page Title": "Regalos de última hora para Hijo",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-hijo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-075",
+    "URL": "/regalos/para-amiga/ultima-hora/",
+    "Page Title": "Regalos de última hora para Amiga",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-amiga/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-076",
+    "URL": "/regalos/para-amigo/ultima-hora/",
+    "Page Title": "Regalos de última hora para Amigo",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-amigo/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-077",
+    "URL": "/regalos/para-suegra/ultima-hora/",
+    "Page Title": "Regalos de última hora para Suegra",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-suegra/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-078",
+    "URL": "/regalos/para-suegro/ultima-hora/",
+    "Page Title": "Regalos de última hora para Suegro",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-suegro/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-079",
+    "URL": "/regalos/para-cunada/ultima-hora/",
+    "Page Title": "Regalos de última hora para Cuñada",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-cunada/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-080",
+    "URL": "/regalos/para-cunado/ultima-hora/",
+    "Page Title": "Regalos de última hora para Cuñado",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-cunado/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-081",
+    "URL": "/regalos/para-maestra/ultima-hora/",
+    "Page Title": "Regalos de última hora para Maestra",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-maestra/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-082",
+    "URL": "/regalos/para-maestro/ultima-hora/",
+    "Page Title": "Regalos de última hora para Maestro",
+    "URL Type": "RECIPIENT_URGENCY",
+    "Parent URL": "/regalos/para-maestro/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-083",
+    "URL": "/regalos/cumpleanos/",
+    "Page Title": "Regalos de Cumpleaños",
+    "URL Type": "OCCASION",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-084",
+    "URL": "/regalos/navidad/",
+    "Page Title": "Regalos de Navidad",
+    "URL Type": "OCCASION",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-085",
+    "URL": "/regalos/san-valentin/",
+    "Page Title": "Regalos de San Valentín",
+    "URL Type": "OCCASION",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-086",
+    "URL": "/regalos/aniversario/",
+    "Page Title": "Regalos de Aniversario",
+    "URL Type": "OCCASION",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-087",
+    "URL": "/regalos/dia-de-la-madre/",
+    "Page Title": "Regalos de Día de la Madre",
+    "URL Type": "OCCASION",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-088",
+    "URL": "/regalos/dia-del-padre/",
+    "Page Title": "Regalos de Día del Padre",
+    "URL Type": "OCCASION",
+    "Parent URL": "/regalos/",
+    "Priority": "P1",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-089",
+    "URL": "/regalos/originales/",
+    "Page Title": "Regalos originales",
+    "URL Type": "STYLE",
+    "Parent URL": "/regalos/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-090",
+    "URL": "/regalos/utiles/",
+    "Page Title": "Regalos útiles",
+    "URL Type": "STYLE",
+    "Parent URL": "/regalos/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-091",
+    "URL": "/regalos/sentimentales/",
+    "Page Title": "Regalos sentimentales",
+    "URL Type": "STYLE",
+    "Parent URL": "/regalos/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  },
+  {
+    "URL ID": "URL-092",
+    "URL": "/regalos/romanticos/",
+    "Page Title": "Regalos románticos",
+    "URL Type": "STYLE",
+    "Parent URL": "/regalos/",
+    "Priority": "P2",
+    "Status": "CREATE"
+  }
+]

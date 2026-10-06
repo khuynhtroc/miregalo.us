@@ -1,0 +1,93 @@
+URL ID,URL,Page Title,URL Type,Parent URL,Priority,Status
+URL-001,/,Home,ROOT,-,P1,CREATE
+URL-002,/regalos/,Regalos,SILO,/,P1,CREATE
+URL-003,/regalos/para-mama/,Regalos para Mamá,RECIPIENT,/regalos/,P1,CREATE
+URL-004,/regalos/para-papa/,Regalos para Papá,RECIPIENT,/regalos/,P1,CREATE
+URL-005,/regalos/para-novia/,Regalos para Novia,RECIPIENT,/regalos/,P1,CREATE
+URL-006,/regalos/para-novio/,Regalos para Novio,RECIPIENT,/regalos/,P1,CREATE
+URL-007,/regalos/para-esposa/,Regalos para Esposa,RECIPIENT,/regalos/,P1,CREATE
+URL-008,/regalos/para-esposo/,Regalos para Esposo,RECIPIENT,/regalos/,P1,CREATE
+URL-009,/regalos/para-abuela/,Regalos para Abuela,RECIPIENT,/regalos/,P1,CREATE
+URL-010,/regalos/para-abuelo/,Regalos para Abuelo,RECIPIENT,/regalos/,P1,CREATE
+URL-011,/regalos/para-hermana/,Regalos para Hermana,RECIPIENT,/regalos/,P1,CREATE
+URL-012,/regalos/para-hermano/,Regalos para Hermano,RECIPIENT,/regalos/,P1,CREATE
+URL-013,/regalos/para-hija/,Regalos para Hija,RECIPIENT,/regalos/,P1,CREATE
+URL-014,/regalos/para-hijo/,Regalos para Hijo,RECIPIENT,/regalos/,P1,CREATE
+URL-015,/regalos/para-amiga/,Regalos para Amiga,RECIPIENT,/regalos/,P1,CREATE
+URL-016,/regalos/para-amigo/,Regalos para Amigo,RECIPIENT,/regalos/,P1,CREATE
+URL-017,/regalos/para-suegra/,Regalos para Suegra,RECIPIENT,/regalos/,P1,CREATE
+URL-018,/regalos/para-suegro/,Regalos para Suegro,RECIPIENT,/regalos/,P1,CREATE
+URL-019,/regalos/para-cunada/,Regalos para Cuñada,RECIPIENT,/regalos/,P1,CREATE
+URL-020,/regalos/para-cunado/,Regalos para Cuñado,RECIPIENT,/regalos/,P1,CREATE
+URL-021,/regalos/para-maestra/,Regalos para Maestra,RECIPIENT,/regalos/,P1,CREATE
+URL-022,/regalos/para-maestro/,Regalos para Maestro,RECIPIENT,/regalos/,P1,CREATE
+URL-023,/regalos/para-mama/personalizados/,Regalos personalizados para Mamá,RECIPIENT_ATTRIBUTE,/regalos/para-mama/,P2,CREATE
+URL-024,/regalos/para-papa/personalizados/,Regalos personalizados para Papá,RECIPIENT_ATTRIBUTE,/regalos/para-papa/,P2,CREATE
+URL-025,/regalos/para-novia/personalizados/,Regalos personalizados para Novia,RECIPIENT_ATTRIBUTE,/regalos/para-novia/,P2,CREATE
+URL-026,/regalos/para-novio/personalizados/,Regalos personalizados para Novio,RECIPIENT_ATTRIBUTE,/regalos/para-novio/,P2,CREATE
+URL-027,/regalos/para-esposa/personalizados/,Regalos personalizados para Esposa,RECIPIENT_ATTRIBUTE,/regalos/para-esposa/,P2,CREATE
+URL-028,/regalos/para-esposo/personalizados/,Regalos personalizados para Esposo,RECIPIENT_ATTRIBUTE,/regalos/para-esposo/,P2,CREATE
+URL-029,/regalos/para-abuela/personalizados/,Regalos personalizados para Abuela,RECIPIENT_ATTRIBUTE,/regalos/para-abuela/,P2,CREATE
+URL-030,/regalos/para-abuelo/personalizados/,Regalos personalizados para Abuelo,RECIPIENT_ATTRIBUTE,/regalos/para-abuelo/,P2,CREATE
+URL-031,/regalos/para-hermana/personalizados/,Regalos personalizados para Hermana,RECIPIENT_ATTRIBUTE,/regalos/para-hermana/,P2,CREATE
+URL-032,/regalos/para-hermano/personalizados/,Regalos personalizados para Hermano,RECIPIENT_ATTRIBUTE,/regalos/para-hermano/,P2,CREATE
+URL-033,/regalos/para-hija/personalizados/,Regalos personalizados para Hija,RECIPIENT_ATTRIBUTE,/regalos/para-hija/,P2,CREATE
+URL-034,/regalos/para-hijo/personalizados/,Regalos personalizados para Hijo,RECIPIENT_ATTRIBUTE,/regalos/para-hijo/,P2,CREATE
+URL-035,/regalos/para-amiga/personalizados/,Regalos personalizados para Amiga,RECIPIENT_ATTRIBUTE,/regalos/para-amiga/,P2,CREATE
+URL-036,/regalos/para-amigo/personalizados/,Regalos personalizados para Amigo,RECIPIENT_ATTRIBUTE,/regalos/para-amigo/,P2,CREATE
+URL-037,/regalos/para-suegra/personalizados/,Regalos personalizados para Suegra,RECIPIENT_ATTRIBUTE,/regalos/para-suegra/,P2,CREATE
+URL-038,/regalos/para-suegro/personalizados/,Regalos personalizados para Suegro,RECIPIENT_ATTRIBUTE,/regalos/para-suegro/,P2,CREATE
+URL-039,/regalos/para-cunada/personalizados/,Regalos personalizados para Cuñada,RECIPIENT_ATTRIBUTE,/regalos/para-cunada/,P2,CREATE
+URL-040,/regalos/para-cunado/personalizados/,Regalos personalizados para Cuñado,RECIPIENT_ATTRIBUTE,/regalos/para-cunado/,P2,CREATE
+URL-041,/regalos/para-maestra/personalizados/,Regalos personalizados para Maestra,RECIPIENT_ATTRIBUTE,/regalos/para-maestra/,P2,CREATE
+URL-042,/regalos/para-maestro/personalizados/,Regalos personalizados para Maestro,RECIPIENT_ATTRIBUTE,/regalos/para-maestro/,P2,CREATE
+URL-043,/regalos/para-mama/que-lo-tiene-todo/,Regalos para Mamá que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-mama/,P2,CREATE
+URL-044,/regalos/para-papa/que-lo-tiene-todo/,Regalos para Papá que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-papa/,P2,CREATE
+URL-045,/regalos/para-novia/que-lo-tiene-todo/,Regalos para Novia que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-novia/,P2,CREATE
+URL-046,/regalos/para-novio/que-lo-tiene-todo/,Regalos para Novio que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-novio/,P2,CREATE
+URL-047,/regalos/para-esposa/que-lo-tiene-todo/,Regalos para Esposa que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-esposa/,P2,CREATE
+URL-048,/regalos/para-esposo/que-lo-tiene-todo/,Regalos para Esposo que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-esposo/,P2,CREATE
+URL-049,/regalos/para-abuela/que-lo-tiene-todo/,Regalos para Abuela que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-abuela/,P2,CREATE
+URL-050,/regalos/para-abuelo/que-lo-tiene-todo/,Regalos para Abuelo que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-abuelo/,P2,CREATE
+URL-051,/regalos/para-hermana/que-lo-tiene-todo/,Regalos para Hermana que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-hermana/,P2,CREATE
+URL-052,/regalos/para-hermano/que-lo-tiene-todo/,Regalos para Hermano que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-hermano/,P2,CREATE
+URL-053,/regalos/para-hija/que-lo-tiene-todo/,Regalos para Hija que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-hija/,P2,CREATE
+URL-054,/regalos/para-hijo/que-lo-tiene-todo/,Regalos para Hijo que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-hijo/,P2,CREATE
+URL-055,/regalos/para-amiga/que-lo-tiene-todo/,Regalos para Amiga que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-amiga/,P2,CREATE
+URL-056,/regalos/para-amigo/que-lo-tiene-todo/,Regalos para Amigo que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-amigo/,P2,CREATE
+URL-057,/regalos/para-suegra/que-lo-tiene-todo/,Regalos para Suegra que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-suegra/,P2,CREATE
+URL-058,/regalos/para-suegro/que-lo-tiene-todo/,Regalos para Suegro que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-suegro/,P2,CREATE
+URL-059,/regalos/para-cunada/que-lo-tiene-todo/,Regalos para Cuñada que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-cunada/,P2,CREATE
+URL-060,/regalos/para-cunado/que-lo-tiene-todo/,Regalos para Cuñado que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-cunado/,P2,CREATE
+URL-061,/regalos/para-maestra/que-lo-tiene-todo/,Regalos para Maestra que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-maestra/,P2,CREATE
+URL-062,/regalos/para-maestro/que-lo-tiene-todo/,Regalos para Maestro que lo tiene todo,RECIPIENT_PROBLEM,/regalos/para-maestro/,P2,CREATE
+URL-063,/regalos/para-mama/ultima-hora/,Regalos de última hora para Mamá,RECIPIENT_URGENCY,/regalos/para-mama/,P2,CREATE
+URL-064,/regalos/para-papa/ultima-hora/,Regalos de última hora para Papá,RECIPIENT_URGENCY,/regalos/para-papa/,P2,CREATE
+URL-065,/regalos/para-novia/ultima-hora/,Regalos de última hora para Novia,RECIPIENT_URGENCY,/regalos/para-novia/,P2,CREATE
+URL-066,/regalos/para-novio/ultima-hora/,Regalos de última hora para Novio,RECIPIENT_URGENCY,/regalos/para-novio/,P2,CREATE
+URL-067,/regalos/para-esposa/ultima-hora/,Regalos de última hora para Esposa,RECIPIENT_URGENCY,/regalos/para-esposa/,P2,CREATE
+URL-068,/regalos/para-esposo/ultima-hora/,Regalos de última hora para Esposo,RECIPIENT_URGENCY,/regalos/para-esposo/,P2,CREATE
+URL-069,/regalos/para-abuela/ultima-hora/,Regalos de última hora para Abuela,RECIPIENT_URGENCY,/regalos/para-abuela/,P2,CREATE
+URL-070,/regalos/para-abuelo/ultima-hora/,Regalos de última hora para Abuelo,RECIPIENT_URGENCY,/regalos/para-abuelo/,P2,CREATE
+URL-071,/regalos/para-hermana/ultima-hora/,Regalos de última hora para Hermana,RECIPIENT_URGENCY,/regalos/para-hermana/,P2,CREATE
+URL-072,/regalos/para-hermano/ultima-hora/,Regalos de última hora para Hermano,RECIPIENT_URGENCY,/regalos/para-hermano/,P2,CREATE
+URL-073,/regalos/para-hija/ultima-hora/,Regalos de última hora para Hija,RECIPIENT_URGENCY,/regalos/para-hija/,P2,CREATE
+URL-074,/regalos/para-hijo/ultima-hora/,Regalos de última hora para Hijo,RECIPIENT_URGENCY,/regalos/para-hijo/,P2,CREATE
+URL-075,/regalos/para-amiga/ultima-hora/,Regalos de última hora para Amiga,RECIPIENT_URGENCY,/regalos/para-amiga/,P2,CREATE
+URL-076,/regalos/para-amigo/ultima-hora/,Regalos de última hora para Amigo,RECIPIENT_URGENCY,/regalos/para-amigo/,P2,CREATE
+URL-077,/regalos/para-suegra/ultima-hora/,Regalos de última hora para Suegra,RECIPIENT_URGENCY,/regalos/para-suegra/,P2,CREATE
+URL-078,/regalos/para-suegro/ultima-hora/,Regalos de última hora para Suegro,RECIPIENT_URGENCY,/regalos/para-suegro/,P2,CREATE
+URL-079,/regalos/para-cunada/ultima-hora/,Regalos de última hora para Cuñada,RECIPIENT_URGENCY,/regalos/para-cunada/,P2,CREATE
+URL-080,/regalos/para-cunado/ultima-hora/,Regalos de última hora para Cuñado,RECIPIENT_URGENCY,/regalos/para-cunado/,P2,CREATE
+URL-081,/regalos/para-maestra/ultima-hora/,Regalos de última hora para Maestra,RECIPIENT_URGENCY,/regalos/para-maestra/,P2,CREATE
+URL-082,/regalos/para-maestro/ultima-hora/,Regalos de última hora para Maestro,RECIPIENT_URGENCY,/regalos/para-maestro/,P2,CREATE
+URL-083,/regalos/cumpleanos/,Regalos de Cumpleaños,OCCASION,/regalos/,P1,CREATE
+URL-084,/regalos/navidad/,Regalos de Navidad,OCCASION,/regalos/,P1,CREATE
+URL-085,/regalos/san-valentin/,Regalos de San Valentín,OCCASION,/regalos/,P1,CREATE
+URL-086,/regalos/aniversario/,Regalos de Aniversario,OCCASION,/regalos/,P1,CREATE
+URL-087,/regalos/dia-de-la-madre/,Regalos de Día de la Madre,OCCASION,/regalos/,P1,CREATE
+URL-088,/regalos/dia-del-padre/,Regalos de Día del Padre,OCCASION,/regalos/,P1,CREATE
+URL-089,/regalos/originales/,Regalos originales,STYLE,/regalos/,P2,CREATE
+URL-090,/regalos/utiles/,Regalos útiles,STYLE,/regalos/,P2,CREATE
+URL-091,/regalos/sentimentales/,Regalos sentimentales,STYLE,/regalos/,P2,CREATE
+URL-092,/regalos/romanticos/,Regalos románticos,STYLE,/regalos/,P2,CREATE

@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+*.tsbuildinfo
+next-env.d.ts
+.env.local
+.env*.local
+data/db.json
+data/seed.json
+data/scraped-cache.json
+scratch/
+npm-debug.log*
+.DS_Store

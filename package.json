@@ -1,0 +1,31 @@
+{
+  "name": "giftblog",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gift-guide blog platform (Phase 1: code / structure / SEO / admin). Phase 2: AI Content Engine.",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "seed:build": "node scripts/build-seed.mjs",
+    "seed:local": "node scripts/build-seed.mjs && node scripts/reset-local.mjs",
+    "seed:supabase": "node scripts/seed-supabase.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@google/genai": "^2.27.0",
+    "@supabase/supabase-js": "^2.49.0",
+    "next": "15.5.27",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "server-only": "^0.0.1",
+    "xlsx": "^0.18.5",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "typescript": "^5.7.0"
+  }
+}

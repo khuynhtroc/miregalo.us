@@ -1,0 +1,41 @@
+import type { SiteSettings } from '@/lib/types';
+
+/** Default settings – every value is editable in /admin/settings. */
+export const DEFAULT_SETTINGS: SiteSettings = {
+  site_name: 'Loveable Blog',
+  site_tagline: 'Ideas de regalos significativas para cada persona, relación y ocasión.',
+  site_description: 'Guías y sugerencias de regalos pensadas para sorprender a quien más quieres en cualquier momento especial.',
+  organization_name: 'Loveable',
+  organization_url: 'https://loveable.us',
+  logo_url: '/images/loveable-logo.png',
+  logo_fullsize_url: '/images/loveable-logo-fullsize.png',
+  favicon_url: '/favicon.ico',
+  default_og_image: '/images/loveable-logo-fullsize.png',
+  locale: 'es',
+  title_separator: '|',
+  shop_url: 'https://loveable.us',
+  shop_label: 'Tienda Loveable',
+  contact_url: 'https://loveable.us/pages/contact-us',
+  copyright: '© {year} Loveable LLC. Todos los derechos reservados.',
+  footer_tagline: 'Ideas desde el corazón, hechas para compartir.',
+  footer_about: 'Ideas y guías de regalos para cada persona, relación y momento significativo.',
+  hero_eyebrow: 'Ideas con significado, hechas personales',
+  hero_title: 'Encuentra un regalo que recordarán siempre',
+  hero_lead:
+    'Explora guías detalladas para cada persona, relación y ocasión, y transforma la idea perfecta en un recuerdo inolvidable.',
+  search_placeholder: 'Buscar ideas de regalos, personas u ocasiones...',
+  cta_eyebrow: 'Hazlo personal',
+  cta_title: '¿Encontraste la idea perfecta?',
+  cta_text: 'Convierte tu inspiración en un regalo personalizado creado especialmente para ellos.',
+  affiliate_disclosure:
+    'Este artículo puede contener enlaces de afiliados. Si compras a través de ellos, podemos recibir una pequeña comisión sin ningún coste adicional para ti.',
+  posts_per_page: 24,
+  ga4_id: '',
+  gsc_verification: '',
+  gsc_property: '',
+  bing_verification: '',
+  head_scripts: '',
+  body_scripts: '',
+  robots_extra: '',
+  noindex_site: false,
+};

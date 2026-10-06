@@ -1,0 +1,501 @@
+Keyword ID,Primary Keyword,Keyword Cluster,Action,Target URL ID,Target URL,Parent URL,Silo,Priority,Notes
+KW-001,ideas de regalos para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-002,qué regalar a regalos para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-003,mejores regalos para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-004,regalos originales para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-005,regalos personalizados para mamá,Mamá,MERGE,URL-023,/regalos/para-mama/personalizados/,/regalos/para-mama/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-006,regalos sentimentales para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-007,regalos útiles para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-008,regalos baratos para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-009,regalos especiales para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-010,regalos únicos para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-011,regalos bonitos para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-012,regalos divertidos para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-013,regalos prácticos para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-014,regalos creativos para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-015,regalos inolvidables para mamá,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-016,regalos para mamá que lo tiene todo,Mamá,MERGE,URL-043,/regalos/para-mama/que-lo-tiene-todo/,/regalos/para-mama/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-017,regalos para mamá que no quiere nada,Mamá,MERGE,URL-043,/regalos/para-mama/que-lo-tiene-todo/,/regalos/para-mama/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-018,regalos de última hora para mamá,Mamá,MERGE,URL-063,/regalos/para-mama/ultima-hora/,/regalos/para-mama/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-019,regalos para mamá hechos a mano,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-020,regalos para mamá de parte de su hijo,Mamá,MERGE,URL-003,/regalos/para-mama/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-021,ideas de regalos para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-022,qué regalar a regalos para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-023,mejores regalos para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-024,regalos originales para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-025,regalos personalizados para papá,Papá,MERGE,URL-024,/regalos/para-papa/personalizados/,/regalos/para-papa/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-026,regalos sentimentales para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-027,regalos útiles para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-028,regalos baratos para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-029,regalos especiales para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-030,regalos únicos para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-031,regalos bonitos para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-032,regalos divertidos para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-033,regalos prácticos para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-034,regalos creativos para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-035,regalos inolvidables para papá,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-036,regalos para papá que lo tiene todo,Papá,MERGE,URL-044,/regalos/para-papa/que-lo-tiene-todo/,/regalos/para-papa/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-037,regalos para papá que no quiere nada,Papá,MERGE,URL-044,/regalos/para-papa/que-lo-tiene-todo/,/regalos/para-papa/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-038,regalos de última hora para papá,Papá,MERGE,URL-064,/regalos/para-papa/ultima-hora/,/regalos/para-papa/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-039,regalos para papá hechos a mano,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-040,regalos para papá de parte de su hijo,Papá,MERGE,URL-004,/regalos/para-papa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-041,ideas de regalos para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-042,qué regalar a regalos para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-043,mejores regalos para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-044,regalos originales para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-045,regalos personalizados para novia,Novia,MERGE,URL-025,/regalos/para-novia/personalizados/,/regalos/para-novia/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-046,regalos sentimentales para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-047,regalos útiles para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-048,regalos baratos para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-049,regalos especiales para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-050,regalos únicos para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-051,regalos bonitos para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-052,regalos divertidos para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-053,regalos prácticos para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-054,regalos creativos para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-055,regalos inolvidables para novia,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-056,regalos para novia que lo tiene todo,Novia,MERGE,URL-045,/regalos/para-novia/que-lo-tiene-todo/,/regalos/para-novia/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-057,regalos para novia que no quiere nada,Novia,MERGE,URL-045,/regalos/para-novia/que-lo-tiene-todo/,/regalos/para-novia/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-058,regalos de última hora para novia,Novia,MERGE,URL-065,/regalos/para-novia/ultima-hora/,/regalos/para-novia/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-059,regalos para novia hechos a mano,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-060,regalos para novia de parte de su hijo,Novia,MERGE,URL-005,/regalos/para-novia/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-061,ideas de regalos para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-062,qué regalar a regalos para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-063,mejores regalos para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-064,regalos originales para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-065,regalos personalizados para novio,Novio,MERGE,URL-026,/regalos/para-novio/personalizados/,/regalos/para-novio/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-066,regalos sentimentales para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-067,regalos útiles para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-068,regalos baratos para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-069,regalos especiales para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-070,regalos únicos para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-071,regalos bonitos para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-072,regalos divertidos para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-073,regalos prácticos para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-074,regalos creativos para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-075,regalos inolvidables para novio,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-076,regalos para novio que lo tiene todo,Novio,MERGE,URL-046,/regalos/para-novio/que-lo-tiene-todo/,/regalos/para-novio/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-077,regalos para novio que no quiere nada,Novio,MERGE,URL-046,/regalos/para-novio/que-lo-tiene-todo/,/regalos/para-novio/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-078,regalos de última hora para novio,Novio,MERGE,URL-066,/regalos/para-novio/ultima-hora/,/regalos/para-novio/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-079,regalos para novio hechos a mano,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-080,regalos para novio de parte de su hijo,Novio,MERGE,URL-006,/regalos/para-novio/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-081,ideas de regalos para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-082,qué regalar a regalos para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-083,mejores regalos para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-084,regalos originales para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-085,regalos personalizados para esposa,Esposa,MERGE,URL-027,/regalos/para-esposa/personalizados/,/regalos/para-esposa/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-086,regalos sentimentales para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-087,regalos útiles para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-088,regalos baratos para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-089,regalos especiales para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-090,regalos únicos para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-091,regalos bonitos para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-092,regalos divertidos para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-093,regalos prácticos para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-094,regalos creativos para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-095,regalos inolvidables para esposa,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-096,regalos para esposa que lo tiene todo,Esposa,MERGE,URL-047,/regalos/para-esposa/que-lo-tiene-todo/,/regalos/para-esposa/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-097,regalos para esposa que no quiere nada,Esposa,MERGE,URL-047,/regalos/para-esposa/que-lo-tiene-todo/,/regalos/para-esposa/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-098,regalos de última hora para esposa,Esposa,MERGE,URL-067,/regalos/para-esposa/ultima-hora/,/regalos/para-esposa/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-099,regalos para esposa hechos a mano,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-100,regalos para esposa de parte de su hijo,Esposa,MERGE,URL-007,/regalos/para-esposa/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-101,ideas de regalos para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-102,qué regalar a regalos para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-103,mejores regalos para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-104,regalos originales para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-105,regalos personalizados para esposo,Esposo,MERGE,URL-028,/regalos/para-esposo/personalizados/,/regalos/para-esposo/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-106,regalos sentimentales para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-107,regalos útiles para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-108,regalos baratos para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-109,regalos especiales para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-110,regalos únicos para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-111,regalos bonitos para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-112,regalos divertidos para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-113,regalos prácticos para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-114,regalos creativos para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-115,regalos inolvidables para esposo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-116,regalos para esposo que lo tiene todo,Esposo,MERGE,URL-048,/regalos/para-esposo/que-lo-tiene-todo/,/regalos/para-esposo/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-117,regalos para esposo que no quiere nada,Esposo,MERGE,URL-048,/regalos/para-esposo/que-lo-tiene-todo/,/regalos/para-esposo/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-118,regalos de última hora para esposo,Esposo,MERGE,URL-068,/regalos/para-esposo/ultima-hora/,/regalos/para-esposo/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-119,regalos para esposo hechos a mano,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-120,regalos para esposo de parte de su hijo,Esposo,MERGE,URL-008,/regalos/para-esposo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-121,ideas de regalos para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-122,qué regalar a regalos para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-123,mejores regalos para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-124,regalos originales para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-125,regalos personalizados para abuela,Abuela,MERGE,URL-029,/regalos/para-abuela/personalizados/,/regalos/para-abuela/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-126,regalos sentimentales para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-127,regalos útiles para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-128,regalos baratos para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-129,regalos especiales para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-130,regalos únicos para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-131,regalos bonitos para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-132,regalos divertidos para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-133,regalos prácticos para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-134,regalos creativos para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-135,regalos inolvidables para abuela,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-136,regalos para abuela que lo tiene todo,Abuela,MERGE,URL-049,/regalos/para-abuela/que-lo-tiene-todo/,/regalos/para-abuela/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-137,regalos para abuela que no quiere nada,Abuela,MERGE,URL-049,/regalos/para-abuela/que-lo-tiene-todo/,/regalos/para-abuela/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-138,regalos de última hora para abuela,Abuela,MERGE,URL-069,/regalos/para-abuela/ultima-hora/,/regalos/para-abuela/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-139,regalos para abuela hechos a mano,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-140,regalos para abuela de parte de su hijo,Abuela,MERGE,URL-009,/regalos/para-abuela/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-141,ideas de regalos para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-142,qué regalar a regalos para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-143,mejores regalos para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-144,regalos originales para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-145,regalos personalizados para abuelo,Abuelo,MERGE,URL-030,/regalos/para-abuelo/personalizados/,/regalos/para-abuelo/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-146,regalos sentimentales para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-147,regalos útiles para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-148,regalos baratos para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-149,regalos especiales para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-150,regalos únicos para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-151,regalos bonitos para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-152,regalos divertidos para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-153,regalos prácticos para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-154,regalos creativos para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-155,regalos inolvidables para abuelo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-156,regalos para abuelo que lo tiene todo,Abuelo,MERGE,URL-050,/regalos/para-abuelo/que-lo-tiene-todo/,/regalos/para-abuelo/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-157,regalos para abuelo que no quiere nada,Abuelo,MERGE,URL-050,/regalos/para-abuelo/que-lo-tiene-todo/,/regalos/para-abuelo/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-158,regalos de última hora para abuelo,Abuelo,MERGE,URL-070,/regalos/para-abuelo/ultima-hora/,/regalos/para-abuelo/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-159,regalos para abuelo hechos a mano,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-160,regalos para abuelo de parte de su hijo,Abuelo,MERGE,URL-010,/regalos/para-abuelo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-161,ideas de regalos para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-162,qué regalar a regalos para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-163,mejores regalos para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-164,regalos originales para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-165,regalos personalizados para hermana,Hermana,MERGE,URL-031,/regalos/para-hermana/personalizados/,/regalos/para-hermana/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-166,regalos sentimentales para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-167,regalos útiles para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-168,regalos baratos para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-169,regalos especiales para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-170,regalos únicos para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-171,regalos bonitos para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-172,regalos divertidos para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-173,regalos prácticos para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-174,regalos creativos para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-175,regalos inolvidables para hermana,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-176,regalos para hermana que lo tiene todo,Hermana,MERGE,URL-051,/regalos/para-hermana/que-lo-tiene-todo/,/regalos/para-hermana/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-177,regalos para hermana que no quiere nada,Hermana,MERGE,URL-051,/regalos/para-hermana/que-lo-tiene-todo/,/regalos/para-hermana/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-178,regalos de última hora para hermana,Hermana,MERGE,URL-071,/regalos/para-hermana/ultima-hora/,/regalos/para-hermana/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-179,regalos para hermana hechos a mano,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-180,regalos para hermana de parte de su hijo,Hermana,MERGE,URL-011,/regalos/para-hermana/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-181,ideas de regalos para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-182,qué regalar a regalos para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-183,mejores regalos para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-184,regalos originales para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-185,regalos personalizados para hermano,Hermano,MERGE,URL-032,/regalos/para-hermano/personalizados/,/regalos/para-hermano/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-186,regalos sentimentales para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-187,regalos útiles para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-188,regalos baratos para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-189,regalos especiales para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-190,regalos únicos para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-191,regalos bonitos para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-192,regalos divertidos para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-193,regalos prácticos para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-194,regalos creativos para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-195,regalos inolvidables para hermano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-196,regalos para hermano que lo tiene todo,Hermano,MERGE,URL-052,/regalos/para-hermano/que-lo-tiene-todo/,/regalos/para-hermano/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-197,regalos para hermano que no quiere nada,Hermano,MERGE,URL-052,/regalos/para-hermano/que-lo-tiene-todo/,/regalos/para-hermano/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-198,regalos de última hora para hermano,Hermano,MERGE,URL-072,/regalos/para-hermano/ultima-hora/,/regalos/para-hermano/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-199,regalos para hermano hechos a mano,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-200,regalos para hermano de parte de su hijo,Hermano,MERGE,URL-012,/regalos/para-hermano/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-201,regalos para hija,Hija,PRIMARY,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-202,ideas de regalos para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-203,qué regalar a hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-204,mejores regalos para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-205,regalos originales para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-206,regalos personalizados para hija,Hija,MERGE,URL-033,/regalos/para-hija/personalizados/,/regalos/para-hija/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-207,regalos sentimentales para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-208,regalos útiles para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-209,regalos baratos para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-210,regalos especiales para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-211,regalos únicos para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-212,regalos bonitos para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-213,regalos divertidos para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-214,regalos prácticos para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-215,regalos creativos para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-216,regalos para hija que lo tiene todo,Hija,MERGE,URL-053,/regalos/para-hija/que-lo-tiene-todo/,/regalos/para-hija/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-217,regalos para hija que no quiere nada,Hija,MERGE,URL-053,/regalos/para-hija/que-lo-tiene-todo/,/regalos/para-hija/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-218,regalos de última hora para hija,Hija,MERGE,URL-073,/regalos/para-hija/ultima-hora/,/regalos/para-hija/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-219,regalos personalizados y baratos para hija,Hija,MERGE,URL-033,/regalos/para-hija/personalizados/,/regalos/para-hija/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-220,regalos de cumpleaños para hija,Hija,MERGE,URL-013,/regalos/para-hija/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-221,regalos para hijo,Hijo,PRIMARY,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-222,ideas de regalos para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-223,qué regalar a hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-224,mejores regalos para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-225,regalos originales para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-226,regalos personalizados para hijo,Hijo,MERGE,URL-034,/regalos/para-hijo/personalizados/,/regalos/para-hijo/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-227,regalos sentimentales para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-228,regalos útiles para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-229,regalos baratos para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-230,regalos especiales para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-231,regalos únicos para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-232,regalos bonitos para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-233,regalos divertidos para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-234,regalos prácticos para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-235,regalos creativos para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-236,regalos para hijo que lo tiene todo,Hijo,MERGE,URL-054,/regalos/para-hijo/que-lo-tiene-todo/,/regalos/para-hijo/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-237,regalos para hijo que no quiere nada,Hijo,MERGE,URL-054,/regalos/para-hijo/que-lo-tiene-todo/,/regalos/para-hijo/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-238,regalos de última hora para hijo,Hijo,MERGE,URL-074,/regalos/para-hijo/ultima-hora/,/regalos/para-hijo/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-239,regalos personalizados y baratos para hijo,Hijo,MERGE,URL-034,/regalos/para-hijo/personalizados/,/regalos/para-hijo/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-240,regalos de cumpleaños para hijo,Hijo,MERGE,URL-014,/regalos/para-hijo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-241,regalos para amiga,Amiga,PRIMARY,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-242,ideas de regalos para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-243,qué regalar a amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-244,mejores regalos para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-245,regalos originales para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-246,regalos personalizados para amiga,Amiga,MERGE,URL-035,/regalos/para-amiga/personalizados/,/regalos/para-amiga/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-247,regalos sentimentales para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-248,regalos útiles para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-249,regalos baratos para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-250,regalos especiales para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-251,regalos únicos para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-252,regalos bonitos para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-253,regalos divertidos para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-254,regalos prácticos para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-255,regalos creativos para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-256,regalos para amiga que lo tiene todo,Amiga,MERGE,URL-055,/regalos/para-amiga/que-lo-tiene-todo/,/regalos/para-amiga/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-257,regalos para amiga que no quiere nada,Amiga,MERGE,URL-055,/regalos/para-amiga/que-lo-tiene-todo/,/regalos/para-amiga/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-258,regalos de última hora para amiga,Amiga,MERGE,URL-075,/regalos/para-amiga/ultima-hora/,/regalos/para-amiga/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-259,regalos personalizados y baratos para amiga,Amiga,MERGE,URL-035,/regalos/para-amiga/personalizados/,/regalos/para-amiga/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-260,regalos de cumpleaños para amiga,Amiga,MERGE,URL-015,/regalos/para-amiga/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-261,regalos para amigo,Amigo,PRIMARY,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-262,ideas de regalos para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-263,qué regalar a amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-264,mejores regalos para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-265,regalos originales para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-266,regalos personalizados para amigo,Amigo,MERGE,URL-036,/regalos/para-amigo/personalizados/,/regalos/para-amigo/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-267,regalos sentimentales para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-268,regalos útiles para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-269,regalos baratos para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-270,regalos especiales para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-271,regalos únicos para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-272,regalos bonitos para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-273,regalos divertidos para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-274,regalos prácticos para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-275,regalos creativos para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-276,regalos para amigo que lo tiene todo,Amigo,MERGE,URL-056,/regalos/para-amigo/que-lo-tiene-todo/,/regalos/para-amigo/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-277,regalos para amigo que no quiere nada,Amigo,MERGE,URL-056,/regalos/para-amigo/que-lo-tiene-todo/,/regalos/para-amigo/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-278,regalos de última hora para amigo,Amigo,MERGE,URL-076,/regalos/para-amigo/ultima-hora/,/regalos/para-amigo/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-279,regalos personalizados y baratos para amigo,Amigo,MERGE,URL-036,/regalos/para-amigo/personalizados/,/regalos/para-amigo/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-280,regalos de cumpleaños para amigo,Amigo,MERGE,URL-016,/regalos/para-amigo/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-281,regalos para suegra,Suegra,PRIMARY,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-282,ideas de regalos para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-283,qué regalar a suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-284,mejores regalos para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-285,regalos originales para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-286,regalos personalizados para suegra,Suegra,MERGE,URL-037,/regalos/para-suegra/personalizados/,/regalos/para-suegra/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-287,regalos sentimentales para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-288,regalos útiles para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-289,regalos baratos para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-290,regalos especiales para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-291,regalos únicos para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-292,regalos bonitos para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-293,regalos divertidos para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-294,regalos prácticos para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-295,regalos creativos para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-296,regalos para suegra que lo tiene todo,Suegra,MERGE,URL-057,/regalos/para-suegra/que-lo-tiene-todo/,/regalos/para-suegra/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-297,regalos para suegra que no quiere nada,Suegra,MERGE,URL-057,/regalos/para-suegra/que-lo-tiene-todo/,/regalos/para-suegra/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-298,regalos de última hora para suegra,Suegra,MERGE,URL-077,/regalos/para-suegra/ultima-hora/,/regalos/para-suegra/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-299,regalos personalizados y baratos para suegra,Suegra,MERGE,URL-037,/regalos/para-suegra/personalizados/,/regalos/para-suegra/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-300,regalos de cumpleaños para suegra,Suegra,MERGE,URL-017,/regalos/para-suegra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-301,regalos para suegro,Suegro,PRIMARY,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-302,ideas de regalos para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-303,qué regalar a suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-304,mejores regalos para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-305,regalos originales para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-306,regalos personalizados para suegro,Suegro,MERGE,URL-038,/regalos/para-suegro/personalizados/,/regalos/para-suegro/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-307,regalos sentimentales para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-308,regalos útiles para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-309,regalos baratos para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-310,regalos especiales para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-311,regalos únicos para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-312,regalos bonitos para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-313,regalos divertidos para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-314,regalos prácticos para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-315,regalos creativos para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-316,regalos para suegro que lo tiene todo,Suegro,MERGE,URL-058,/regalos/para-suegro/que-lo-tiene-todo/,/regalos/para-suegro/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-317,regalos para suegro que no quiere nada,Suegro,MERGE,URL-058,/regalos/para-suegro/que-lo-tiene-todo/,/regalos/para-suegro/,RECIPIENT_PROBLEM,P2,Merge 'no quiere nada' into same problem-intent page.
+KW-318,regalos de última hora para suegro,Suegro,MERGE,URL-078,/regalos/para-suegro/ultima-hora/,/regalos/para-suegro/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-319,regalos personalizados y baratos para suegro,Suegro,MERGE,URL-038,/regalos/para-suegro/personalizados/,/regalos/para-suegro/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-320,regalos de cumpleaños para suegro,Suegro,MERGE,URL-018,/regalos/para-suegro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-321,regalos para cuñada,Cuñada,PRIMARY,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-322,ideas de regalos para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-323,qué regalar a cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-324,mejores regalos para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-325,regalos originales para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-326,regalos personalizados para cuñada,Cuñada,MERGE,URL-039,/regalos/para-cunada/personalizados/,/regalos/para-cunada/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-327,regalos baratos para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-328,regalos útiles para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-329,regalos bonitos para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-330,regalos especiales para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-331,regalos únicos para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-332,regalos divertidos para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-333,regalos prácticos para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-334,regalos de agradecimiento para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-335,regalos de cumpleaños para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-336,regalos de Navidad para cuñada,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-337,regalos de última hora para cuñada,Cuñada,MERGE,URL-079,/regalos/para-cunada/ultima-hora/,/regalos/para-cunada/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-338,regalos para cuñada por menos de $20,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-339,regalos para cuñada por menos de $50,Cuñada,MERGE,URL-019,/regalos/para-cunada/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-340,regalos personalizados para cuñada de fin de curso,Cuñada,MERGE,URL-039,/regalos/para-cunada/personalizados/,/regalos/para-cunada/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-341,regalos para cuñado,Cuñado,PRIMARY,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-342,ideas de regalos para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-343,qué regalar a cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-344,mejores regalos para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-345,regalos originales para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-346,regalos personalizados para cuñado,Cuñado,MERGE,URL-040,/regalos/para-cunado/personalizados/,/regalos/para-cunado/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-347,regalos baratos para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-348,regalos útiles para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-349,regalos bonitos para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-350,regalos especiales para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-351,regalos únicos para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-352,regalos divertidos para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-353,regalos prácticos para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-354,regalos de agradecimiento para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-355,regalos de cumpleaños para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-356,regalos de Navidad para cuñado,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-357,regalos de última hora para cuñado,Cuñado,MERGE,URL-080,/regalos/para-cunado/ultima-hora/,/regalos/para-cunado/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-358,regalos para cuñado por menos de $20,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-359,regalos para cuñado por menos de $50,Cuñado,MERGE,URL-020,/regalos/para-cunado/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-360,regalos personalizados para cuñado de fin de curso,Cuñado,MERGE,URL-040,/regalos/para-cunado/personalizados/,/regalos/para-cunado/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-361,regalos para maestra,Maestra,PRIMARY,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-362,ideas de regalos para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-363,qué regalar a maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-364,mejores regalos para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-365,regalos originales para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-366,regalos personalizados para maestra,Maestra,MERGE,URL-041,/regalos/para-maestra/personalizados/,/regalos/para-maestra/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-367,regalos baratos para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-368,regalos útiles para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-369,regalos bonitos para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-370,regalos especiales para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-371,regalos únicos para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-372,regalos divertidos para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-373,regalos prácticos para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-374,regalos de agradecimiento para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-375,regalos de cumpleaños para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-376,regalos de Navidad para maestra,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-377,regalos de última hora para maestra,Maestra,MERGE,URL-081,/regalos/para-maestra/ultima-hora/,/regalos/para-maestra/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-378,regalos para maestra por menos de $20,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-379,regalos para maestra por menos de $50,Maestra,MERGE,URL-021,/regalos/para-maestra/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-380,regalos personalizados para maestra de fin de curso,Maestra,MERGE,URL-041,/regalos/para-maestra/personalizados/,/regalos/para-maestra/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-381,regalos para maestro,Maestro,PRIMARY,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-382,ideas de regalos para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-383,qué regalar a maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-384,mejores regalos para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-385,regalos originales para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-386,regalos personalizados para maestro,Maestro,MERGE,URL-042,/regalos/para-maestro/personalizados/,/regalos/para-maestro/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-387,regalos baratos para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-388,regalos útiles para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-389,regalos bonitos para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-390,regalos especiales para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-391,regalos únicos para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-392,regalos divertidos para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-393,regalos prácticos para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-394,regalos de agradecimiento para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-395,regalos de cumpleaños para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-396,regalos de Navidad para maestro,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-397,regalos de última hora para maestro,Maestro,MERGE,URL-082,/regalos/para-maestro/ultima-hora/,/regalos/para-maestro/,RECIPIENT_URGENCY,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-398,regalos para maestro por menos de $20,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-399,regalos para maestro por menos de $50,Maestro,MERGE,URL-022,/regalos/para-maestro/,/regalos/,RECIPIENT,P1,Seed keyword; validate demand/SERP before creating a URL.
+KW-400,regalos personalizados para maestro de fin de curso,Maestro,MERGE,URL-042,/regalos/para-maestro/personalizados/,/regalos/para-maestro/,RECIPIENT_ATTRIBUTE,P2,Seed keyword; validate demand/SERP before creating a URL.
+KW-401,regalos de cumpleaños para mamá,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-402,ideas de regalos de cumpleaños para mamá,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-403,regalos de cumpleaños para papá,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-404,ideas de regalos de cumpleaños para papá,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-405,regalos de cumpleaños para novia,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-406,ideas de regalos de cumpleaños para novia,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-407,regalos de cumpleaños para novio,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-408,ideas de regalos de cumpleaños para novio,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-409,regalos de cumpleaños para esposa,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-410,ideas de regalos de cumpleaños para esposa,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-411,regalos de cumpleaños para esposo,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-412,ideas de regalos de cumpleaños para esposo,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-413,ideas de regalos de cumpleaños para amiga,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-414,ideas de regalos de cumpleaños para amigo,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-415,regalos de cumpleaños para abuela,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-416,ideas de regalos de cumpleaños para abuela,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-417,regalos de cumpleaños para abuelo,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-418,ideas de regalos de cumpleaños para abuelo,Cumpleaños,MERGE,URL-083,/regalos/cumpleanos/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-419,regalos de Navidad para mamá,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-420,ideas de regalos de Navidad para mamá,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-421,regalos de Navidad para papá,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-422,ideas de regalos de Navidad para papá,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-423,regalos de Navidad para novia,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-424,ideas de regalos de Navidad para novia,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-425,regalos de Navidad para novio,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-426,ideas de regalos de Navidad para novio,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-427,regalos de Navidad para esposa,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-428,ideas de regalos de Navidad para esposa,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-429,regalos de Navidad para esposo,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-430,ideas de regalos de Navidad para esposo,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-431,regalos de Navidad para amiga,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-432,ideas de regalos de Navidad para amiga,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-433,regalos de Navidad para amigo,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-434,ideas de regalos de Navidad para amigo,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-435,regalos de Navidad para abuela,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-436,ideas de regalos de Navidad para abuela,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-437,regalos de Navidad para abuelo,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-438,ideas de regalos de Navidad para abuelo,Navidad,MERGE,URL-084,/regalos/navidad/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-439,regalos de San Valentín para novia,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-440,ideas de regalos de San Valentín para novia,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-441,regalos de San Valentín para novio,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-442,ideas de regalos de San Valentín para novio,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-443,regalos de San Valentín para esposa,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-444,ideas de regalos de San Valentín para esposa,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-445,regalos de San Valentín para esposo,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-446,ideas de regalos de San Valentín para esposo,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-447,regalos de San Valentín para pareja,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-448,ideas de regalos de San Valentín para pareja,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-449,regalos de San Valentín para amiga,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-450,ideas de regalos de San Valentín para amiga,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-451,regalos de San Valentín para amigo,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-452,ideas de regalos de San Valentín para amigo,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-453,regalos de San Valentín para ella,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-454,ideas de regalos de San Valentín para ella,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-455,regalos de San Valentín para él,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-456,ideas de regalos de San Valentín para él,San Valentín,MERGE,URL-085,/regalos/san-valentin/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-457,regalos de aniversario para esposa,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-458,ideas de regalos de aniversario para esposa,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-459,regalos de aniversario para esposo,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-460,ideas de regalos de aniversario para esposo,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-461,regalos de aniversario para novia,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-462,ideas de regalos de aniversario para novia,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-463,regalos de aniversario para novio,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-464,ideas de regalos de aniversario para novio,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-465,regalos de aniversario para pareja,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-466,ideas de regalos de aniversario para pareja,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-467,regalos de aniversario para mamá,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-468,ideas de regalos de aniversario para mamá,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-469,regalos de aniversario para papá,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-470,ideas de regalos de aniversario para papá,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-471,regalos de aniversario para padres,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-472,ideas de regalos de aniversario para padres,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-473,regalos de aniversario para amigos,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-474,ideas de regalos de aniversario para amigos,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-475,regalos de aniversario para pareja joven,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-476,ideas de regalos de aniversario para pareja joven,Aniversario,MERGE,URL-086,/regalos/aniversario/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-477,regalos de Día de la Madre para mamá,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-478,ideas de regalos de Día de la Madre para mamá,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-479,regalos de Día de la Madre para abuela,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-480,ideas de regalos de Día de la Madre para abuela,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-481,regalos de Día de la Madre para madre,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-482,ideas de regalos de Día de la Madre para madre,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-483,regalos de Día de la Madre para suegra,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-484,ideas de regalos de Día de la Madre para suegra,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-485,regalos de Día de la Madre para madrina,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-486,ideas de regalos de Día de la Madre para madrina,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-487,regalos de Día de la Madre para esposa,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-488,ideas de regalos de Día de la Madre para esposa,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-489,regalos de Día de la Madre para madre primeriza,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-490,ideas de regalos de Día de la Madre para madre primeriza,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-491,regalos de Día de la Madre para mamá latina,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-492,ideas de regalos de Día de la Madre para mamá latina,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-493,regalos de Día de la Madre para mamá mexicana,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-494,ideas de regalos de Día de la Madre para mamá mexicana,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-495,regalos de Día de la Madre para mamá que lo tiene todo,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-496,ideas de regalos de Día de la Madre para mamá que lo tiene todo,Día de la Madre,MERGE,URL-087,/regalos/dia-de-la-madre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-497,regalos de Día del Padre para papá,Día del Padre,MERGE,URL-088,/regalos/dia-del-padre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-498,ideas de regalos de Día del Padre para papá,Día del Padre,MERGE,URL-088,/regalos/dia-del-padre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-499,regalos de Día del Padre para abuelo,Día del Padre,MERGE,URL-088,/regalos/dia-del-padre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
+KW-500,ideas de regalos de Día del Padre para abuelo,Día del Padre,MERGE,URL-088,/regalos/dia-del-padre/,/regalos/,OCCASION,P1,Recipient-specific variants are supporting keywords for the occasion hub.
