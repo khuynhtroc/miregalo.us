@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import type { AnalyticsOverview } from '@/lib/types';
+import type { AnalyticsOverview, GscOpportunity, SiteSettings } from '@/lib/types';
 
 interface DashboardClientProps {
   initialAnalytics: AnalyticsOverview;
+  gscOpportunities?: GscOpportunity[];
+  siteSettings?: Partial<SiteSettings>;
   systemStats: {
     totalCatalogUrls: number;
     totalKeywords: number;
@@ -23,13 +25,21 @@ function formatNumber(num: number | undefined | null): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-export function DashboardClient({ initialAnalytics, systemStats }: DashboardClientProps) {
+export function DashboardClient({
+  initialAnalytics,
+  gscOpportunities = [],
+  siteSettings = {},
+  systemStats,
+}: DashboardClientProps) {
   const [analytics, setAnalytics] = useState<AnalyticsOverview>(initialAnalytics);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
   const [syncing, setSyncing] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [ga4Id, setGa4Id] = useState(initialAnalytics.ga4_measurement_id || 'G-LV892B193K');
-  const [gscProperty, setGscProperty] = useState(initialAnalytics.gsc_property || 'https://blog.loveable.us');
+  const [ga4Id, setGa4Id] = useState(initialAnalytics.ga4_measurement_id || siteSettings.ga4_id || 'G-WRGWXTNWV3');
+  const [gscProperty, setGscProperty] = useState(initialAnalytics.gsc_property || siteSettings.gsc_property || 'https://www.miregalo.us/');
+  const [customSessions, setCustomSessions] = useState<number>(initialAnalytics.total_sessions || 0);
+  const [customUsers, setCustomUsers] = useState<number>(initialAnalytics.total_users || 0);
+  const [customPageviews, setCustomPageviews] = useState<number>(initialAnalytics.total_pageviews || 0);
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const handleSyncGoogle = async () => {
@@ -61,11 +71,18 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
         body: JSON.stringify({
           ga4_measurement_id: ga4Id,
           gsc_property: gscProperty,
+          total_sessions: Number(customSessions) || 0,
+          total_users: Number(customUsers) || 0,
+          total_pageviews: Number(customPageviews) || 0,
         }),
       });
       if (res.ok) {
+        const saved = await res.json();
+        setAnalytics(saved);
         setShowConfigModal(false);
-        setFeedback('Google Analytics integration configuration saved.');
+        setFeedback('Configuración y métricas de Google Analytics / Search Console guardadas con éxito.');
+      } else {
+        setFeedback('Error al guardar la configuración.');
       }
     } catch {
       setFeedback('Error saving configuration.');
@@ -138,32 +155,32 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
       <div className="stat-grid" style={{ marginBottom: '24px' }}>
         <div className="stat-card">
           <span className="stat-label">Catalog URLs</span>
-          <span className="stat-val">{systemStats.totalCatalogUrls}</span>
-          <span className="stat-desc">92 Live Spanish Silo Routes</span>
+          <span className="stat-val">{formatNumber(systemStats.totalCatalogUrls)}</span>
+          <span className="stat-desc">{systemStats.totalCatalogUrls} Rutas Silo Españolas Activas</span>
         </div>
 
         <div className="stat-card">
           <span className="stat-label">Keywords Mapped</span>
-          <span className="stat-val">{systemStats.totalKeywords}</span>
-          <span className="stat-desc">26 Topic Clusters • 100% Matched</span>
+          <span className="stat-val">{formatNumber(systemStats.totalKeywords)}</span>
+          <span className="stat-desc">{systemStats.totalKeywords} Palabras Clave SEO Mapeadas</span>
         </div>
 
         <div className="stat-card">
           <span className="stat-label">Published Articles</span>
-          <span className="stat-val">{systemStats.totalPosts}</span>
-          <span className="stat-desc">{systemStats.publishedPosts} Spanish Gift Guides Live</span>
+          <span className="stat-val">{formatNumber(systemStats.totalPosts)}</span>
+          <span className="stat-desc">{systemStats.publishedPosts} Guías de Regalos en Español</span>
         </div>
 
         <div className="stat-card">
           <span className="stat-label">Merchants &amp; Networks</span>
-          <span className="stat-val">{systemStats.totalMerchants}</span>
+          <span className="stat-val">{formatNumber(systemStats.totalMerchants)}</span>
           <span className="stat-desc">Amazon, Awin, eBay, Walmart</span>
         </div>
 
         <div className="stat-card">
           <span className="stat-label">Affiliate Products</span>
-          <span className="stat-val">{systemStats.totalProducts}</span>
-          <span className="stat-desc">{systemStats.totalClicks} Outbound /go/ Clicks</span>
+          <span className="stat-val">{formatNumber(systemStats.totalProducts)}</span>
+          <span className="stat-desc">{formatNumber(systemStats.totalClicks)} Clics Salientes /go/</span>
         </div>
 
         <div className="stat-card">
@@ -171,7 +188,7 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
           <span className="stat-val" style={{ fontSize: '1.25rem', color: '#0284c7' }}>
             {systemStats.dbDriver}
           </span>
-          <span className="stat-desc">Cloudflare R2 &amp; Local Active</span>
+          <span className="stat-desc">Supabase Cloud &amp; CDN Activo</span>
         </div>
       </div>
 
@@ -191,7 +208,7 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
           </div>
           <div style={{ textAlign: 'right' }}>
             <span style={{ fontSize: '0.75rem', background: '#ecfdf5', color: '#047857', padding: '4px 10px', borderRadius: '9999px', fontWeight: 600 }}>
-              ● GA4 Property: {analytics.ga4_measurement_id || 'G-LV892B193K'}
+              ● GA4 Property: {analytics.ga4_measurement_id || siteSettings.ga4_id || 'G-WRGWXTNWV3'}
             </span>
           </div>
         </div>
@@ -203,7 +220,9 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
             <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b' }} suppressHydrationWarning>
               {formatNumber(analytics.total_sessions)}
             </span>
-            <span style={{ fontSize: '0.75rem', color: '#16a34a', display: 'block', marginTop: '2px' }}>↑ +14.2% vs last month</span>
+            <span style={{ fontSize: '0.75rem', color: analytics.total_sessions > 0 ? '#16a34a' : '#64748b', display: 'block', marginTop: '2px' }}>
+              {analytics.total_sessions > 0 ? '↑ Tráfico activo' : '● Medición GA4 activa'}
+            </span>
           </div>
 
           <div style={{ padding: '14px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
@@ -211,7 +230,9 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
             <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b' }} suppressHydrationWarning>
               {formatNumber(analytics.total_users)}
             </span>
-            <span style={{ fontSize: '0.75rem', color: '#16a34a', display: 'block', marginTop: '2px' }}>↑ +12.8% new users</span>
+            <span style={{ fontSize: '0.75rem', color: analytics.total_users > 0 ? '#16a34a' : '#64748b', display: 'block', marginTop: '2px' }}>
+              {analytics.total_users > 0 ? '↑ Visitantes únicos' : '● Stream verificado'}
+            </span>
           </div>
 
           <div style={{ padding: '14px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
@@ -219,7 +240,9 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
             <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b' }} suppressHydrationWarning>
               {formatNumber(analytics.total_pageviews)}
             </span>
-            <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginTop: '2px' }}>2.23 pages/session</span>
+            <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginTop: '2px' }}>
+              {analytics.total_sessions > 0 ? `${(analytics.total_pageviews / (analytics.total_sessions || 1)).toFixed(2)} páginas/sesión` : '0 páginas vistas'}
+            </span>
           </div>
 
           <div style={{ padding: '14px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
@@ -227,7 +250,9 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
             <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0284c7' }}>
               {analytics.bounce_rate}%
             </span>
-            <span style={{ fontSize: '0.75rem', color: '#16a34a', display: 'block', marginTop: '2px' }}>↓ -3.4% engagement gain</span>
+            <span style={{ fontSize: '0.75rem', color: '#16a34a', display: 'block', marginTop: '2px' }}>
+              {analytics.bounce_rate > 0 ? `${analytics.bounce_rate}% tasa de rebote` : '● En medición'}
+            </span>
           </div>
 
           <div style={{ padding: '14px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
@@ -235,7 +260,9 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
             <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1e293b' }}>
               {analytics.avg_session_duration}
             </span>
-            <span style={{ fontSize: '0.75rem', color: '#16a34a', display: 'block', marginTop: '2px' }}>Deep content reading</span>
+            <span style={{ fontSize: '0.75rem', color: '#16a34a', display: 'block', marginTop: '2px' }}>
+              {analytics.total_sessions > 0 ? 'Tiempo medio lectura' : '● Esperando sesiones'}
+            </span>
           </div>
         </div>
 
@@ -322,27 +349,30 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
               </tr>
             </thead>
             <tbody>
-              {[
-                { q: 'regalos 1 año noviazgo', pos: 2.1, imp: 48200, clicks: 3120, ctr: '6.47%' },
-                { q: 'regalos bodas de madera', pos: 3.4, imp: 39100, clicks: 2410, ctr: '6.16%' },
-                { q: 'regalos cumpleaños para mama', pos: 4.2, imp: 34500, clicks: 1980, ctr: '5.74%' },
-                { q: 'regalos san valentin para el', pos: 2.8, imp: 29800, clicks: 1840, ctr: '6.17%' },
-                { q: 'regalos de aniversario pareja', pos: 5.1, imp: 26400, clicks: 1420, ctr: '5.38%' },
-              ].map((row, idx) => (
-                <tr key={idx}>
-                  <td>
-                    <span style={{ fontWeight: 600, color: '#1e293b' }}>{row.q}</span>
+              {gscOpportunities && gscOpportunities.length > 0 ? (
+                gscOpportunities.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      <span style={{ fontWeight: 600, color: '#1e293b' }}>{row.query}</span>
+                      <div style={{ fontSize: '0.74rem', color: '#64748b' }}>{row.page}</div>
+                    </td>
+                    <td>
+                      <span style={{ background: '#ecfdf5', color: '#047857', padding: '2px 6px', borderRadius: '4px', fontWeight: 700, fontSize: '0.8rem' }}>
+                        #{Number(row.current_position || 1).toFixed(1)}
+                      </span>
+                    </td>
+                    <td suppressHydrationWarning>{formatNumber(row.impressions || 0)}</td>
+                    <td style={{ fontWeight: 600 }} suppressHydrationWarning>{formatNumber(row.clicks || 0)}</td>
+                    <td style={{ color: '#059669', fontWeight: 600 }}>{((row.actual_ctr || 0) * 100).toFixed(2)}%</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', color: '#64748b', padding: '16px' }}>
+                    Esperando datos de Google Search Console. Las consultas aparecerán tras la sincronización.
                   </td>
-                  <td>
-                    <span style={{ background: '#ecfdf5', color: '#047857', padding: '2px 6px', borderRadius: '4px', fontWeight: 700, fontSize: '0.8rem' }}>
-                      #{row.pos}
-                    </span>
-                  </td>
-                  <td suppressHydrationWarning>{formatNumber(row.imp)}</td>
-                  <td style={{ fontWeight: 600 }} suppressHydrationWarning>{formatNumber(row.clicks)}</td>
-                  <td style={{ color: '#059669', fontWeight: 600 }}>{row.ctr}</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -498,31 +528,64 @@ export function DashboardClient({ initialAnalytics, systemStats }: DashboardClie
                   required
                   value={ga4Id}
                   onChange={(e) => setGa4Id(e.target.value)}
-                  placeholder="G-LV892B193K"
+                  placeholder="G-WRGWXTNWV3"
                   className="form-input"
                 />
-                <div className="form-hint">Format: G-XXXXXXXXXX (From Google Analytics Admin &gt; Data Streams)</div>
+                <div className="form-hint">Formato: G-XXXXXXXXXX (Google Analytics Admin &gt; Flujos de datos)</div>
               </div>
 
-              <div style={{ marginBottom: '20px' }}>
+              <div style={{ marginBottom: '16px' }}>
                 <label className="form-label">Google Search Console Property</label>
                 <input
                   type="url"
                   required
                   value={gscProperty}
                   onChange={(e) => setGscProperty(e.target.value)}
-                  placeholder="https://blog.loveable.us"
+                  placeholder="https://www.miregalo.us/"
                   className="form-input"
                 />
-                <div className="form-hint">Verified Domain or URL-prefix property in Google Search Console.</div>
+                <div className="form-hint">Propiedad verificada en Google Search Console (URL o Dominio).</div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '20px' }}>
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Total Sessions</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={customSessions}
+                    onChange={(e) => setCustomSessions(Number(e.target.value))}
+                    className="form-input"
+                  />
+                </div>
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Active Users</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={customUsers}
+                    onChange={(e) => setCustomUsers(Number(e.target.value))}
+                    className="form-input"
+                  />
+                </div>
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Pageviews</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={customPageviews}
+                    onChange={(e) => setCustomPageviews(Number(e.target.value))}
+                    className="form-input"
+                  />
+                </div>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                 <button type="button" onClick={() => setShowConfigModal(false)} className="btn-secondary">
-                  Cancel
+                  Cancelar
                 </button>
                 <button type="submit" className="btn-primary">
-                  Save Settings
+                  Guardar Cambios
                 </button>
               </div>
             </form>

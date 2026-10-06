@@ -344,6 +344,56 @@
   max-width: 580px;
   line-height: 1.5;
 }
+
+/* Search Mode Switcher Tabs */
+.search-mode-tabs {
+  display: inline-flex;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 9999px;
+  margin-bottom: 24px;
+}
+.search-mode-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #64748b;
+  border: none;
+  background: transparent;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.search-mode-tab.active {
+  background: #ffffff;
+  color: #1e1b4b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.google-hero-bar {
+  border-color: #cbd5e1;
+}
+.google-hero-bar:focus-within {
+  border-color: #4285f4;
+  box-shadow: 0 8px 28px -4px rgba(66, 133, 244, 0.25);
+}
+.google-btn {
+  background: #4285f4 !important;
+}
+.google-btn:hover {
+  background: #2b6cb0 !important;
+}
+.google-search-panel {
+  max-width: 680px;
+  margin: 0 auto;
+}
+.google-cse-container {
+  min-height: 50px;
+}
+
 .search-hero-form {
   max-width: 640px;
   margin: 0 auto;

@@ -77,12 +77,8 @@ function buildIndexes(db: DB): LocalDbIndexes {
   }
   for (const r of (db.redirects || [])) {
     if (r.active && r.source) {
-      const src = String(r.source);
+      const src = String(r.source).toLowerCase().replace(/\/+$/, '');
       indexes.redirectsBySource.set(src, r);
-      const noSlash = src.replace(/\/+$/, '');
-      if (!indexes.redirectsBySource.has(noSlash)) indexes.redirectsBySource.set(noSlash, r);
-      const withSlash = noSlash + '/';
-      if (!indexes.redirectsBySource.has(withSlash)) indexes.redirectsBySource.set(withSlash, r);
     }
   }
   for (const c of (db.categories || [])) {
@@ -216,8 +212,8 @@ function applyQuery<T extends Record<string, unknown>>(rows: T[] = [], q: Query 
     };
   }
 
-  // Zero-overhead shallow copy
-  return { rows: r.map((x) => ({ ...x })), total };
+  // Zero-overhead slice
+  return { rows: r.slice(), total };
 }
 
 export const localDriver: Driver = {
@@ -251,7 +247,8 @@ export const localDriver: Driver = {
       }
     } else if (table === 'redirects') {
       if (eq.source) {
-        const r = indexes.redirectsBySource.get(String(eq.source));
+        const src = String(eq.source).toLowerCase().replace(/\/+$/, '');
+        const r = indexes.redirectsBySource.get(src);
         if (r && (eq.active === undefined || r.active === eq.active)) {
           return { ...r } as never;
         }

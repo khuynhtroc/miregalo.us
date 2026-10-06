@@ -141,8 +141,11 @@ const g = globalThis as unknown as { __redirectCache?: { at: number; map: Map<st
 
 export async function getRedirectMap(): Promise<Map<string, Redirect>> {
   const now = Date.now();
-  if (g.__redirectCache && now - g.__redirectCache.at < 15_000) return g.__redirectCache.map;
-  const { rows } = await db.find('redirects', { eq: { active: true } });
+  if (g.__redirectCache && now - g.__redirectCache.at < 60_000) return g.__redirectCache.map;
+  const { rows } = await db.find('redirects', {
+    eq: { active: true },
+    select: 'source,destination,status_code,active',
+  });
   const map = new Map(rows.map((r) => [normalizePath(r.source), r]));
   g.__redirectCache = { at: now, map };
   return map;

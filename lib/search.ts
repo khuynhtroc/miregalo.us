@@ -64,16 +64,22 @@ async function getSearchablePosts(): Promise<Post[]> {
     return cachedPosts;
   }
 
-  // Load all published posts with items for deep searching
-  const { rows } = await db.find('posts', {
-    eq: { status: 'published' },
-    select: 'id,type,slug,title,excerpt,content_html,intro_html,items,hero_image,hero_alt,primary_category_id,category_ids,published_at,focus_keyword',
-    order: [{ field: 'published_at', asc: false }],
-  });
+  try {
+    // Only load card & item search fields (DO NOT select content_html/intro_html which are 60MB+)
+    const { rows } = await db.find('posts', {
+      eq: { status: 'published' },
+      select: 'id,type,slug,title,excerpt,items,hero_image,hero_alt,primary_category_id,category_ids,published_at,focus_keyword',
+      order: [{ field: 'published_at', asc: false }],
+      limit: 1000,
+    });
 
-  cachedPosts = rows as Post[];
-  lastCacheTime = now;
-  return cachedPosts;
+    cachedPosts = rows as Post[];
+    lastCacheTime = now;
+    return cachedPosts;
+  } catch (err) {
+    console.error('[search] Error loading searchable posts:', err);
+    return cachedPosts || [];
+  }
 }
 
 /** Normalize string: lowercase, remove accents / diacritics */
@@ -123,14 +129,7 @@ export async function searchPosts(options: SearchOptions): Promise<SearchRespons
   const perPage = options.perPage ?? 20;
   const page = Math.max(1, options.page ?? 1);
 
-  const [posts, categories] = await Promise.all([
-    getSearchablePosts(),
-    getCategories(),
-  ]);
-
-  const catById = new Map<string, Category>(categories.map((c) => [c.id, c]));
-  const catBySlug = new Map<string, Category>(categories.map((c) => [c.slug, c]));
-
+  // If query is empty, exit immediately without querying posts!
   if (!query) {
     return {
       query: '',
@@ -143,6 +142,14 @@ export async function searchPosts(options: SearchOptions): Promise<SearchRespons
       topics: [],
     };
   }
+
+  const [posts, categories] = await Promise.all([
+    getSearchablePosts(),
+    getCategories(),
+  ]);
+
+  const catById = new Map<string, Category>(categories.map((c) => [c.id, c]));
+  const catBySlug = new Map<string, Category>(categories.map((c) => [c.slug, c]));
 
   const tokens = query
     .split(/\s+/)

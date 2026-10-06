@@ -21,13 +21,14 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
+    const existing = await db.findOne('analytics', { id: 'analytics-main' });
     const updated: AnalyticsOverview = {
       ...DEFAULT_ANALYTICS,
+      ...(existing || {}),
       ...body,
       id: 'analytics-main',
       last_updated: new Date().toISOString(),
     };
-    const existing = await db.findOne('analytics', { id: 'analytics-main' });
     if (existing) {
       await db.update('analytics', 'analytics-main', updated as any);
     } else {

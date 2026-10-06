@@ -333,6 +333,20 @@ export function SettingsManager({ initialSettings, dbDriver }: SettingsManagerPr
 
             <div className="form-row">
               <div className="form-group">
+                <label className="form-label">Google Programmable Search Engine ID (CX)</label>
+                <input
+                  className="form-input"
+                  type="text"
+                  value={settings.google_search_cx || ''}
+                  onChange={(e) => setSettings({ ...settings, google_search_cx: e.target.value })}
+                  placeholder="e.g. 0123456789abcdef:example"
+                />
+                <div className="form-hint">Habilita el script y widget oficial de Google Search en /search/</div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
                 <label className="form-label">Bing Webmaster Verification Code</label>
                 <input
                   className="form-input"

@@ -226,6 +226,7 @@ export interface SiteSettings {
   body_scripts: string;
   robots_extra: string;
   noindex_site: boolean;
+  google_search_cx?: string;
 }
 
 export interface ContentJob {

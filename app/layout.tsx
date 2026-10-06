@@ -53,7 +53,12 @@ export default async function RootLayout({
           </>
         )}
         {settings.head_scripts && (
-          <div dangerouslySetInnerHTML={{ __html: settings.head_scripts }} />
+          <script
+            id="site-custom-head-scripts"
+            dangerouslySetInnerHTML={{
+              __html: settings.head_scripts.replace(/<\/?script[^>]*>/gi, ''),
+            }}
+          />
         )}
       </head>
       <body>
