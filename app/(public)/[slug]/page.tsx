@@ -399,11 +399,11 @@ export default async function DynamicSlugPage({ params }: PageProps) {
                     settings.organization_name
                   )}
                 </span>
-                <span className="article-date">
-                  <time dateTime={post.published_at || post.created_at}>
+                <span className="article-date" suppressHydrationWarning>
+                  <time dateTime={post.published_at || post.created_at} suppressHydrationWarning>
                     {fmtDate(post.published_at || post.created_at)}
                   </time>
-                  {post.updated_at && ` · Actualizado el ${fmtDate(post.updated_at)}`}
+                  {post.updated_at && <span suppressHydrationWarning>{` · Actualizado el ${fmtDate(post.updated_at)}`}</span>}
                 </span>
               </div>
             </div>
@@ -415,6 +415,10 @@ export default async function DynamicSlugPage({ params }: PageProps) {
                 src={post.hero_image}
                 alt={post.hero_alt || post.title}
                 loading="eager"
+                fetchPriority="high"
+                width={800}
+                height={450}
+                style={{ width: '100%', height: 'auto', aspectRatio: '16/9', objectFit: 'cover' }}
               />
             )}
           </header>

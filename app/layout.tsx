@@ -1,8 +1,17 @@
 import type { Metadata } from 'next';
+import { Poppins } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { getSettings } from '@/lib/repo';
 import { orgSchema, websiteSchema } from '@/lib/seo';
 import { JsonLd } from '@/components/JsonLd';
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-poppins',
+});
 
 export const dynamic = 'force-dynamic';
 
@@ -37,40 +46,16 @@ export default async function RootLayout({
   const settings = await getSettings();
 
   return (
-    <html lang={settings.locale || 'es'}>
+    <html lang={settings.locale || 'es'} className={poppins.variable} suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/png" href={settings.favicon_url || '/favicon.png'} />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <JsonLd data={[websiteSchema(settings), orgSchema(settings)]} />
-        {settings.ga4_id && (
-          <>
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${settings.ga4_id}`}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${settings.ga4_id}');
-                `,
-              }}
-            />
-          </>
-        )}
         {settings.head_scripts && (() => {
           const raw = settings.head_scripts.trim();
           if (!raw) return null;
 
           const metaTags = raw.match(/<meta\s+[^>]+>/gi) || [];
-          const cleanJs = raw
-            .replace(/<!--[\s\S]*?-->/g, '')
-            .replace(/<meta\s+[^>]+>/gi, '')
-            .replace(/<\/?script[^>]*>/gi, '')
-            .trim();
-
           return (
             <>
               {metaTags.map((tag, idx) => {
@@ -81,20 +66,53 @@ export default async function RootLayout({
                 if (property && content) return <meta key={`m-${idx}`} property={property} content={content} />;
                 return null;
               })}
-              {cleanJs ? (
-                <script
-                  id="site-custom-head-scripts"
-                  dangerouslySetInnerHTML={{ __html: cleanJs }}
-                />
-              ) : null}
             </>
           );
         })()}
       </head>
-      <body>
+      <body className={poppins.className} suppressHydrationWarning>
         {children}
+
+        {/* Analytics & Custom Scripts loaded safely with Next.js Script */}
+        {settings.ga4_id && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${settings.ga4_id}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${settings.ga4_id}');
+              `}
+            </Script>
+          </>
+        )}
+
+        {settings.head_scripts && (() => {
+          const raw = settings.head_scripts.trim();
+          if (!raw) return null;
+          const cleanJs = raw
+            .replace(/<!--[\s\S]*?-->/g, '')
+            .replace(/<meta\s+[^>]+>/gi, '')
+            .replace(/<\/?script[^>]*>/gi, '')
+            .trim();
+          if (!cleanJs) return null;
+          return (
+            <Script id="custom-head-js" strategy="afterInteractive">
+              {cleanJs}
+            </Script>
+          );
+        })()}
+
         {settings.body_scripts && (
-          <div dangerouslySetInnerHTML={{ __html: settings.body_scripts }} />
+          <div
+            id="body-scripts-container"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: settings.body_scripts }}
+          />
         )}
       </body>
     </html>
