@@ -27,23 +27,25 @@ const sb = createClient(url, key, { auth: { persistSession: false } });
 const file = process.argv.includes('--from-local') ? 'db.json' : 'seed.json';
 const data = JSON.parse(readFileSync(path.join(root, 'data', file), 'utf8'));
 
-async function upsert(table, rows, onConflict = 'id') {
+async function upsert(table, rows, onConflict = 'id', batchSize = 200) {
   if (!rows?.length) return;
-  for (let i = 0; i < rows.length; i += 500) {
-    const chunk = rows.slice(i, i + 500);
+  console.log(`⏳ Seeding ${table} (${rows.length} rows)...`);
+  for (let i = 0; i < rows.length; i += batchSize) {
+    const chunk = rows.slice(i, i + batchSize);
     const { error } = await sb.from(table).upsert(chunk, { onConflict });
-    if (error) throw new Error(`${table}: ${error.message}`);
+    if (error) throw new Error(`${table} [${i}..${i + chunk.length}]: ${error.message}`);
+    process.stdout.write(`\r   Progress: ${Math.min(i + batchSize, rows.length)}/${rows.length}`);
   }
-  console.log(`✓ ${table}: ${rows.length}`);
+  console.log(`\n✓ ${table}: ${rows.length} rows synced successfully`);
 }
 
 // order matters for foreign keys
-await upsert('authors', data.authors);
-await upsert('categories', data.categories);
-await upsert('products', data.products);
-await upsert('posts', data.posts);
-await upsert('redirects', data.redirects);
-await upsert('keywords', data.keywords);
+await upsert('authors', data.authors, 'id', 100);
+await upsert('categories', data.categories, 'id', 100);
+await upsert('products', data.products, 'id', 150);
+await upsert('posts', data.posts, 'id', 40);
+await upsert('redirects', data.redirects, 'id', 400);
+await upsert('keywords', data.keywords, 'id', 200);
 for (const [k, v] of Object.entries(data.settings ?? {})) {
   const { error } = await sb.from('settings').upsert({ key: k, value: v }, { onConflict: 'key' });
   if (error) throw new Error(`settings: ${error.message}`);

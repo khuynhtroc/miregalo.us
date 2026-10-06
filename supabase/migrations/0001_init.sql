@@ -13,7 +13,7 @@ create table if not exists public.settings (
 
 -- ── authors ─────────────────────────────────────────────────────────
 create table if not exists public.authors (
-  id           uuid primary key default gen_random_uuid(),
+  id           text primary key default gen_random_uuid()::text,
   slug         text not null unique,
   name         text not null,
   entity_type  text not null default 'Organization' check (entity_type in ('Organization','Person')),
@@ -29,7 +29,7 @@ create table if not exists public.authors (
 
 -- ── categories (hubs + taxonomies) ─────────────────────────────────
 create table if not exists public.categories (
-  id                uuid primary key default gen_random_uuid(),
+  id                text primary key default gen_random_uuid()::text,
   slug              text not null unique,
   name              text not null,
   "group"           text not null check ("group" in ('hub','recipients','occasions','interests','blog')),
@@ -49,7 +49,7 @@ create table if not exists public.categories (
 
 -- ── posts (gift guides, blog posts, static pages) ──────────────────
 create table if not exists public.posts (
-  id                   uuid primary key default gen_random_uuid(),
+  id                   text primary key default gen_random_uuid()::text,
   type                 text not null default 'gift' check (type in ('gift','blog','page')),
   slug                 text not null,
   title                text not null,
@@ -60,9 +60,9 @@ create table if not exists public.posts (
   faqs                 jsonb not null default '[]'::jsonb,
   hero_image           text not null default '',
   hero_alt             text not null default '',
-  primary_category_id  uuid references public.categories(id) on delete set null,
-  category_ids         uuid[] not null default '{}',
-  author_id            uuid references public.authors(id) on delete set null,
+  primary_category_id  text references public.categories(id) on delete set null,
+  category_ids         text[] not null default '{}',
+  author_id            text references public.authors(id) on delete set null,
   status               text not null default 'draft' check (status in ('draft','published','planned','archived')),
   featured             boolean not null default false,
   editor_pick          boolean not null default false,
@@ -83,7 +83,7 @@ create index if not exists posts_type_idx on public.posts (type);
 
 -- ── products (affiliate library) ───────────────────────────────────
 create table if not exists public.products (
-  id           uuid primary key default gen_random_uuid(),
+  id           text primary key default gen_random_uuid()::text,
   slug         text not null unique,
   name         text not null,
   url          text not null default '',
@@ -101,7 +101,7 @@ create table if not exists public.products (
 
 -- ── redirects (301/302 manager) ────────────────────────────────────
 create table if not exists public.redirects (
-  id           uuid primary key default gen_random_uuid(),
+  id           text primary key default gen_random_uuid()::text,
   source       text not null unique,
   destination  text not null,
   code         int not null default 301 check (code in (301,302,308)),
@@ -115,7 +115,7 @@ create table if not exists public.redirects (
 --  PHASE 2 – AI Content Engine tables (prepared, used later)
 -- ════════════════════════════════════════════════════════════════════
 create table if not exists public.keywords (
-  id           uuid primary key default gen_random_uuid(),
+  id           text primary key default gen_random_uuid()::text,
   keyword      text not null,
   target_path  text not null default '',
   post_type    text not null default 'gift' check (post_type in ('gift','blog','page')),
@@ -126,7 +126,7 @@ create table if not exists public.keywords (
   priority     int not null default 0,
   status       text not null default 'planned'
                check (status in ('planned','researching','writing','review','published','skipped')),
-  post_id      uuid references public.posts(id) on delete set null,
+  post_id      text references public.posts(id) on delete set null,
   notes        text not null default '',
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()
@@ -134,8 +134,8 @@ create table if not exists public.keywords (
 create index if not exists keywords_status_idx on public.keywords (status, priority desc);
 
 create table if not exists public.content_jobs (
-  id          uuid primary key default gen_random_uuid(),
-  keyword_id  uuid references public.keywords(id) on delete cascade,
+  id          text primary key default gen_random_uuid()::text,
+  keyword_id  text references public.keywords(id) on delete cascade,
   stage       text not null default 'research'
               check (stage in ('research','outline','draft','seo','products','internal_links','review','done','error')),
   payload     jsonb not null default '{}'::jsonb,
@@ -146,9 +146,9 @@ create table if not exists public.content_jobs (
 );
 
 create table if not exists public.internal_links (
-  id              uuid primary key default gen_random_uuid(),
-  source_post_id  uuid references public.posts(id) on delete cascade,
-  target_post_id  uuid references public.posts(id) on delete cascade,
+  id              text primary key default gen_random_uuid()::text,
+  source_post_id  text references public.posts(id) on delete cascade,
+  target_post_id  text references public.posts(id) on delete cascade,
   anchor          text not null default '',
   status          text not null default 'suggested' check (status in ('suggested','applied','rejected')),
   created_at      timestamptz not null default now()
@@ -167,7 +167,7 @@ create table if not exists public.gsc_metrics (
 );
 
 -- ── counter helper used by driver.increment() ──────────────────────
-create or replace function public.increment_counter(p_table text, p_id uuid, p_field text)
+create or replace function public.increment_counter(p_table text, p_id text, p_field text)
 returns void language plpgsql security definer as $$
 begin
   if p_table not in ('products','redirects') or p_field not in ('clicks','hits') then
