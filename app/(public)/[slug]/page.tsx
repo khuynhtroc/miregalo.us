@@ -31,6 +31,8 @@ import { Pagination } from '@/components/Pagination';
 import { StoreCta } from '@/components/StoreCta';
 import { JsonLd } from '@/components/JsonLd';
 import { ContactForm } from '@/components/ContactForm';
+import { TableOfContents } from '@/components/TableOfContents';
+import { extractTocItems } from '@/lib/toc';
 import { fmtDate } from '@/lib/format';
 
 interface PageProps {
@@ -347,6 +349,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
   const primaryCat = post.primary_category_id ? catMap.get(post.primary_category_id) : null;
   const author = await getAuthorById(post.author_id);
   const relatedPosts = await getRelatedPosts(post, 8);
+  const tocItems = extractTocItems(post);
 
   const breadcrumbs = [
     ...(primaryCat
@@ -433,6 +436,15 @@ export default async function DynamicSlugPage({ params }: PageProps) {
               className="article-content prose"
               style={{ marginBottom: '32px' }}
               dangerouslySetInnerHTML={{ __html: post.intro_html }}
+            />
+          )}
+
+          {/* In-Article Table of Contents (Mục lục sản phẩm) */}
+          {tocItems.length >= 2 && (
+            <TableOfContents
+              items={tocItems}
+              variant="inline"
+              title={`Índice de contenidos (${post.items?.length || tocItems.length} ideas)`}
             />
           )}
 
@@ -595,8 +607,8 @@ export default async function DynamicSlugPage({ params }: PageProps) {
 
           {/* FAQ Accordion */}
           {post.faqs && post.faqs.length > 0 && (
-            <section style={{ marginTop: '48px' }}>
-              <h2>Preguntas frecuentes</h2>
+            <section style={{ marginTop: '48px' }} id="preguntas-frecuentes">
+              <h2 id="faq-heading">Preguntas frecuentes</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
                 {post.faqs.map((faq, idx) => (
                   <details
@@ -663,7 +675,15 @@ export default async function DynamicSlugPage({ params }: PageProps) {
         </article>
 
         {/* Sidebar */}
-        <aside className="article-aside">
+        <aside className="article-aside" aria-label="En esta página">
+          {tocItems.length >= 2 && (
+            <TableOfContents
+              items={tocItems}
+              variant="aside"
+              title="En este artículo"
+            />
+          )}
+
           {relatedPosts.length > 0 && (
             <div className="aside-related" style={{ padding: '20px' }}>
               <p

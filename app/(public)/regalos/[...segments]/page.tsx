@@ -184,8 +184,96 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
           </div>
         )}
 
+        {/* ── ÍNDICE RÁPIDO DE LA PÁGINA ── */}
+        <nav
+          className="catalog-quick-nav"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            flexWrap: 'wrap',
+            marginBottom: '36px',
+            padding: '12px 18px',
+            background: '#ffffff',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0',
+            fontSize: '0.86rem',
+          }}
+        >
+          <span style={{ fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>📑</span>
+            <span>Índice rápido:</span>
+          </span>
+          <a
+            href="#ideas-destacadas"
+            style={{
+              padding: '5px 12px',
+              borderRadius: '999px',
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              color: '#334155',
+              textDecoration: 'none',
+              fontWeight: 600,
+              fontSize: '0.82rem',
+            }}
+          >
+            🎁 Productos ({matchedProducts.length})
+          </a>
+          {content.tips && content.tips.length > 0 && (
+            <a
+              href="#consejos"
+              style={{
+                padding: '5px 12px',
+                borderRadius: '999px',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                color: '#334155',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '0.82rem',
+              }}
+            >
+              💡 Consejos de compra
+            </a>
+          )}
+          {content.faqs && content.faqs.length > 0 && (
+            <a
+              href="#faqs"
+              style={{
+                padding: '5px 12px',
+                borderRadius: '999px',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                color: '#334155',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '0.82rem',
+              }}
+            >
+              ❓ Preguntas frecuentes
+            </a>
+          )}
+          {relatedArticles.length > 0 && (
+            <a
+              href="#articulos-recomendados"
+              style={{
+                padding: '5px 12px',
+                borderRadius: '999px',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                color: '#334155',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '0.82rem',
+              }}
+            >
+              📚 Artículos relacionados
+            </a>
+          )}
+        </nav>
+
         {/* ── SECCIÓN 1: PRODUCTOS SELECCIONADOS ── */}
-        <section style={{ marginBottom: '56px' }}>
+        <section id="ideas-destacadas" style={{ marginBottom: '56px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
             <div>
               <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#1e293b', margin: '0 0 4px' }}>
@@ -222,7 +310,7 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
         </section>
 
         {/* ── SECCIÓN 2: CONSEJOS Y GUÍA DEL COMPRADOR ── */}
-        <section style={{ marginBottom: '56px', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '36px', borderRadius: '16px' }}>
+        <section id="consejos" style={{ marginBottom: '56px', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '36px', borderRadius: '16px' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>
             Consejos para Acertar al 100%
           </h2>
@@ -245,7 +333,7 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
 
         {/* ── SECCIÓN 3: PREGUNTAS FRECUENTES (FAQ) ── */}
         {content.faqs && content.faqs.length > 0 && (
-          <section style={{ marginBottom: '56px' }}>
+          <section id="faqs" style={{ marginBottom: '56px' }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>
               Preguntas Frecuentes ({content.faqs.length})
             </h2>
@@ -275,7 +363,7 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
 
         {/* ── SECCIÓN 4: ARTÍCULOS Y GUÍAS EDITORIALES RELACIONADAS ── */}
         {relatedArticles.length > 0 && (
-          <section style={{ marginBottom: '56px' }}>
+          <section id="articulos-recomendados" style={{ marginBottom: '56px' }}>
             <div
               style={{
                 display: 'flex',

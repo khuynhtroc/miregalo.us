@@ -1177,3 +1177,99 @@
     gap: 24px;
   }
 }
+
+/* ───────────────────────── Table of Contents (In-Article & Aside) ───────────────────────── */
+.in-article-toc {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin: 28px 0 36px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+.in-article-toc-summary {
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid transparent;
+  transition: background 0.16s ease;
+}
+.in-article-toc-summary:hover {
+  background: #f1f5f9;
+}
+.in-article-toc[open] .in-article-toc-summary {
+  border-bottom-color: var(--line);
+}
+.in-article-toc-body {
+  padding: 18px 20px 22px;
+}
+.in-article-toc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px 14px;
+  max-height: 440px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+.in-article-toc-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.16s ease;
+}
+.in-article-toc-link:hover {
+  background: var(--pink-soft);
+  color: var(--pink-dark);
+  border-color: #ffd6dc;
+  transform: translateX(3px);
+}
+.in-article-toc-idx {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--pink);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.in-article-toc-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.table-of-contents a.is-active {
+  color: var(--pink-dark) !important;
+  font-weight: 700 !important;
+  border-left: 2px solid var(--pink);
+  padding-left: 6px;
+}
+@media (max-width: 680px) {
+  .in-article-toc-grid {
+    grid-template-columns: 1fr;
+    max-height: 380px;
+  }
+  .in-article-toc-summary {
+    padding: 14px 16px;
+  }
+  .in-article-toc-body {
+    padding: 14px 16px 18px;
+  }
+}

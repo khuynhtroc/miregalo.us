@@ -13,6 +13,7 @@ import { postPath } from '@/lib/urls';
 import { fmtDate } from '@/lib/format';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { TableOfContents } from '@/components/TableOfContents';
+import { extractTocItems } from '@/lib/toc';
 import { PostCard } from '@/components/PostCard';
 import { StoreCta } from '@/components/StoreCta';
 import { JsonLd } from '@/components/JsonLd';
@@ -38,6 +39,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const primaryCat = post.primary_category_id ? catMap.get(post.primary_category_id) : null;
   const author = await getAuthorById(post.author_id);
   const relatedPosts = await getRelatedPosts(post, 4);
+  const tocItems = extractTocItems(post);
 
   const breadcrumbs = [
     { name: 'Blog', path: '/blog/' },
@@ -104,6 +106,14 @@ export default async function BlogPostPage({ params }: PageProps) {
             )}
           </header>
 
+          {tocItems.length >= 2 && (
+            <TableOfContents
+              items={tocItems}
+              variant="inline"
+              title={`Índice del artículo (${tocItems.length} secciones)`}
+            />
+          )}
+
           <div
             className="article-content prose"
             dangerouslySetInnerHTML={{ __html: post.content_html }}
@@ -114,7 +124,13 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         {/* Sticky Aside with Table of Contents */}
         <aside className="article-aside" aria-label="En esta página">
-          <TableOfContents />
+          {tocItems.length >= 2 && (
+            <TableOfContents
+              items={tocItems}
+              variant="aside"
+              title="En este artículo"
+            />
+          )}
 
           {relatedPosts.length > 0 && (
             <div className="aside-related" style={{ padding: '20px' }}>
