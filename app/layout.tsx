@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { getSettings } from '@/lib/repo';
 import { orgSchema, websiteSchema } from '@/lib/seo';
@@ -114,6 +116,9 @@ export default async function RootLayout({
             dangerouslySetInnerHTML={{ __html: settings.body_scripts }}
           />
         )}
+
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
