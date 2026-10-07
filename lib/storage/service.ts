@@ -142,24 +142,54 @@ export async function createMediaFile(data: {
   let publicUrl = '';
   let syncedToCloud = false;
 
-  if (data.externalUrl) {
-    publicUrl = data.externalUrl;
-    syncedToCloud = settings.provider !== 'local';
-  } else if (data.buffer) {
-    const filePath = path.join(UPLOAD_DIR, filename);
-    await fs.promises.writeFile(filePath, data.buffer);
-    publicUrl = `/uploads/${filename}`;
-  } else {
-    publicUrl = `https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&auto=format&fit=crop&q=80`;
+  // 1. Save local backup if filesystem is writable
+  if (data.buffer) {
+    try {
+      const filePath = path.join(UPLOAD_DIR, filename);
+      await fs.promises.writeFile(filePath, data.buffer);
+    } catch {
+      // Ignore if read-only filesystem (e.g. serverless)
+    }
   }
 
-  // If cloud provider is enabled and auto-sync is on
-  if (settings.auto_sync && settings.provider === 'cloudflare_r2' && settings.cloudflare?.public_domain) {
-    publicUrl = `${settings.cloudflare.public_domain}/uploads/${filename}`;
-    syncedToCloud = true;
-  } else if (settings.auto_sync && settings.provider === 'supabase' && settings.supabase?.public_url) {
-    publicUrl = `${settings.supabase.public_url}/${filename}`;
-    syncedToCloud = true;
+  // 2. Direct Cloudflare R2 Upload
+  try {
+    const { getR2Config, uploadBufferToR2 } = await import('./r2');
+    const r2Config = await getR2Config();
+
+    if (r2Config && data.buffer) {
+      const r2Key = `media/uploads/${filename}`;
+      publicUrl = await uploadBufferToR2(r2Key, data.buffer, data.mimeType, r2Config);
+      syncedToCloud = true;
+    } else if (r2Config && data.externalUrl && !data.externalUrl.includes(r2Config.publicDomain)) {
+      try {
+        const extRes = await fetch(data.externalUrl);
+        if (extRes.ok) {
+          const extBuf = Buffer.from(await extRes.arrayBuffer());
+          const r2Key = `media/uploads/${filename}`;
+          const mime = extRes.headers.get('content-type') || data.mimeType;
+          publicUrl = await uploadBufferToR2(r2Key, extBuf, mime, r2Config);
+          syncedToCloud = true;
+        } else {
+          publicUrl = data.externalUrl;
+        }
+      } catch {
+        publicUrl = data.externalUrl;
+      }
+    }
+  } catch (err) {
+    console.warn('R2 direct upload error in createMediaFile:', err);
+  }
+
+  // 3. Fallbacks if not uploaded to R2
+  if (!publicUrl) {
+    if (data.externalUrl) {
+      publicUrl = data.externalUrl;
+    } else if (data.buffer) {
+      publicUrl = `/uploads/${filename}`;
+    } else {
+      publicUrl = `https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&auto=format&fit=crop&q=80`;
+    }
   }
 
   const newFile: MediaFile = {
@@ -167,11 +197,11 @@ export async function createMediaFile(data: {
     name: data.name,
     original_name: data.originalName,
     url: publicUrl,
-    storage_provider: syncedToCloud ? settings.provider : 'local',
+    storage_provider: syncedToCloud ? 'cloudflare_r2' : 'local',
     size_bytes: data.sizeBytes,
     mime_type: data.mimeType,
     alt_text: data.altText || data.name,
-    remote_key: `uploads/${filename}`,
+    remote_key: `media/uploads/${filename}`,
     synced_to_cloud: syncedToCloud,
     used_in: [],
     created_at: new Date().toISOString(),
