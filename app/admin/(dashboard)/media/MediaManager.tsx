@@ -49,6 +49,32 @@ export function MediaManager({
 
   // Settings Form State
   const [settingsForm, setSettingsForm] = useState<CloudStorageSettings>(initialSettings);
+  const [testingR2, setTestingR2] = useState(false);
+  const [r2TestResult, setR2TestResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  const handleTestR2 = async () => {
+    setTestingR2(true);
+    setR2TestResult(null);
+    try {
+      const res = await fetch('/api/admin/media/r2/test/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accountId: settingsForm.cloudflare?.account_id,
+          accessKeyId: settingsForm.cloudflare?.access_key_id,
+          secretAccessKey: settingsForm.cloudflare?.secret_access_key,
+          bucketName: settingsForm.cloudflare?.bucket_name,
+          publicDomain: settingsForm.cloudflare?.public_domain,
+        }),
+      });
+      const data = await res.json();
+      setR2TestResult(data);
+    } catch (e: any) {
+      setR2TestResult({ success: false, message: e.message || 'Connection test failed' });
+    } finally {
+      setTestingR2(false);
+    }
+  };
 
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return '0 B';
@@ -922,6 +948,24 @@ export function MediaManager({
                     placeholder="https://cdn.miregalo.us"
                     className="form-input"
                   />
+                </div>
+
+                <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={handleTestR2}
+                    disabled={testingR2}
+                    className="btn-secondary"
+                    style={{ fontSize: '0.82rem', padding: '6px 14px', background: '#ffedd5', borderColor: '#fed7aa', color: '#9a3412' }}
+                  >
+                    {testingR2 ? 'Testing Connection...' : '⚡ Test R2 Connection'}
+                  </button>
+                  {r2TestResult && (
+                    <span style={{ fontSize: '0.82rem', fontWeight: 500, color: r2TestResult.success ? '#15803d' : '#b91c1c' }}>
+                      {r2TestResult.success ? '✅ ' : '❌ '}
+                      {r2TestResult.message}
+                    </span>
+                  )}
                 </div>
               </div>
 
