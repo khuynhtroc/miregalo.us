@@ -11,6 +11,7 @@ import {
   hubFilter,
   listPublishedPosts,
   getPublishedPost,
+  getRelatedPosts,
 } from '@/lib/repo';
 import {
   buildMetadata,
@@ -345,11 +346,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
   // 2B: GIFT GUIDE
   const primaryCat = post.primary_category_id ? catMap.get(post.primary_category_id) : null;
   const author = await getAuthorById(post.author_id);
-  const { rows: relatedPosts } = await listPublishedPosts({
-    categoryId: post.primary_category_id || undefined,
-    excludeId: post.id,
-    perPage: 4,
-  });
+  const relatedPosts = await getRelatedPosts(post, 8);
 
   const breadcrumbs = [
     ...(primaryCat
@@ -453,6 +450,140 @@ export default async function DynamicSlugPage({ params }: PageProps) {
             </div>
           )}
 
+          {/* In-Article Related Guides for Products */}
+          {post.items && post.items.length > 0 && relatedPosts.length > 0 && (
+            <div
+              className="related-guides-box"
+              style={{
+                margin: '44px 0',
+                padding: '26px 28px',
+                background: 'linear-gradient(135deg, #fff7ed 0%, #fff1f2 100%)',
+                border: '1px solid #fed7aa',
+                borderRadius: '16px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '16px',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                }}
+              >
+                <div>
+                  <span
+                    style={{
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      color: '#e11d48',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      display: 'block',
+                      marginBottom: '2px',
+                    }}
+                  >
+                    💡 Guías recomendadas
+                  </span>
+                  <h3 style={{ margin: 0, fontSize: '1.22rem', fontWeight: 700, color: '#1e293b' }}>
+                    ¿Buscas más inspiración para regalar?
+                  </h3>
+                </div>
+                <span
+                  style={{
+                    fontSize: '0.8rem',
+                    color: '#c2410c',
+                    background: '#ffedd5',
+                    padding: '4px 12px',
+                    borderRadius: '999px',
+                    fontWeight: 600,
+                  }}
+                >
+                  Ideas seleccionadas
+                </span>
+              </div>
+              <p style={{ margin: '0 0 18px', fontSize: '0.9rem', color: '#64748b', lineHeight: 1.5 }}>
+                Explora otras selecciones de nuestro equipo editorial con recomendaciones complementarias:
+              </p>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                  gap: '14px',
+                }}
+              >
+                {relatedPosts.slice(0, 3).map((rp) => (
+                  <Link
+                    key={rp.id}
+                    href={postPath(rp)}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      background: '#ffffff',
+                      borderRadius: '12px',
+                      border: '1px solid #fee2e2',
+                      overflow: 'hidden',
+                      textDecoration: 'none',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+                      transition: 'transform 0.18s, box-shadow 0.18s',
+                    }}
+                  >
+                    {rp.hero_image && (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={rp.hero_image}
+                        alt={rp.hero_alt || rp.title}
+                        loading="lazy"
+                        style={{ width: '100%', height: '130px', objectFit: 'cover' }}
+                      />
+                    )}
+                    <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <h4
+                        style={{
+                          margin: '0 0 6px',
+                          fontSize: '0.92rem',
+                          fontWeight: 700,
+                          color: '#1e293b',
+                          lineHeight: 1.35,
+                        }}
+                      >
+                        {rp.title}
+                      </h4>
+                      {rp.excerpt && (
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: '0.8rem',
+                            color: '#64748b',
+                            lineHeight: 1.4,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {rp.excerpt}
+                        </p>
+                      )}
+                      <span
+                        style={{
+                          marginTop: 'auto',
+                          paddingTop: '8px',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          color: '#e11d48',
+                        }}
+                      >
+                        Leer guía completa →
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Bottom Line / Conclusion HTML */}
           {post.content_html && (
             <div
@@ -534,12 +665,85 @@ export default async function DynamicSlugPage({ params }: PageProps) {
         {/* Sidebar */}
         <aside className="article-aside">
           {relatedPosts.length > 0 && (
-            <div className="aside-related">
-              <p className="aside-title">Guías relacionadas</p>
-              <ul>
-                {relatedPosts.map((rp) => (
+            <div className="aside-related" style={{ padding: '20px' }}>
+              <p
+                className="aside-title"
+                style={{
+                  fontSize: '0.92rem',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  color: 'var(--ink)',
+                  fontWeight: 700,
+                }}
+              >
+                <span>🎁</span>
+                <span>Guías recomendadas</span>
+              </p>
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '14px', listStyle: 'none', padding: 0 }}>
+                {relatedPosts.slice(0, 5).map((rp) => (
                   <li key={rp.id}>
-                    <Link href={postPath(rp)}>{rp.title}</Link>
+                    <Link
+                      href={postPath(rp)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      {rp.hero_image ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={rp.hero_image}
+                          alt={rp.hero_alt || rp.title}
+                          loading="lazy"
+                          style={{
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '8px',
+                            objectFit: 'cover',
+                            flexShrink: 0,
+                            border: '1px solid #e2e8f0',
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '8px',
+                            background: 'var(--pink-soft)',
+                            display: 'grid',
+                            placeItems: 'center',
+                            flexShrink: 0,
+                            fontSize: '1.2rem',
+                          }}
+                        >
+                          🎁
+                        </div>
+                      )}
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <span
+                          style={{
+                            fontSize: '0.84rem',
+                            fontWeight: 600,
+                            lineHeight: 1.35,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            color: '#1e293b',
+                          }}
+                        >
+                          {rp.title}
+                        </span>
+                        <span style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '3px', display: 'block' }}>
+                          {fmtDate(rp.published_at || rp.created_at)}
+                        </span>
+                      </div>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -565,11 +769,11 @@ export default async function DynamicSlugPage({ params }: PageProps) {
             </div>
 
             <div className="article-grid article-grid-four">
-              {relatedPosts.map((rp) => (
+              {relatedPosts.slice(0, 4).map((rp) => (
                 <PostCard
                   key={rp.id}
                   post={rp}
-                  category={primaryCat}
+                  category={rp.primary_category_id ? catMap.get(rp.primary_category_id) : primaryCat}
                   variant="standard"
                 />
               ))}

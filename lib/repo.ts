@@ -103,6 +103,119 @@ export async function getPublishedPost(type: PostType | PostType[], slug: string
   return null;
 }
 
+/** Get related published posts for a given post with intelligent multi-level fallback */
+export async function getRelatedPosts(
+  currentPost: Pick<Post, 'id' | 'type' | 'primary_category_id' | 'category_ids' | 'title'>,
+  limit = 6
+): Promise<Post[]> {
+  const catIds = [
+    currentPost.primary_category_id,
+    ...(currentPost.category_ids || []),
+  ].filter(Boolean) as string[];
+
+  const gathered: Post[] = [];
+  const seenIds = new Set<string>([currentPost.id]);
+
+  // 1. Try matching by overlapping category IDs
+  if (catIds.length > 0) {
+    const { rows } = await listPublishedPosts({
+      categoryIds: catIds,
+      excludeId: currentPost.id,
+      perPage: limit,
+    });
+    for (const r of rows) {
+      if (!seenIds.has(r.id)) {
+        seenIds.add(r.id);
+        gathered.push(r);
+      }
+    }
+  }
+
+  // 2. Try searching by title keywords if still fewer than limit
+  if (gathered.length < limit && currentPost.title) {
+    const keywords = currentPost.title
+      .replace(/[^\p{L}\p{N}\s]/gu, '')
+      .split(/\s+/)
+      .filter((w) => w.length > 4 && !['regalos', 'mejores', 'ideas', 'para', 'todos', 'desde'].includes(w.toLowerCase()))
+      .slice(0, 2)
+      .join(' ');
+
+    if (keywords) {
+      const { rows } = await listPublishedPosts({
+        q: keywords,
+        excludeId: currentPost.id,
+        perPage: limit,
+      });
+      for (const r of rows) {
+        if (!seenIds.has(r.id)) {
+          seenIds.add(r.id);
+          gathered.push(r);
+        }
+      }
+    }
+  }
+
+  // 3. Fallback: top up with other published posts
+  if (gathered.length < limit) {
+    const { rows } = await listPublishedPosts({
+      type: currentPost.type || 'gift',
+      excludeId: currentPost.id,
+      perPage: limit * 2,
+    });
+    for (const r of rows) {
+      if (!seenIds.has(r.id)) {
+        seenIds.add(r.id);
+        gathered.push(r);
+        if (gathered.length >= limit) break;
+      }
+    }
+  }
+
+  return gathered.slice(0, limit);
+}
+
+/** Get related published articles for a catalog / category page */
+export async function getRelatedPostsForCatalog(
+  term: string,
+  limit = 4
+): Promise<Post[]> {
+  const cleanTerm = term
+    .replace(/^Regalos\s+(para\s+|de\s+)?/i, '')
+    .trim();
+
+  const gathered: Post[] = [];
+  const seenIds = new Set<string>();
+
+  if (cleanTerm) {
+    const { rows } = await listPublishedPosts({
+      q: cleanTerm,
+      perPage: limit,
+    });
+    for (const r of rows) {
+      if (!seenIds.has(r.id)) {
+        seenIds.add(r.id);
+        gathered.push(r);
+      }
+    }
+  }
+
+  if (gathered.length < limit) {
+    const { rows } = await listPublishedPosts({
+      featured: true,
+      perPage: limit * 2,
+    });
+    for (const r of rows) {
+      if (!seenIds.has(r.id)) {
+        seenIds.add(r.id);
+        gathered.push(r);
+        if (gathered.length >= limit) break;
+      }
+    }
+  }
+
+  return gathered.slice(0, limit);
+}
+
 /** All published post paths – used by sitemap / URL map. */
 export async function getAllPublishedForSitemap() {
   const { rows } = await db.find('posts', {

@@ -2,11 +2,12 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
-import { getSettings, getCatalogUrls, getCatalogUrlByPath, getKeywordsForUrl } from '@/lib/repo';
+import { getSettings, getCatalogUrls, getCatalogUrlByPath, getKeywordsForUrl, getRelatedPostsForCatalog, getCategoryMap } from '@/lib/repo';
 import { buildMetadata, breadcrumbSchema, collectionSchema, faqSchema } from '@/lib/seo';
 import { getCatalogContent } from '@/lib/catalog-content';
 import { Breadcrumbs, type Crumb } from '@/components/Breadcrumbs';
 import { ProductCard } from '@/components/ProductCard';
+import { PostCard } from '@/components/PostCard';
 import { JsonLd } from '@/components/JsonLd';
 import { StoreCta } from '@/components/StoreCta';
 import type { Product } from '@/lib/types';
@@ -42,12 +43,15 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
     notFound();
   }
 
-  const [settings, allCatalogUrls, keywords, productsRes] = await Promise.all([
+  const [settings, allCatalogUrls, keywords, productsRes, catMap] = await Promise.all([
     getSettings(),
     getCatalogUrls(),
     getKeywordsForUrl(catalogUrl.id),
     db.find('products', { eq: { active: true }, limit: 20 }),
+    getCategoryMap(),
   ]);
+
+  const relatedArticles = await getRelatedPostsForCatalog(catalogUrl.page_title, 4);
 
   const content = getCatalogContent(catalogUrl);
 
@@ -269,7 +273,66 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* ── SECCIÓN 4: ENLACES INTERNOS Y OTRAS GUÍAS RELACIONADAS ── */}
+        {/* ── SECCIÓN 4: ARTÍCULOS Y GUÍAS EDITORIALES RELACIONADAS ── */}
+        {relatedArticles.length > 0 && (
+          <section style={{ marginBottom: '56px' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '24px',
+                flexWrap: 'wrap',
+                gap: '12px',
+              }}
+            >
+              <div>
+                <span
+                  style={{
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    color: '#e11d48',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    display: 'block',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Lecturas recomendadas
+                </span>
+                <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#1e293b', margin: 0 }}>
+                  Artículos y Guías para {catalogUrl.page_title}
+                </h2>
+              </div>
+              <Link
+                href="/blog/"
+                style={{
+                  fontSize: '0.88rem',
+                  fontWeight: 600,
+                  color: '#e11d48',
+                  textDecoration: 'none',
+                }}
+              >
+                Ver todo el blog →
+              </Link>
+            </div>
+            <p style={{ margin: '0 0 24px', color: '#64748b', fontSize: '0.94rem', maxWidth: '780px' }}>
+              Consejos prácticos, listas temáticas y recomendaciones de nuestro equipo para complementar tu elección.
+            </p>
+            <div className="article-grid article-grid-four">
+              {relatedArticles.map((art) => (
+                <PostCard
+                  key={art.id}
+                  post={art}
+                  category={art.primary_category_id ? catMap.get(art.primary_category_id) : null}
+                  variant="standard"
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── SECCIÓN 5: ENLACES INTERNOS Y OTRAS GUÍAS RELACIONADAS ── */}
         <section style={{ marginBottom: '48px', borderTop: '1px solid #e2e8f0', paddingTop: '36px' }}>
           <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1e293b', marginBottom: '16px' }}>
             Otras Guías Relacionadas

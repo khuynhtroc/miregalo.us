@@ -6,7 +6,7 @@ import {
   getCategoryMap,
   getAuthorById,
   getPublishedPost,
-  listPublishedPosts,
+  getRelatedPosts,
 } from '@/lib/repo';
 import { postMetadata, blogPostingSchema, breadcrumbSchema } from '@/lib/seo';
 import { postPath } from '@/lib/urls';
@@ -37,13 +37,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const [settings, catMap] = await Promise.all([getSettings(), getCategoryMap()]);
   const primaryCat = post.primary_category_id ? catMap.get(post.primary_category_id) : null;
   const author = await getAuthorById(post.author_id);
-
-  const { rows: relatedPosts } = await listPublishedPosts({
-    type: 'blog',
-    categoryId: post.primary_category_id || undefined,
-    excludeId: post.id,
-    perPage: 4,
-  });
+  const relatedPosts = await getRelatedPosts(post, 4);
 
   const breadcrumbs = [
     { name: 'Blog', path: '/blog/' },
@@ -123,12 +117,85 @@ export default async function BlogPostPage({ params }: PageProps) {
           <TableOfContents />
 
           {relatedPosts.length > 0 && (
-            <div className="aside-related">
-              <p className="aside-title">Ideas relacionadas</p>
-              <ul>
+            <div className="aside-related" style={{ padding: '20px' }}>
+              <p
+                className="aside-title"
+                style={{
+                  fontSize: '0.92rem',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  color: 'var(--ink)',
+                  fontWeight: 700,
+                }}
+              >
+                <span>💡</span>
+                <span>Ideas relacionadas</span>
+              </p>
+              <ul style={{ display: 'flex', flexDirection: 'column', gap: '14px', listStyle: 'none', padding: 0 }}>
                 {relatedPosts.map((rp) => (
                   <li key={rp.id}>
-                    <Link href={postPath(rp)}>{rp.title}</Link>
+                    <Link
+                      href={postPath(rp)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      {rp.hero_image ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={rp.hero_image}
+                          alt={rp.hero_alt || rp.title}
+                          loading="lazy"
+                          style={{
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '8px',
+                            objectFit: 'cover',
+                            flexShrink: 0,
+                            border: '1px solid #e2e8f0',
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '8px',
+                            background: 'var(--pink-soft)',
+                            display: 'grid',
+                            placeItems: 'center',
+                            flexShrink: 0,
+                            fontSize: '1.2rem',
+                          }}
+                        >
+                          📝
+                        </div>
+                      )}
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <span
+                          style={{
+                            fontSize: '0.84rem',
+                            fontWeight: 600,
+                            lineHeight: 1.35,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            color: '#1e293b',
+                          }}
+                        >
+                          {rp.title}
+                        </span>
+                        <span style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '3px', display: 'block' }}>
+                          {fmtDate(rp.published_at || rp.created_at)}
+                        </span>
+                      </div>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -158,7 +225,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 <PostCard
                   key={rp.id}
                   post={rp}
-                  category={primaryCat}
+                  category={rp.primary_category_id ? catMap.get(rp.primary_category_id) : primaryCat}
                   variant="standard"
                 />
               ))}

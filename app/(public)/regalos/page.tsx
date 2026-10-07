@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
-import { getSettings, getCatalogUrls } from '@/lib/repo';
+import { getSettings, getCatalogUrls, getRelatedPostsForCatalog, getCategoryMap } from '@/lib/repo';
 import { buildMetadata, breadcrumbSchema, collectionSchema, faqSchema } from '@/lib/seo';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ProductCard } from '@/components/ProductCard';
+import { PostCard } from '@/components/PostCard';
 import { JsonLd } from '@/components/JsonLd';
 import { StoreCta } from '@/components/StoreCta';
 import type { CatalogUrl, FaqItem } from '@/lib/types';
@@ -20,11 +21,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RegalosSiloPage() {
-  const [settings, catalogUrls, productsRes] = await Promise.all([
+  const [settings, catalogUrls, productsRes, catMap] = await Promise.all([
     getSettings(),
     getCatalogUrls(),
     db.find('products', { eq: { active: true }, limit: 12 }),
+    getCategoryMap(),
   ]);
+
+  const featuredArticles = await getRelatedPostsForCatalog('Regalos', 4);
 
   const recipients = catalogUrls.filter((u) => u.url_type === 'RECIPIENT');
   const occasions = catalogUrls.filter((u) => u.url_type === 'OCCASION');
@@ -219,7 +223,63 @@ export default async function RegalosSiloPage() {
           </div>
         </section>
 
-        {/* ── SECCIÓN 5: FAQ ACCORDION ── */}
+        {/* ── SECCIÓN 5: GUÍAS Y ARTÍCULOS DESTACADOS ── */}
+        {featuredArticles.length > 0 && (
+          <section style={{ marginBottom: '56px' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '24px',
+                flexWrap: 'wrap',
+                gap: '12px',
+              }}
+            >
+              <div>
+                <span
+                  style={{
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    color: '#e11d48',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    display: 'block',
+                    marginBottom: '4px',
+                  }}
+                >
+                  Inspiración editorial
+                </span>
+                <h2 style={{ fontSize: '1.6rem', fontWeight: 700, color: '#1e293b', margin: 0 }}>
+                  Guías y Artículos Recomendados de Regalos
+                </h2>
+              </div>
+              <Link
+                href="/blog/"
+                style={{
+                  fontSize: '0.88rem',
+                  fontWeight: 600,
+                  color: '#e11d48',
+                  textDecoration: 'none',
+                }}
+              >
+                Explorar todos los artículos →
+              </Link>
+            </div>
+            <div className="article-grid article-grid-four">
+              {featuredArticles.map((art) => (
+                <PostCard
+                  key={art.id}
+                  post={art}
+                  category={art.primary_category_id ? catMap.get(art.primary_category_id) : null}
+                  variant="standard"
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── SECCIÓN 6: FAQ ACCORDION ── */}
         <section style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '36px', borderRadius: '16px', marginBottom: '48px' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', marginBottom: '20px' }}>
             Preguntas Frecuentes sobre el Catálogo de Regalos
