@@ -28,7 +28,7 @@ export async function matchProductsForItems(items: GiftItem[]): Promise<GiftItem
         ...item,
         url: `/go/${matched.slug}/`,
         button_label: item.button_label || 'Ver en Tienda',
-        merchant: item.merchant || matched.merchant || 'Loveable Store',
+        merchant: item.merchant || matched.merchant || 'Miregalo Store',
         price: item.price || matched.price || undefined,
         image: item.image || matched.image || undefined,
       };

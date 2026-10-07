@@ -271,6 +271,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
             {post.content_html && (
               <div
                 className="article-content prose"
+                suppressHydrationWarning
                 style={{ marginTop: isContactPage ? '36px' : '0' }}
                 dangerouslySetInnerHTML={{ __html: post.content_html }}
               />
@@ -600,6 +601,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
           {post.content_html && (
             <div
               className="article-content prose"
+              suppressHydrationWarning
               style={{ marginTop: '40px' }}
               dangerouslySetInnerHTML={{ __html: post.content_html }}
             />
