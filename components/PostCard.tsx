@@ -21,7 +21,7 @@ export function PostCard({ post, category, variant = 'standard', priority = fals
       <Link className="card-image" href={path} tabIndex={-1} aria-hidden="true">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={post.hero_image || 'https://storage.googleapis.com/loveable.appspot.com/medium_personalized_gifts_for_wife_5bd9ed5d3a/medium_personalized_gifts_for_wife_5bd9ed5d3a.png'}
+          src={post.hero_image || 'https://media.miregalo.us/media/medium_personalized_gifts_for_wife_5bd9ed5d3a/medium_personalized_gifts_for_wife_5bd9ed5d3a.png'}
           alt={post.hero_alt || post.title}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"

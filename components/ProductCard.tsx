@@ -23,7 +23,7 @@ export function ProductCard({ item, index, productSlug, variant = 'card' }: Prod
     : (item.url?.startsWith('/go/') ? item.url : '/go/amazon-regalo-destacado/');
   const buttonLabel = item.button_label || (item.merchant ? `Ver en ${item.merchant}` : 'Ver en Tienda');
   const cleanDesc = stripHtml(item.description_html);
-  const imageUrl = item.image || 'https://storage.googleapis.com/loveable.appspot.com/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg';
+  const imageUrl = item.image || 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg';
 
   // ─────────────────────────────────────────────────────────────
   // 1. VERTICAL CARD VARIANT (Catalog Grids)

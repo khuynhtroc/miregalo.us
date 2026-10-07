@@ -256,14 +256,20 @@ export async function syncArticleImagesToR2(
     if (post.hero_image && post.hero_image.startsWith('http') && !post.hero_image.includes(config.publicDomain)) {
       result.totalProcessed++;
       try {
-        const filename = path.basename(new URL(post.hero_image).pathname);
-        const r2Key = `media/posts/hero-${post.slug}-${filename}`;
+        let cleanPath = '';
+        try {
+          const parsed = new URL(post.hero_image);
+          cleanPath = parsed.pathname.replace(/^\/+/, '').replace(/^loveable\.appspot\.com\/+/, '');
+        } catch {
+          cleanPath = path.basename(post.hero_image);
+        }
+        const r2Key = `media/${cleanPath}`;
         
         const imgRes = await fetch(post.hero_image);
         if (imgRes.ok) {
           const arrayBuffer = await imgRes.arrayBuffer();
           const buffer = Buffer.from(arrayBuffer);
-          const mime = imgRes.headers.get('content-type') || getMimeType(filename);
+          const mime = imgRes.headers.get('content-type') || getMimeType(cleanPath);
           const newUrl = await uploadBufferToR2(r2Key, buffer, mime, config);
 
           post.hero_image = newUrl;
@@ -286,15 +292,20 @@ export async function syncArticleImagesToR2(
         if (item.image && item.image.startsWith('http') && !item.image.includes(config.publicDomain)) {
           result.totalProcessed++;
           try {
-            const filename = path.basename(new URL(item.image).pathname);
-            const cleanHeading = (item.heading || 'item').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30);
-            const r2Key = `media/items/${cleanHeading}-${filename}`;
+            let cleanPath = '';
+            try {
+              const parsed = new URL(item.image);
+              cleanPath = parsed.pathname.replace(/^\/+/, '').replace(/^loveable\.appspot\.com\/+/, '');
+            } catch {
+              cleanPath = path.basename(item.image);
+            }
+            const r2Key = `media/${cleanPath}`;
 
             const imgRes = await fetch(item.image);
             if (imgRes.ok) {
               const arrayBuffer = await imgRes.arrayBuffer();
               const buffer = Buffer.from(arrayBuffer);
-              const mime = imgRes.headers.get('content-type') || getMimeType(filename);
+              const mime = imgRes.headers.get('content-type') || getMimeType(cleanPath);
               const newUrl = await uploadBufferToR2(r2Key, buffer, mime, config);
 
               item.image = newUrl;

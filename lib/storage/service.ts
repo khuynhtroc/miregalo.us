@@ -13,14 +13,14 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 }
 
 export const DEFAULT_STORAGE_SETTINGS: CloudStorageSettings = {
-  provider: 'local',
+  provider: 'cloudflare_r2',
   cloudflare: {
-    account_id: 'cf_acc_982341908234',
-    access_key_id: 'r2_key_prod_a98f12',
-    secret_access_key: '••••••••••••••••••••••••',
-    bucket_name: 'miregalo-assets-cdn',
-    public_domain: 'https://cdn.miregalo.us',
-    endpoint: 'https://cf_acc_982341908234.r2.cloudflarestorage.com',
+    account_id: '2e901a592cf5f497b7b446745cce98fd',
+    access_key_id: 'dc17895411931434dc806460b19e7473',
+    secret_access_key: '2d9712bfb69c14de896d456771f0f20bee6047a0f7669f284c7a0d22228946cc',
+    bucket_name: 'media-miregalo',
+    public_domain: 'https://media.miregalo.us',
+    endpoint: 'https://2e901a592cf5f497b7b446745cce98fd.r2.cloudflarestorage.com',
   },
   supabase: {
     project_url: 'https://tvgipyhvvtovgttnyivw.supabase.co',

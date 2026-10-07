@@ -97,7 +97,7 @@ function generateWithTemplateEngine(
   const defaultItems: GiftItem[] = [
     {
       heading: `Lámina Personalizada de Recuerdos Especiales`,
-      image: 'https://storage.googleapis.com/loveable.appspot.com/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
       url: '/go/engraved-star-map-print/',
       button_label: 'Ver en Tienda',
       price: '45,00 €',
@@ -107,7 +107,7 @@ function generateWithTemplateEngine(
     },
     {
       heading: `Joya Grabada con Fecha Significativa`,
-      image: 'https://storage.googleapis.com/loveable.appspot.com/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
       url: '/go/custom-name-necklace/',
       button_label: 'Ver en Tienda',
       price: '69,00 €',
@@ -117,7 +117,7 @@ function generateWithTemplateEngine(
     },
     {
       heading: `Organizador de Cuero Hecho a Mano`,
-      image: 'https://storage.googleapis.com/loveable.appspot.com/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
       url: '/go/leather-travel-wallet/',
       button_label: 'Ver en Tienda',
       price: '55,00 €',
@@ -127,7 +127,7 @@ function generateWithTemplateEngine(
     },
     {
       heading: `Manta Ultrasuave con Mensaje Personalizado`,
-      image: 'https://storage.googleapis.com/loveable.appspot.com/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
       url: '/go/photo-memory-blanket/',
       button_label: 'Ver en Tienda',
       price: '49,90 €',
@@ -137,7 +137,7 @@ function generateWithTemplateEngine(
     },
     {
       heading: `Set de Experiencias Gourmet para Degustación`,
-      image: 'https://storage.googleapis.com/loveable.appspot.com/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
       url: 'https://miregalo.us',
       button_label: 'Ver en Tienda',
       price: '59,00 €',
@@ -187,7 +187,7 @@ function generateWithTemplateEngine(
     faqs,
     seo_title: `${title.slice(0, 55)} | Miregalo`,
     seo_description: excerpt.slice(0, 155),
-    hero_image: items[0]?.image || 'https://storage.googleapis.com/loveable.appspot.com/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+    hero_image: items[0]?.image || 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
     hero_alt: title,
     status: 'draft',
   };
@@ -305,7 +305,7 @@ DEVUELVE ÚNICAMENTE UN OBJETO JSON VÁLIDO con la siguiente estructura:
           content_html: parsed.content_html || '',
           items: parsed.items || [],
           faqs: parsed.faqs || [],
-          hero_image: scrapedData?.hero_image || 'https://storage.googleapis.com/loveable.appspot.com/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+          hero_image: scrapedData?.hero_image || 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
           hero_alt: parsed.title,
         };
         source = 'gemini';
