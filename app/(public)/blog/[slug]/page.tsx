@@ -106,6 +106,20 @@ export default async function BlogPostPage({ params }: PageProps) {
             )}
           </header>
 
+          {/* Prominent Pre-Content Affiliate Disclosure */}
+          <div className="affiliate-disclosure-box">
+            <div className="affiliate-disclosure-header">
+              <span className="affiliate-disclosure-icon" aria-hidden="true">⚖️</span>
+              <strong>Aviso de Afiliación y Transparencia Editorial</strong>
+            </div>
+            <p className="affiliate-disclosure-body">
+              Este artículo puede contener enlaces de recomendación. Si compras a través de nuestros enlaces, podemos percibir una pequeña comisión sin coste añadido para ti. <em>En calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.</em>{' '}
+              <Link href="/divulgacion-de-afiliados/" className="affiliate-disclosure-link">
+                Más detalles sobre nuestra política de afiliados
+              </Link>.
+            </p>
+          </div>
+
           {tocItems.length >= 2 && (
             <TableOfContents
               items={tocItems}

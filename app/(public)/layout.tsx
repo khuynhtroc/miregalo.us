@@ -1,6 +1,7 @@
 import { getSettings, getCategories } from '@/lib/repo';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { CookieBanner } from '@/components/CookieBanner';
 
 export default async function PublicLayout({
   children,
@@ -20,6 +21,7 @@ export default async function PublicLayout({
       <Header settings={settings} categories={categories} />
       <main id="main-content">{children}</main>
       <Footer settings={settings} categories={categories} />
+      <CookieBanner />
     </>
   );
 }

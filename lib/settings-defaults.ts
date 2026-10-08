@@ -28,7 +28,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   cta_title: '¿Encontraste la idea perfecta?',
   cta_text: 'Convierte tu inspiración en un regalo personalizado creado especialmente para ellos.',
   affiliate_disclosure:
-    'Este artículo puede contener enlaces de afiliados. Si compras a través de ellos, podemos recibir una pequeña comisión sin ningún coste adicional para ti.',
+    'Este artículo contiene recomendaciones editoriales independientes. Si compras a través de nuestros enlaces, podemos recibir una pequeña comisión sin coste adicional para ti. En calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.',
   posts_per_page: 24,
   ga4_id: '',
   gsc_verification: '',

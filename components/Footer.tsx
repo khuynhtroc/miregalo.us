@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import type { SiteSettings, Category } from '@/lib/types';
 
@@ -13,6 +15,12 @@ export function Footer({ settings, categories }: FooterProps) {
   const recipients = categories.filter((c) => c.group === 'recipients' && c.show_in_footer).slice(0, 6);
   const occasions = categories.filter((c) => c.group === 'occasions' && c.show_in_footer).slice(0, 6);
   const blogCats = categories.filter((c) => c.group === 'blog' && c.show_in_footer).slice(0, 5);
+
+  const handleOpenCookies = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('miregalo:open-cookie-banner'));
+    }
+  };
 
   return (
     <footer className="site-footer">
@@ -82,11 +90,29 @@ export function Footer({ settings, categories }: FooterProps) {
         </div>
       </div>
 
+      {/* Mandatory Amazon Associates & Affiliate Disclosure */}
+      <div className="container footer-affiliate-note">
+        <p>
+          <strong>Aviso legal de afiliados:</strong> Miregalo participa en el Programa de Afiliados de Amazon EU y otras plataformas publicitarias de afiliación. <em>En calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.</em> Los enlaces hacia tiendas externas no implican ningún recargo sobre el precio final y nos permiten mantener nuestras guías editoriales 100% gratuitas e independientes.{' '}
+          <Link href="/divulgacion-de-afiliados/">Conoce más sobre nuestra política de afiliación</Link>.
+        </p>
+      </div>
+
       <div className="container footer-bottom">
         <span>{copyright}</span>
-        <div style={{ display: 'flex', gap: '16px', fontSize: '0.82rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '16px', fontSize: '0.82rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <Link href="/politica-de-privacidad/">Privacidad</Link>
           <Link href="/terminos-y-condiciones/">Términos</Link>
+          <Link href="/politica-de-cookies/">Cookies</Link>
+          <button
+            type="button"
+            onClick={handleOpenCookies}
+            className="footer-cookie-trigger"
+            aria-label="Abrir panel de configuración de cookies"
+          >
+            Configurar cookies
+          </button>
+          <Link href="/divulgacion-de-afiliados/">Afiliados</Link>
           <Link href="/faqs/">FAQs</Link>
           <Link href="/contacto/">Contacto</Link>
           <Link href="/search/">Buscar</Link>

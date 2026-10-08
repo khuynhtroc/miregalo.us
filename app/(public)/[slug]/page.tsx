@@ -449,12 +449,25 @@ export default async function DynamicSlugPage({ params }: PageProps) {
             )}
           </header>
 
-          {/* Affiliate Disclosure */}
-          {settings.affiliate_disclosure && (
-            <div className="notice" style={{ marginBottom: '24px', fontSize: '0.85rem' }}>
-              ℹ️ {settings.affiliate_disclosure}
+          {/* Prominent Pre-Content Affiliate Disclosure (FTC & Amazon Associates Operating Agreement Compliant) */}
+          <div className="affiliate-disclosure-box">
+            <div className="affiliate-disclosure-header">
+              <span className="affiliate-disclosure-icon" aria-hidden="true">⚖️</span>
+              <strong>Aviso de Afiliación y Transparencia Editorial</strong>
             </div>
-          )}
+            <p className="affiliate-disclosure-body">
+              {settings.affiliate_disclosure ? (
+                <span>{settings.affiliate_disclosure} </span>
+              ) : (
+                <span>
+                  Este artículo contiene recomendaciones editoriales independientes. Si compras a través de nuestros enlaces, podemos percibir una pequeña comisión sin ningún coste añadido para ti. <em>En calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.</em>{' '}
+                </span>
+              )}
+              <Link href="/divulgacion-de-afiliados/" className="affiliate-disclosure-link">
+                Más información sobre nuestra política de afiliados
+              </Link>.
+            </p>
+          </div>
 
           {/* Intro HTML */}
           {post.intro_html && (
@@ -485,6 +498,16 @@ export default async function DynamicSlugPage({ params }: PageProps) {
                   variant="row"
                 />
               ))}
+            </div>
+          )}
+
+          {/* Price & Availability Disclaimer (Amazon IP License Section 2(i) Compliant) */}
+          {post.items && post.items.length > 0 && (
+            <div className="price-disclaimer-note">
+              <span className="price-disclaimer-icon" aria-hidden="true">ℹ️</span>
+              <p>
+                <strong>Información sobre precios y disponibilidad:</strong> Los precios indicados corresponden a la fecha de publicación y pueden fluctuar. La disponibilidad y el precio final mostrado en Amazon u otras plataformas en el momento de la compra será el que se aplique al producto.
+              </p>
             </div>
           )}
 

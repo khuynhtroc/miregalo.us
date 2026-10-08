@@ -61,7 +61,7 @@ const pages = [
     focus_keyword: 'preguntas frecuentes miregalo',
     seo_title: 'Preguntas Frecuentes (FAQs) | Miregalo',
     seo_description: 'Resuelve tus dudas sobre cómo funciona Miregalo, selección de regalos, enlaces de compra y garantías de tiendas asociadas.',
-    canonical_url: 'https://miregalo.us/faqs/',
+    canonical_url: 'https://www.miregalo.us/faqs/',
     robots: 'index, follow',
     og_image: '/images/miregalo-logo-fullsize.png',
     published_at: new Date().toISOString(),
@@ -103,7 +103,7 @@ const pages = [
     focus_keyword: 'contacto miregalo',
     seo_title: 'Contacto y Soporte | Miregalo',
     seo_description: 'Ponte en contacto con el equipo de Miregalo para consultas, sugerencias de regalos o propuestas de colaboración editorial.',
-    canonical_url: 'https://miregalo.us/contacto/',
+    canonical_url: 'https://www.miregalo.us/contacto/',
     robots: 'index, follow',
     og_image: '/images/miregalo-logo-fullsize.png',
     published_at: new Date().toISOString(),
@@ -167,7 +167,7 @@ const pages = [
     focus_keyword: 'politica de privacidad miregalo',
     seo_title: 'Política de Privacidad | Miregalo',
     seo_description: 'Conoce cómo Miregalo protege y gestiona tus datos personales de acuerdo con el Reglamento General de Protección de Datos (RGPD).',
-    canonical_url: 'https://miregalo.us/politica-de-privacidad/',
+    canonical_url: 'https://www.miregalo.us/politica-de-privacidad/',
     robots: 'index, follow',
     og_image: '/images/miregalo-logo-fullsize.png',
     published_at: new Date().toISOString(),
@@ -213,7 +213,7 @@ const pages = [
     focus_keyword: 'terminos y condiciones miregalo',
     seo_title: 'Términos y Condiciones de Uso | Miregalo',
     seo_description: 'Consulta los términos y condiciones que regulan el uso, recomendaciones editoriales y navegación en Miregalo.',
-    canonical_url: 'https://miregalo.us/terminos-y-condiciones/',
+    canonical_url: 'https://www.miregalo.us/terminos-y-condiciones/',
     robots: 'index, follow',
     og_image: '/images/miregalo-logo-fullsize.png',
     published_at: new Date().toISOString(),
@@ -260,7 +260,7 @@ const pages = [
     focus_keyword: 'politica de cookies miregalo',
     seo_title: 'Política de Cookies | Miregalo',
     seo_description: 'Descubre qué cookies utilizamos en Miregalo, su propósito y cómo puedes gestionarlas o desactivarlas fácilmente.',
-    canonical_url: 'https://miregalo.us/politica-de-cookies/',
+    canonical_url: 'https://www.miregalo.us/politica-de-cookies/',
     robots: 'index, follow',
     og_image: '/images/miregalo-logo-fullsize.png',
     published_at: new Date().toISOString(),
@@ -304,7 +304,7 @@ const pages = [
     focus_keyword: 'sobre nosotros miregalo',
     seo_title: 'Sobre Nosotros | Miregalo',
     seo_description: 'Conoce la historia, misión y criterios de selección detrás de Miregalo, tu guía de referencia en regalos personalizados y originales.',
-    canonical_url: 'https://miregalo.us/sobre-nosotros/',
+    canonical_url: 'https://www.miregalo.us/sobre-nosotros/',
     robots: 'index, follow',
     og_image: '/images/miregalo-logo-fullsize.png',
     published_at: new Date().toISOString(),
@@ -331,8 +331,15 @@ const pages = [
       <h2>Independencia Editorial Garantizada</h2>
       <p>Nuestra selección de artículos es 100% independiente. Ninguna marca o fabricante paga por asegurarse una reseña favorable. Únicamente recomendamos aquellos productos que consideramos sinceramente excelentes para la persona y ocasión correspondiente.</p>
 
-      <h2>Aviso de Amazon Afiliados</h2>
-      <p>Miregalo participa en el Programa de Afiliados de Amazon de la Unión Europea, un programa de publicidad para afiliados diseñado para ofrecer a sitios web un modo de obtener comisiones por publicidad, publicitando e incluyendo enlaces a Amazon.es.</p>
+      <h2>Aviso Oficial de Amazon Afiliados</h2>
+      <p>Miregalo participa en el Programa de Afiliados de Amazon de la Unión Europea y Amazon.com, programas de publicidad diseñados para proporcionar a sitios web un medio para obtener comisiones por publicidad mediante la creación de enlaces y anuncios hacia plataformas de Amazon.</p>
+      <p><strong>Declaración oficial exigida por Amazon:</strong></p>
+      <blockquote style="margin: 16px 0; padding: 14px 18px; background: #fff1f3; border-left: 4px solid #fd546c; font-style: italic;">
+        «En calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.» (As an Amazon Associate I earn from qualifying purchases).
+      </blockquote>
+
+      <h2>Precios y Disponibilidad</h2>
+      <p>Los precios y la disponibilidad de los artículos mostrados en Miregalo corresponden al momento de redacción de cada guía y están sujetos a modificaciones por parte de las marcas y tiendas vendedoras. El precio y condiciones finales válidas para la compra serán siempre los que figuren en la web de Amazon o del comercio vendedor en el instante exacto de realizar el pedido.</p>
     `,
     faqs: [],
     hero_image: '',
@@ -346,7 +353,7 @@ const pages = [
     focus_keyword: 'divulgacion de afiliados miregalo',
     seo_title: 'Aviso y Divulgación de Enlaces de Afiliados | Miregalo',
     seo_description: 'Información transparente sobre los programas de afiliados en Miregalo y nuestra garantía de independencia editorial.',
-    canonical_url: 'https://miregalo.us/divulgacion-de-afiliados/',
+    canonical_url: 'https://www.miregalo.us/divulgacion-de-afiliados/',
     robots: 'index, follow',
     og_image: '/images/miregalo-logo-fullsize.png',
     published_at: new Date().toISOString(),

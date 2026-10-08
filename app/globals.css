@@ -1273,3 +1273,300 @@
     padding: 14px 16px 18px;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   COOKIE BANNER (GDPR & AMAZON POLICIES COMPLIANT)
+   ════════════════════════════════════════════════════════════════ */
+.cookie-banner-wrapper {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  max-width: 440px;
+  width: calc(100% - 40px);
+  z-index: 99999;
+  animation: cookieFadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cookieFadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cookie-banner-card {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 20px 50px rgba(23, 26, 53, 0.16), 0 4px 12px rgba(23, 26, 53, 0.08);
+  border-radius: 18px;
+  padding: 22px 24px;
+  color: var(--ink);
+}
+
+.cookie-banner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cookie-banner-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.cookie-emoji {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.cookie-close-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 1rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.cookie-close-btn:hover {
+  color: var(--ink);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.cookie-banner-text {
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: #4a5568;
+  margin-bottom: 18px;
+}
+
+.cookie-banner-text strong {
+  color: var(--ink);
+}
+
+.cookie-policy-link {
+  color: var(--blue);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.cookie-policy-link:hover {
+  color: var(--pink-dark);
+}
+
+.cookie-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cookie-btn {
+  border: none;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  font-family: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cookie-btn-primary {
+  background: var(--pink);
+  color: #fff;
+  flex: 1 1 auto;
+}
+
+.cookie-btn-primary:hover {
+  background: var(--pink-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(253, 84, 108, 0.3);
+}
+
+.cookie-btn-secondary {
+  background: #f1f5f9;
+  color: var(--ink);
+  border: 1px solid #e2e8f0;
+}
+
+.cookie-btn-secondary:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.cookie-btn-link {
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 10px;
+}
+
+.cookie-btn-link:hover {
+  color: var(--blue);
+}
+
+.footer-cookie-trigger {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  text-decoration: underline;
+  font-family: inherit;
+  transition: color 0.15s ease;
+}
+
+.footer-cookie-trigger:hover {
+  color: #fff;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FOOTER AFFILIATE DISCLAIMER (SECTION 5 COMPLIANT)
+   ════════════════════════════════════════════════════════════════ */
+.footer-affiliate-note {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 24px;
+  padding-bottom: 24px;
+  color: #a0a5b8;
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+
+.footer-affiliate-note strong {
+  color: #e2e8f0;
+}
+
+.footer-affiliate-note em {
+  color: #fff;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.footer-affiliate-note a {
+  color: #93c5fd;
+  text-decoration: underline;
+}
+
+.footer-affiliate-note a:hover {
+  color: #fff;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PRE-CONTENT AFFILIATE DISCLOSURE (FTC & OPERATING AGREEMENT)
+   ════════════════════════════════════════════════════════════════ */
+.affiliate-disclosure-box {
+  background: linear-gradient(135deg, #fffbf2 0%, #fff5f5 100%);
+  border: 1px solid #fed7aa;
+  border-left: 4px solid var(--pink);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.05);
+}
+
+.affiliate-disclosure-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: #9a3412;
+  font-size: 0.88rem;
+}
+
+.affiliate-disclosure-icon {
+  font-size: 1.1rem;
+}
+
+.affiliate-disclosure-body {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: #57534e;
+}
+
+.affiliate-disclosure-body em {
+  font-style: normal;
+  font-weight: 600;
+  color: #292524;
+}
+
+.affiliate-disclosure-link {
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.affiliate-disclosure-link:hover {
+  color: var(--pink-dark);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PRICE & AVAILABILITY DISCLAIMER (IP LICENSE SECTION 2(i))
+   ════════════════════════════════════════════════════════════════ */
+.price-disclaimer-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 28px 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #64748b;
+}
+
+.price-disclaimer-icon {
+  font-size: 1.05rem;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.price-disclaimer-note p {
+  margin: 0;
+}
+
+.price-disclaimer-note strong {
+  color: #334155;
+}
+
+@media (max-width: 680px) {
+  .cookie-banner-wrapper {
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+  }
+  .cookie-banner-card {
+    padding: 16px 18px;
+  }
+  .cookie-banner-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cookie-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
