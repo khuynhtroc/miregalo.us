@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="2.0" 
+<xsl:stylesheet version="1.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9">
   <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
@@ -28,15 +28,15 @@
             border: 1px solid #e2e8f0;
           }
           .header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
             color: #ffffff;
             padding: 32px 28px;
-            border-bottom: 4px solid #f43f5e;
+            border-bottom: 4px solid #f59e0b;
           }
           .badge {
             display: inline-block;
-            background: #f43f5e;
-            color: #ffffff;
+            background: #f59e0b;
+            color: #020617;
             font-size: 11px;
             font-weight: 900;
             padding: 4px 10px;
@@ -76,8 +76,8 @@
             transition: all 0.2s;
           }
           .search-box:focus-within {
-            border-color: #f43f5e;
-            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
           }
           .search-box input {
             border: none;
@@ -111,9 +111,9 @@
             color: #0f172a;
           }
           .filter-btn.active {
-            background: #f43f5e;
-            border-color: #f43f5e;
-            color: #ffffff;
+            background: #f59e0b;
+            border-color: #f59e0b;
+            color: #020617;
           }
           .stats-bar {
             display: flex;
@@ -150,7 +150,7 @@
             vertical-align: middle;
           }
           tr:hover td {
-            background: #fff1f2;
+            background: #fefce8;
           }
           .category-tag {
             display: inline-block;
@@ -160,8 +160,8 @@
             font-size: 11px;
             white-space: nowrap;
           }
-          .cat-gift { background: #fce7f3; color: #be185d; }
-          .cat-blog { background: #fef3c7; color: #92400e; }
+          .cat-gift { background: #fef3c7; color: #92400e; }
+          .cat-blog { background: #dcfce7; color: #166534; }
           .cat-cat { background: #f3e8ff; color: #6b21a8; }
           .cat-author { background: #dbeafe; color: #1e40af; }
           .cat-page { background: #e0f2fe; color: #0369a1; }
@@ -172,7 +172,7 @@
             word-break: break-all;
           }
           .url-link:hover {
-            color: #e11d48;
+            color: #d97706;
             text-decoration: underline;
           }
           .priority-tag {
@@ -199,7 +199,7 @@
             gap: 12px;
           }
           .footer a {
-            color: #e11d48;
+            color: #d97706;
             text-decoration: none;
             font-weight: 700;
           }
@@ -233,7 +233,7 @@
                 <img src="/images/miregalo-logo.png" alt="Miregalo" class="site-logo" />
               </a>
               <div>
-                <div class="badge">Protocolo de Indexación XML de Google y Motores de Búsqueda</div>
+                <div class="badge">Google &amp; Search Engine Indexing Protocol</div>
                 <h1>Mapa del Sitio XML (XML Sitemap)</h1>
               </div>
             </div>
@@ -249,22 +249,22 @@
 
             <div class="filter-tabs">
               <button class="filter-btn active" onclick="setFilter('all', this)">
-                Todos (<span id="count-all"><xsl:value-of select="count(sitemap:urlset/sitemap:url)"/></span>)
+                Todos ( <span id="count-all"><xsl:value-of select="count(sitemap:urlset/sitemap:url)"/></span> )
               </button>
               <button class="filter-btn" onclick="setFilter('gift', this)">
-                🎁 Guías de Regalos (<span id="count-gift">0</span>)
+                🎁 Guías de Regalos ( <span id="count-gift">0</span> )
               </button>
               <button class="filter-btn" onclick="setFilter('blog', this)">
-                📰 Artículos de Blog (<span id="count-blog">0</span>)
+                📰 Artículos de Blog ( <span id="count-blog">0</span> )
               </button>
               <button class="filter-btn" onclick="setFilter('cat', this)">
-                📁 Categorías &amp; Hubs (<span id="count-cat">0</span>)
+                📁 Categorías &amp; Hubs ( <span id="count-cat">0</span> )
               </button>
               <button class="filter-btn" onclick="setFilter('author', this)">
-                ✍️ Autores (<span id="count-author">0</span>)
+                ✍️ Autores ( <span id="count-author">0</span> )
               </button>
               <button class="filter-btn" onclick="setFilter('page', this)">
-                🏢 Páginas &amp; Legal (<span id="count-page">0</span>)
+                🏢 Páginas &amp; Legal ( <span id="count-page">0</span> )
               </button>
             </div>
 
@@ -330,18 +330,14 @@
                     </td>
                     <td>
                       <xsl:variable name="p" select="sitemap:priority"/>
-                      <span class="priority-tag">
-                        <xsl:choose>
-                          <xsl:when test="$p &gt;= 0.8">
-                            <xsl:attribute name="class">priority-tag priority-high</xsl:attribute>
-                          </xsl:when>
-                          <xsl:when test="$p &gt;= 0.6">
-                            <xsl:attribute name="class">priority-tag priority-med</xsl:attribute>
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:attribute name="class">priority-tag priority-low</xsl:attribute>
-                          </xsl:otherwise>
-                        </xsl:choose>
+                      <span>
+                        <xsl:attribute name="class">
+                          <xsl:choose>
+                            <xsl:when test="$p &gt;= 0.8">priority-tag priority-high</xsl:when>
+                            <xsl:when test="$p &gt;= 0.6">priority-tag priority-med</xsl:when>
+                            <xsl:otherwise>priority-tag priority-low</xsl:otherwise>
+                          </xsl:choose>
+                        </xsl:attribute>
                         <xsl:value-of select="sitemap:priority"/>
                       </span>
                     </td>
@@ -385,7 +381,7 @@
             'quienes-somos', 'aviso-legal'
           ]);
 
-          function classifyRow(url) {
+          function classifyUrl(url) {
             try {
               const u = new URL(url);
               const path = u.pathname.replace(/^\/|\/$/g, '');
@@ -410,7 +406,7 @@
 
             rows.forEach(r => {
               const url = r.getAttribute('data-url') || '';
-              const t = classifyRow(url);
+              const t = classifyUrl(url);
               r.setAttribute('data-type', t);
 
               const badgeCell = r.querySelector('.category-tag');
@@ -420,7 +416,7 @@
                 else if (t === 'blog') badgeCell.innerHTML = '📰 Artículo de Blog';
                 else if (t === 'cat') badgeCell.innerHTML = '📁 Categoría &amp; Hub';
                 else if (t === 'author') badgeCell.innerHTML = '✍️ Autor';
-                else if (t === 'page') badgeCell.innerHTML = '🏢 Página';
+                else if (t === 'page') badgeCell.innerHTML = '🏢 Página &amp; Legal';
               }
 
               if (counts[t] !== undefined) counts[t]++;

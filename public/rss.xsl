@@ -33,10 +33,10 @@
             border: 1px solid #e2e8f0;
           }
           .header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
             color: #ffffff;
             padding: 32px 28px;
-            border-bottom: 4px solid #f43f5e;
+            border-bottom: 4px solid #f59e0b;
           }
           .brand-row {
             display: flex;
@@ -55,8 +55,8 @@
           }
           .badge {
             display: inline-block;
-            background: #f43f5e;
-            color: #ffffff;
+            background: #f59e0b;
+            color: #020617;
             font-size: 11px;
             font-weight: 900;
             padding: 4px 10px;
@@ -105,8 +105,8 @@
             transition: all 0.2s;
           }
           .search-box input:focus {
-            border-color: #f43f5e;
-            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
           }
           .items-list {
             padding: 28px;
@@ -122,8 +122,8 @@
             transition: all 0.2s ease;
           }
           .item-card:hover {
-            border-color: #f43f5e;
-            box-shadow: 0 6px 16px rgba(244, 63, 94, 0.08);
+            border-color: #f59e0b;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.08);
             transform: translateY(-1px);
           }
           .item-thumb-wrapper {
@@ -141,8 +141,8 @@
           }
           .item-cat {
             display: inline-block;
-            background: #fce7f3;
-            color: #be185d;
+            background: #fef3c7;
+            color: #92400e;
             font-size: 11px;
             font-weight: 800;
             padding: 3px 8px;
@@ -162,7 +162,7 @@
             text-decoration: none;
           }
           .item-title a:hover {
-            color: #e11d48;
+            color: #d97706;
           }
           .item-desc {
             font-size: 13px;
@@ -185,7 +185,7 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            color: #e11d48;
+            color: #d97706;
             font-weight: 700;
             text-decoration: none;
           }
@@ -205,7 +205,7 @@
             gap: 12px;
           }
           .footer a {
-            color: #e11d48;
+            color: #f59e0b;
             text-decoration: none;
             font-weight: 700;
           }
@@ -246,12 +246,12 @@
                 <xsl:choose>
                   <xsl:when test="media:content/@url">
                     <div class="item-thumb-wrapper">
-                      <img class="item-thumb" src="{media:content/@url}" alt="{title}" loading="lazy" />
+                      <img class="item-thumb" src="{media:content/@url}" loading="lazy" />
                     </div>
                   </xsl:when>
                   <xsl:when test="enclosure/@url">
                     <div class="item-thumb-wrapper">
-                      <img class="item-thumb" src="{enclosure/@url}" alt="{title}" loading="lazy" />
+                      <img class="item-thumb" src="{enclosure/@url}" loading="lazy" />
                     </div>
                   </xsl:when>
                 </xsl:choose>

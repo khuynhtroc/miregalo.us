@@ -71,6 +71,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function DynamicSlugPage({ params }: PageProps) {
   const { slug } = await params;
+  const lowerSlug = slug.toLowerCase();
+  if (lowerSlug === 'sitemap.xml' || lowerSlug === 'sitemap_index.xml') {
+    permanentRedirect('/sitemap.xml');
+  }
+  if (lowerSlug === 'sitemap.xsl') {
+    permanentRedirect('/sitemap.xsl');
+  }
+  if (lowerSlug === 'rss.xml' || lowerSlug === 'feed.xml' || lowerSlug === 'feed') {
+    permanentRedirect('/rss.xml');
+  }
+  if (lowerSlug === 'rss.xsl') {
+    permanentRedirect('/rss.xsl');
+  }
   if (RESERVED_ROOT_SLUGS.has(slug)) notFound();
 
   const [settings, categories, catMap] = await Promise.all([
