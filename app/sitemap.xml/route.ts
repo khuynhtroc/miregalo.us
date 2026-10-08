@@ -10,11 +10,13 @@ export async function GET() {
     getCatalogUrls(),
   ]);
 
-  const urlMap = new Map<string, { loc: string; lastmod?: string; changefreq: string; priority: string }>();
+  const defaultDate = new Date().toISOString().split('T')[0];
+  const urlMap = new Map<string, { loc: string; lastmod: string; changefreq: string; priority: string }>();
 
   // Home
   urlMap.set(`${SITE_URL}/`, {
     loc: `${SITE_URL}/`,
+    lastmod: defaultDate,
     changefreq: 'daily',
     priority: '1.0',
   });
@@ -33,7 +35,7 @@ export async function GET() {
 
     urlMap.set(loc, {
       loc,
-      lastmod: cUrl.updated_at ? cUrl.updated_at.split('T')[0] : undefined,
+      lastmod: cUrl.updated_at ? cUrl.updated_at.split('T')[0] : defaultDate,
       changefreq: cUrl.priority === 'P1' ? 'weekly' : 'monthly',
       priority,
     });
@@ -45,7 +47,7 @@ export async function GET() {
     if (!urlMap.has(loc)) {
       urlMap.set(loc, {
         loc,
-        lastmod: cat.updated_at ? cat.updated_at.split('T')[0] : undefined,
+        lastmod: cat.updated_at ? cat.updated_at.split('T')[0] : defaultDate,
         changefreq: 'weekly',
         priority: cat.group === 'hub' ? '0.9' : '0.8',
       });
@@ -57,11 +59,12 @@ export async function GET() {
     if (p.robots && p.robots.toLowerCase().includes('noindex')) continue;
     const loc = `${SITE_URL}${postPath(p)}`;
     if (!urlMap.has(loc)) {
+      const priority = p.type === 'gift' ? '0.8' : p.type === 'blog' ? '0.7' : '0.6';
       urlMap.set(loc, {
         loc,
-        lastmod: (p.updated_at || p.published_at)?.split('T')[0],
-        changefreq: 'weekly',
-        priority: '0.7',
+        lastmod: (p.updated_at || p.published_at)?.split('T')[0] || defaultDate,
+        changefreq: p.type === 'page' ? 'monthly' : 'weekly',
+        priority,
       });
     }
   }
@@ -72,6 +75,7 @@ export async function GET() {
     if (!urlMap.has(loc)) {
       urlMap.set(loc, {
         loc,
+        lastmod: a.updated_at ? a.updated_at.split('T')[0] : defaultDate,
         changefreq: 'monthly',
         priority: '0.5',
       });
@@ -81,12 +85,15 @@ export async function GET() {
   const urls = Array.from(urlMap.values());
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 ${urls
   .map(
     (u) => `  <url>
     <loc>${u.loc}</loc>
-    ${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}
+    <lastmod>${u.lastmod}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
   </url>`
