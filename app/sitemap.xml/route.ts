@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getCategories, getAllPublishedForSitemap, getAuthors, getCatalogUrls } from '@/lib/repo';
 import { SITE_URL, postPath } from '@/lib/urls';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const [categories, posts, authors, catalogUrls] = await Promise.all([
     getCategories(),

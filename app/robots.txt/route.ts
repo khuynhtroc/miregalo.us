@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getSettings } from '@/lib/repo';
 import { SITE_URL } from '@/lib/urls';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const settings = await getSettings();
 
