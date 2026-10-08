@@ -13,27 +13,12 @@ const nextConfig = {
     cpus: 1,
   },
   async redirects() {
-    // Only load high-level structural/hub redirects into Next router (<100 rules).
-    // The 31,000+ legacy URL redirects are handled dynamically with 0ms O(1) in-memory index lookup in [slug]/page.tsx
     return [
-      // Sitemap & RSS case variations / aliases
-      { source: '/SITEMAP.xml', destination: '/sitemap.xml', permanent: true },
-      { source: '/Sitemap.xml', destination: '/sitemap.xml', permanent: true },
-      { source: '/SITEMAP.XML', destination: '/sitemap.xml', permanent: true },
-      { source: '/sitemap.XML', destination: '/sitemap.xml', permanent: true },
+      // Feed & sitemap aliases
       { source: '/sitemap_index.xml', destination: '/sitemap-index.xml', permanent: true },
-      { source: '/SITEMAP-INDEX.xml', destination: '/sitemap-index.xml', permanent: true },
-      { source: '/RSS.xml', destination: '/rss.xml', permanent: true },
-      { source: '/Rss.xml', destination: '/rss.xml', permanent: true },
-      { source: '/RSS.XML', destination: '/rss.xml', permanent: true },
-      { source: '/rss.XML', destination: '/rss.xml', permanent: true },
       { source: '/feed', destination: '/rss.xml', permanent: true },
       { source: '/feed.xml', destination: '/rss.xml', permanent: true },
       { source: '/rss', destination: '/rss.xml', permanent: true },
-      { source: '/SITEMAP.xsl', destination: '/sitemap.xsl', permanent: true },
-      { source: '/Sitemap.xsl', destination: '/sitemap.xsl', permanent: true },
-      { source: '/RSS.xsl', destination: '/rss.xsl', permanent: true },
-      { source: '/Rss.xsl', destination: '/rss.xsl', permanent: true },
 
       // Legacy page redirects
       { source: '/all-gifts', destination: '/regalos/', permanent: true },

@@ -72,19 +72,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function DynamicSlugPage({ params }: PageProps) {
   const { slug } = await params;
   const lowerSlug = slug.toLowerCase();
-  if (lowerSlug === 'sitemap.xml' || lowerSlug === 'sitemap_index.xml') {
-    permanentRedirect('/sitemap.xml');
+
+  // Redirect uppercase variations to lowercase canonical paths
+  if (slug !== lowerSlug) {
+    if (lowerSlug === 'sitemap.xml' || lowerSlug === 'sitemap_index.xml') {
+      permanentRedirect('/sitemap.xml');
+    }
+    if (lowerSlug === 'sitemap.xsl') {
+      permanentRedirect('/sitemap.xsl');
+    }
+    if (lowerSlug === 'rss.xml' || lowerSlug === 'feed.xml' || lowerSlug === 'feed') {
+      permanentRedirect('/rss.xml');
+    }
+    if (lowerSlug === 'rss.xsl') {
+      permanentRedirect('/rss.xsl');
+    }
   }
-  if (lowerSlug === 'sitemap.xsl') {
-    permanentRedirect('/sitemap.xsl');
-  }
-  if (lowerSlug === 'rss.xml' || lowerSlug === 'feed.xml' || lowerSlug === 'feed') {
+
+  if (lowerSlug === 'feed' || lowerSlug === 'feed.xml') {
     permanentRedirect('/rss.xml');
   }
-  if (lowerSlug === 'rss.xsl') {
-    permanentRedirect('/rss.xsl');
+  if (lowerSlug === 'sitemap_index.xml') {
+    permanentRedirect('/sitemap-index.xml');
   }
-  if (RESERVED_ROOT_SLUGS.has(slug)) notFound();
+
+  if (RESERVED_ROOT_SLUGS.has(slug) || RESERVED_ROOT_SLUGS.has(lowerSlug)) notFound();
 
   const [settings, categories, catMap] = await Promise.all([
     getSettings(),
