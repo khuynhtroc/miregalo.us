@@ -1,6 +1,11 @@
 import type { Post, Category, Author, SiteSettings } from '@/lib/types';
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001').replace(/\/$/, '');
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.miregalo.us';
+export const SITE_URL = (
+  rawSiteUrl.includes('miregalo.us') && !rawSiteUrl.includes('www.miregalo.us')
+    ? 'https://www.miregalo.us'
+    : rawSiteUrl
+).replace(/\/$/, '');
 
 /** Hub slugs and the group they aggregate. Spanish primary hubs with backward aliases. */
 export const HUBS: Record<string, { group: Category['group'] | 'all-gifts' | 'all-blog'; label: string }> = {

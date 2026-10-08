@@ -218,7 +218,7 @@
         <div class="container">
           <div class="header">
             <div class="brand-row">
-              <a href="https://miregalo.us">
+              <a href="https://www.miregalo.us">
                 <img src="/images/miregalo-logo.png" alt="Miregalo" class="site-logo" />
               </a>
               <div>

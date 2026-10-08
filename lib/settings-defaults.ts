@@ -6,7 +6,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   site_tagline: 'Ideas de regalos significativas para cada persona, relación y ocasión.',
   site_description: 'Guías y sugerencias de regalos pensadas para sorprender a quien más quieres en cualquier momento especial.',
   organization_name: 'Miregalo',
-  organization_url: 'https://miregalo.us',
+  organization_url: 'https://www.miregalo.us',
   logo_url: '/images/miregalo-logo.png',
   logo_fullsize_url: '/images/miregalo-logo-fullsize.png',
   favicon_url: '/favicon.png',

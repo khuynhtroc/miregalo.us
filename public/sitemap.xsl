@@ -229,7 +229,7 @@
         <div class="container">
           <div class="header">
             <div class="brand-row">
-              <a href="https://miregalo.us">
+              <a href="https://www.miregalo.us">
                 <img src="/images/miregalo-logo.png" alt="Miregalo" class="site-logo" />
               </a>
               <div>
@@ -355,7 +355,7 @@
 
           <div class="footer">
             <div>
-              Sitio web oficial: <a href="https://miregalo.us">miregalo.us</a> • Contacto: <strong>contacto@miregalo.us</strong>
+              Sitio web oficial: <a href="https://www.miregalo.us">miregalo.us</a> • Contacto: <strong>contacto@miregalo.us</strong>
             </div>
             <div>
               Canal de contenidos: <a href="/rss.xml">RSS Feed 2.0</a>
