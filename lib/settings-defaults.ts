@@ -34,7 +34,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   gsc_verification: '',
   gsc_property: '',
   bing_verification: '',
-  pinterest_verification: '',
+  pinterest_verification: 'aa17ebb2f5874bb384abd7511116e441',
   pinterest_tag_id: '',
   head_scripts: '',
   body_scripts: '',
