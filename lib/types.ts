@@ -223,6 +223,8 @@ export interface SiteSettings {
   gsc_verification: string;
   gsc_property: string;
   bing_verification: string;
+  pinterest_verification?: string;
+  pinterest_tag_id?: string;
   head_scripts: string;
   body_scripts: string;
   robots_extra: string;

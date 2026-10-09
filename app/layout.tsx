@@ -35,7 +35,12 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     verification: {
       google: settings.gsc_verification || undefined,
-      other: settings.bing_verification ? { 'msvalidate.01': settings.bing_verification } : undefined,
+      other: {
+        ...(settings.bing_verification ? { 'msvalidate.01': settings.bing_verification } : {}),
+        ...(settings.pinterest_verification || process.env.PINTEREST_VERIFICATION
+          ? { 'p:domain_verify': settings.pinterest_verification || process.env.PINTEREST_VERIFICATION }
+          : {}),
+      },
     },
   };
 }
@@ -91,6 +96,22 @@ export default async function RootLayout({
               `}
             </Script>
           </>
+        )}
+
+        {/* Pinterest Tag Conversion Tracking */}
+        {(settings.pinterest_tag_id || process.env.PINTEREST_TAG_ID) && (
+          <Script id="pinterest-tag" strategy="afterInteractive">
+            {`
+              !function(e){if(!window.pintrk){window.pintrk = function () {
+              window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
+              n=window.pintrk;n.queue=[],n.version="3.0";var
+              t=document.createElement("script");t.async=!0,t.src=e;var
+              r=document.getElementsByTagName("script")[0];
+              r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
+              pintrk('load', '${settings.pinterest_tag_id || process.env.PINTEREST_TAG_ID}');
+              pintrk('page');
+            `}
+          </Script>
         )}
 
         {settings.head_scripts && (() => {

@@ -32,6 +32,7 @@ import { StoreCta } from '@/components/StoreCta';
 import { JsonLd } from '@/components/JsonLd';
 import { ContactForm } from '@/components/ContactForm';
 import { TableOfContents } from '@/components/TableOfContents';
+import { SocialShareBar } from '@/components/SocialShareBar';
 import { extractTocItems } from '@/lib/toc';
 import { fmtDate } from '@/lib/format';
 
@@ -449,6 +450,14 @@ export default async function DynamicSlugPage({ params }: PageProps) {
             )}
           </header>
 
+          {/* Top Social Share Bar (Pinterest, WhatsApp, Facebook, X) */}
+          <SocialShareBar
+            url={postPath(post)}
+            title={post.title}
+            media={post.hero_image}
+            label="Inspirar y compartir ideas:"
+          />
+
           {/* Prominent Pre-Content Affiliate Disclosure (FTC & Amazon Associates Operating Agreement Compliant) */}
           <div className="affiliate-disclosure-box">
             <div className="affiliate-disclosure-header">
@@ -683,6 +692,14 @@ export default async function DynamicSlugPage({ params }: PageProps) {
               </div>
             </section>
           )}
+
+          {/* Bottom Social Share Bar */}
+          <SocialShareBar
+            url={postPath(post)}
+            title={post.title}
+            media={post.hero_image}
+            label="¿Te ha gustado esta guía? Guárdala en Pinterest o compártela:"
+          />
 
           {/* Author Box */}
           {author && (
