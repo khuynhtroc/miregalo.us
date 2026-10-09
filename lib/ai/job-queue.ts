@@ -79,7 +79,7 @@ export async function processContentJob(jobId: string): Promise<JobResult> {
 
   addLog('info', 'research', `Researching search intent and cluster taxonomy for "${job.topic}"`);
 
-  const provider = getAiProvider(job.model.includes('gemini') ? 'gemini' : 'mock');
+  const provider = getAiProvider((job.model || '').includes('gemini') ? 'gemini' : 'mock');
   addLog('info', 'generation', `Dispatching to AI provider [${provider.name}] (isMock: ${provider.isMock})`);
 
   let generatedPost: Post | undefined;
@@ -88,9 +88,9 @@ export async function processContentJob(jobId: string): Promise<JobResult> {
 
   try {
     const input: GeneratePostInput = {
-      topic: job.topic,
+      topic: job.topic || (job as any).payload?.topic || 'Regalos Especiales',
       keyword: job.keyword_id || undefined,
-      targetPath: job.target_path || undefined,
+      targetPath: job.target_path || (job as any).payload?.target_path || undefined,
     };
 
     // Execute with retry

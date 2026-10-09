@@ -13,20 +13,29 @@ interface AffiliatePlatformSettings {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string[] | string }> }
 ) {
-  const { slug } = await params;
-  const rawSlug = decodeURIComponent(slug || '').trim().replace(/^\/go\//, '').replace(/\/$/, '');
+  const resolvedParams = await params;
+  const rawParts = Array.isArray(resolvedParams.slug) ? resolvedParams.slug : [resolvedParams.slug];
+  const joinedSlug = rawParts.join('/');
+  const rawSlug = decodeURIComponent(joinedSlug || '').trim().replace(/^\/go\//, '').replace(/\/$/, '');
+  const flatSlug = rawSlug.replace(/\//g, '-');
 
   // 1. Find product in DB by exact slug or variations
-  let product = await db.findOne('products', { slug: rawSlug, active: true });
+  let product =
+    (await db.findOne('products', { slug: rawSlug, active: true })) ||
+    (await db.findOne('products', { slug: flatSlug, active: true }));
 
   if (!product && rawSlug.startsWith('prod-')) {
-    product = await db.findOne('products', { slug: rawSlug.replace(/^prod-/, ''), active: true });
+    product =
+      (await db.findOne('products', { slug: rawSlug.replace(/^prod-/, ''), active: true })) ||
+      (await db.findOne('products', { slug: flatSlug.replace(/^prod-/, ''), active: true }));
   }
 
   if (!product && !rawSlug.startsWith('prod-')) {
-    product = await db.findOne('products', { id: `prod-${rawSlug}`, active: true });
+    product =
+      (await db.findOne('products', { id: `prod-${rawSlug}`, active: true })) ||
+      (await db.findOne('products', { id: `prod-${flatSlug}`, active: true }));
   }
 
   let destUrl = product?.url;
@@ -36,7 +45,9 @@ export async function GET(
   if (!destUrl) {
     redirectRule =
       (await db.findOne('redirects', { source: `/go/${rawSlug}/`, active: true })) ||
-      (await db.findOne('redirects', { source: `/go/${rawSlug}`, active: true }));
+      (await db.findOne('redirects', { source: `/go/${rawSlug}`, active: true })) ||
+      (await db.findOne('redirects', { source: `/go/${flatSlug}/`, active: true })) ||
+      (await db.findOne('redirects', { source: `/go/${flatSlug}`, active: true }));
 
     if (redirectRule) {
       destUrl = redirectRule.destination;

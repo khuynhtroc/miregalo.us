@@ -19,6 +19,7 @@ export interface GiftItem {
   price?: string;
   description_html?: string;
   pros?: string[];
+  cons?: string[];
   button_label?: string;
 }
 
@@ -238,9 +239,12 @@ export interface ContentJob {
   id: string;
   keyword_id?: string | null;
   target_path?: string | null;
-  topic: string;
-  status: 'queued' | 'researching' | 'generating' | 'completed' | 'failed';
-  model: string;
+  topic?: string;
+  status?: 'queued' | 'researching' | 'generating' | 'completed' | 'failed' | 'scheduled' | 'processing' | 'published';
+  stage?: string;
+  payload?: any;
+  result?: any;
+  model?: string;
   prompt?: string | null;
   generated_post_id?: string | null;
   attempts?: number;

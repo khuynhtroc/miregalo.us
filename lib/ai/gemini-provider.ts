@@ -25,7 +25,7 @@ export class GeminiAiProvider implements AiProvider {
       return this.mockFallback.generateArticle(input, config);
     }
 
-    const modelName = config?.model || 'gemini-2.5-flash';
+    const modelName = config?.model || 'gemini-3.8-flash';
     const prompt = `
       Actúa como un redactor profesional de guías de compra y regalos en español para un blog de comercio electrónico.
       Genera una guía de compra completa para el tema: "${input.topic}".
