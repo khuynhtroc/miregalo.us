@@ -39,7 +39,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   robots_extra: '',
   noindex_site: false,
   google_search_cx: '',
-  amazon_associates_tag: 'giftblog-21',
+  amazon_associates_tag: 'miregalo26-20',
   awin_affiliate_id: '128945',
   ebay_campaign_id: '5338901234',
   walmart_partner_id: 'wm-giftblog-987',

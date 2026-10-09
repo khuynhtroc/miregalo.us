@@ -56,8 +56,7 @@ export async function GET(
   }
 
   // 4. Fetch dynamic affiliate settings
-  let amazonEsTag = DEFAULT_SETTINGS.amazon_associates_tag || 'giftblog-21';
-  let amazonUsTag = 'miregalo26-20';
+  let amazonTag = DEFAULT_SETTINGS.amazon_associates_tag || 'miregalo26-20';
   let awinId = '1436844';
 
   try {
@@ -66,15 +65,13 @@ export async function GET(
       db.getSetting<any>('site'),
     ]);
 
-    const configuredAmzTag = affSettings?.platforms?.amazon?.tagOrId || siteSettings?.amazon_associates_tag;
+    const configuredAmzTag =
+      affSettings?.platforms?.amazon?.tagOrId ||
+      siteSettings?.amazon_associates_tag ||
+      DEFAULT_SETTINGS.amazon_associates_tag;
+
     if (configuredAmzTag) {
-      if (configuredAmzTag.endsWith('-21')) {
-        amazonEsTag = configuredAmzTag;
-      } else if (configuredAmzTag.endsWith('-20')) {
-        amazonUsTag = configuredAmzTag;
-      } else {
-        amazonEsTag = configuredAmzTag;
-      }
+      amazonTag = configuredAmzTag;
     }
 
     if (affSettings?.platforms?.awin?.tagOrId) {
@@ -98,7 +95,7 @@ export async function GET(
     if (isDefunct) {
       // Convert defunct store links into targeted Amazon España search for the product
       const keyword = (product?.name || rawSlug.replace(/^(prod|item)-/i, '').replace(/[-_]+/g, ' ')).trim();
-      destUrl = `https://www.amazon.es/s?k=${encodeURIComponent(keyword.slice(0, 70))}&tag=${amazonEsTag}`;
+      destUrl = `https://www.amazon.es/s?k=${encodeURIComponent(keyword.slice(0, 70))}&tag=${amazonTag}`;
     } else {
       try {
         const u = new URL(destUrl);
@@ -108,24 +105,10 @@ export async function GET(
           const asinMatch = u.pathname.match(/(?:dp|gp\/product|exec\/obidos\/ASIN|o\/ASIN)\/([A-Z0-9]{10})/i);
           const asin = asinMatch ? asinMatch[1] : null;
 
-          if (u.hostname.endsWith('.es')) {
-            u.searchParams.set('tag', amazonEsTag);
-            if (asin) {
-              destUrl = `https://www.amazon.es/dp/${asin}/?tag=${amazonEsTag}`;
-            } else {
-              destUrl = u.toString();
-            }
-          } else if (u.hostname.endsWith('.com')) {
-            // Amazon US: keep exact product on Amazon COM with valid US tag, or if ASIN exists
-            u.searchParams.set('tag', amazonUsTag);
-            if (asin) {
-              destUrl = `https://www.amazon.com/dp/${asin}/?tag=${amazonUsTag}`;
-            } else {
-              destUrl = u.toString();
-            }
+          u.searchParams.set('tag', amazonTag);
+          if (asin) {
+            destUrl = `https://${u.hostname}/dp/${asin}/?tag=${amazonTag}`;
           } else {
-            // Other Amazon locales (.co.uk, .de, .fr)
-            u.searchParams.set('tag', amazonEsTag);
             destUrl = u.toString();
           }
         }
@@ -153,9 +136,9 @@ export async function GET(
       .trim();
 
     if (rawSearch && rawSearch.length > 2 && rawSearch.toLowerCase() !== 'amazon' && rawSearch.toLowerCase() !== 'regalo destacado') {
-      destUrl = `https://www.amazon.es/s?k=${encodeURIComponent(rawSearch)}&tag=${amazonEsTag}`;
+      destUrl = `https://www.amazon.es/s?k=${encodeURIComponent(rawSearch)}&tag=${amazonTag}`;
     } else {
-      destUrl = `https://www.amazon.es/?tag=${amazonEsTag}`;
+      destUrl = `https://www.amazon.es/?tag=${amazonTag}`;
     }
   }
 

@@ -370,7 +370,7 @@ export function MerchantManager({ initialMerchants }: MerchantManagerProps) {
                     type="text"
                     value={editing.affiliate_param || ''}
                     onChange={(e) => setEditing({ ...editing, affiliate_param: e.target.value })}
-                    placeholder="tag=giftblog-21"
+                    placeholder="tag=miregalo26-20"
                     style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
                   />
                 </div>

@@ -69,7 +69,7 @@ export function SettingsManager({
       amazon: {
         id: 'amazon',
         name: 'Amazon España (Associates)',
-        tagOrId: settings.amazon_associates_tag || 'giftblog-21',
+        tagOrId: settings.amazon_associates_tag || 'miregalo26-20',
         domain: 'https://www.amazon.es',
         active: true,
         commissionRate: '3% - 12%',

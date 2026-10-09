@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
     }
 
     const cleanSlug = body.slug.toLowerCase().replace(/[^a-z0-9_-]+/g, '-');
-    const targetUrl = body.url || 'https://www.amazon.es/?tag=giftblog-21';
+    const targetUrl = body.url || 'https://www.amazon.es/?tag=miregalo26-20';
 
     const product = await db.insert('products', {
       id: `prod-${cleanSlug}`,

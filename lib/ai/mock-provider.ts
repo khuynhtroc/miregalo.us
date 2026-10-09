@@ -43,7 +43,7 @@ export class MockAiProvider implements AiProvider {
           image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&auto=format&fit=crop&q=80',
           price: '34,90 €',
           merchant: 'Amazon España',
-          url: 'https://www.amazon.es?tag=giftblog-21',
+          url: 'https://www.amazon.es?tag=miregalo26-20',
           description_html: '<p>Una selección elegante con presentación prémium lista para regalar. Calidad de acabados garantizada.</p>',
           pros: ['Presentación lista para regalar', 'Materiales sostenibles', 'Envío exprés 24h'],
           button_label: 'Ver en Amazon España',

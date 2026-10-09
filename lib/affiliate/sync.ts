@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS: AffiliateSettings = {
     amazon: {
       id: 'amazon',
       name: 'Amazon España (Associates)',
-      tagOrId: 'giftblog-21',
+      tagOrId: 'miregalo26-20',
       domain: 'https://www.amazon.es',
       active: true,
       commissionRate: '3% - 12%',
@@ -120,7 +120,7 @@ function buildPlatformAffiliateUrl(
       };
     default:
       return {
-        url: `https://www.amazon.es/?tag=${config.tagOrId || 'giftblog-21'}`,
+        url: `https://www.amazon.es/?tag=${config.tagOrId || 'miregalo26-20'}`,
         merchant: 'Amazon España',
         buttonLabel: 'Comprar Producto',
       };

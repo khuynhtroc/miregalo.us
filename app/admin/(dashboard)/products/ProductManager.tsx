@@ -34,7 +34,7 @@ export function ProductManager({ initialProducts, merchants = [], totalCount }: 
     setEditing({
       name: '',
       slug: '',
-      url: 'https://www.amazon.es/?tag=giftblog-21',
+      url: 'https://www.amazon.es/?tag=miregalo26-20',
       merchant: 'Amazon España',
       price: '29,99 €',
       currency: 'EUR',
@@ -595,7 +595,7 @@ export function ProductManager({ initialProducts, merchants = [], totalCount }: 
                   required
                   value={editing.url || ''}
                   onChange={(e) => setEditing({ ...editing, url: e.target.value })}
-                  placeholder="https://www.amazon.es/...&tag=giftblog-21"
+                  placeholder="https://www.amazon.es/...&tag=miregalo26-20"
                   className="form-input"
                 />
                 <div className="form-hint">
