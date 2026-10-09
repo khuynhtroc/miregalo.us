@@ -123,10 +123,21 @@ async function handleCronPublish(req: NextRequest) {
       }
     }
 
+    // Execute automated Pinterest FIFO Pinning (1 post per cron run = 3 posts per day)
+    let pinterestPinResult = null;
+    try {
+      const { pinNextOldestPost } = await import('@/lib/social/pinterest');
+      pinterestPinResult = await pinNextOldestPost();
+    } catch (pinErr: any) {
+      console.warn('[Cron] Pinterest pinning error:', pinErr?.message || pinErr);
+      pinterestPinResult = { success: false, error: pinErr?.message || String(pinErr) };
+    }
+
     return NextResponse.json({
       success: true,
       processed: results.length,
       results,
+      pinterest: pinterestPinResult,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);

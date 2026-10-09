@@ -48,6 +48,10 @@ export interface Post {
   robots: string;
   og_image: string;
   published_at: string | null;
+  pinterest_pinned?: boolean;
+  pinterest_pin_id?: string;
+  pinterest_board?: string;
+  pinterest_pinned_at?: string;
   updated_at: string;
   created_at: string;
 }
