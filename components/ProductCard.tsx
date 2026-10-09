@@ -1,4 +1,5 @@
 import type { GiftItem } from '@/lib/types';
+import { slugify } from '@/lib/urls';
 
 interface ProductCardProps {
   item: GiftItem;
@@ -17,10 +18,24 @@ function stripHtml(html?: string): string {
 
 export function ProductCard({ item, index, productSlug, variant = 'card' }: ProductCardProps) {
   const number = index + 1;
-  // If we have a product slug, route via /go/{slug}/ for click tracking; otherwise check item.url
-  const destUrl = productSlug
-    ? `/go/${productSlug}/`
-    : (item.url?.startsWith('/go/') ? item.url : '/go/amazon-regalo-destacado/');
+  // Smart destination URL resolver:
+  // 1. Explicit productSlug -> /go/${productSlug}/
+  // 2. item.url if it already points to /go/
+  // 3. Generate clean slug from item.heading -> /go/${slugify(item.heading)}/
+  // 4. item.url if it is a valid external URL (not '#')
+  // 5. Fallback to /go/item-${number}/
+  let destUrl: string;
+  if (productSlug) {
+    destUrl = `/go/${productSlug}/`;
+  } else if (item.url && item.url.startsWith('/go/')) {
+    destUrl = item.url;
+  } else if (item.heading) {
+    destUrl = `/go/${slugify(item.heading)}/`;
+  } else if (item.url && item.url.startsWith('http') && !item.url.includes('#')) {
+    destUrl = item.url;
+  } else {
+    destUrl = `/go/item-${number}/`;
+  }
   const buttonLabel = item.button_label || (item.merchant ? `Ver en ${item.merchant}` : 'Ver en Tienda');
   const cleanDesc = stripHtml(item.description_html);
   const imageUrl = item.image || 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg';

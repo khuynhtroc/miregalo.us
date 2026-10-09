@@ -495,6 +495,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
                   key={idx}
                   item={item}
                   index={idx}
+                  productSlug={`${post.slug}-item-${idx + 1}`}
                   variant="row"
                 />
               ))}
