@@ -27,11 +27,10 @@ export default async function HomePage() {
   const catMap = new Map(categories.map((c) => [c.id, c]));
 
   // Fetch posts for homepage sections
-  const [featuredRes, editorRes, latestRes, blogRes] = await Promise.all([
+  const [featuredRes, editorRes, latestRes] = await Promise.all([
     listPublishedPosts({ featured: true, perPage: 5 }),
     listPublishedPosts({ editorPick: true, perPage: 6 }),
     listPublishedPosts({ type: 'gift', perPage: 8 }),
-    listPublishedPosts({ type: 'blog', perPage: 15 }),
   ]);
 
   // Featured stories
@@ -51,18 +50,18 @@ export default async function HomePage() {
   // Quick link topics
   const quickLinks = categories.filter((c) => c.quick_link).slice(0, 6);
 
-  // Blog topic grouping for the 5 columns
-  const blogPostsByCat = new Map<string, Post[]>();
-  for (const bp of blogRes.rows) {
-    const cids = Array.isArray(bp.category_ids) && bp.category_ids.length > 0
-      ? bp.category_ids
-      : (bp.primary_category_id ? [bp.primary_category_id] : []);
-    for (const cid of cids) {
-      const list = blogPostsByCat.get(cid) || [];
-      list.push(bp);
-      blogPostsByCat.set(cid, list);
-    }
-  }
+  // Fetch top 3 posts per blog category to guarantee all 5 categories have their featured post and links
+  const blogCatEntries = await Promise.all(
+    blogCats.map(async (cat) => {
+      const { rows } = await listPublishedPosts({
+        type: 'blog',
+        categoryId: cat.id,
+        perPage: 3,
+      });
+      return [cat.id, rows] as const;
+    })
+  );
+  const blogPostsByCat = new Map(blogCatEntries);
 
   return (
     <>
