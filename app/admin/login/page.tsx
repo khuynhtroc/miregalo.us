@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -98,6 +98,7 @@ export default function AdminLoginPage() {
               className="form-input"
               type="text"
               required
+              autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -112,22 +113,10 @@ export default function AdminLoginPage() {
               className="form-input"
               type="password"
               required
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-          </div>
-
-          <div
-            style={{
-              padding: '10px 14px',
-              background: '#f4f5f8',
-              borderRadius: '8px',
-              fontSize: '0.78rem',
-              color: '#69707d',
-              marginBottom: '20px',
-            }}
-          >
-            Default credentials: <strong>admin</strong> / <strong>admin123</strong> (configured in <code>.env.local</code>)
           </div>
 
           <button
