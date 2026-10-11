@@ -27,11 +27,11 @@ export async function callGemini(options: GenerateTextOptions): Promise<string |
   if (!ai) return null;
 
   const modelsToTry = [
-    options.model || 'gemini-3.5-flash',
+    options.model || 'gemini-3.8-flash',
+    'gemini-3.8-flash',
     'gemini-3-flash-preview',
     'gemini-3.1-flash-lite',
     'gemini-flash-lite-latest',
-    'gemini-3.8-flash',
   ];
 
   for (const model of modelsToTry) {

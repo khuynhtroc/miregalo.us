@@ -180,7 +180,7 @@ Responde ÚNICAMENTE en JSON válido:
   try {
     const resText = await callGemini({
       prompt: stage1Prompt,
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.8-flash',
       systemInstruction: 'Eres un editor profesional de Miregalo. Responde siempre con JSON válido en español.',
       responseMimeType: 'application/json',
     });
@@ -249,7 +249,7 @@ Responde ÚNICAMENTE en JSON:
   try {
     const resReviews = await callGemini({
       prompt: stage2Prompt,
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.8-flash',
       systemInstruction: 'Eres un analista de productos exhaustivo. Escribe textos largos, detallados y elegantes en español.',
       responseMimeType: 'application/json',
     });
@@ -362,7 +362,7 @@ Responde ÚNICAMENTE en JSON:
   try {
     const resGuide = await callGemini({
       prompt: stage3Prompt,
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.8-flash',
       systemInstruction: 'Eres un ensayista y redactor de guías de compra prémium. Escribe contenido muy largo, profundo y estructurado en español.',
       responseMimeType: 'application/json',
     });
@@ -477,7 +477,7 @@ Responde ÚNICAMENTE en JSON:
   try {
     const resStage4 = await callGemini({
       prompt: stage4Prompt,
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.8-flash',
       systemInstruction: 'Eres un escritor profesional en español. Genera textos muy ricos, empáticos y amplios.',
       responseMimeType: 'application/json',
     });
