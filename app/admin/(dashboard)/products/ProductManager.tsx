@@ -36,7 +36,7 @@ export function ProductManager({ initialProducts, merchants = [], totalCount }: 
       slug: '',
       url: 'https://www.amazon.es/?tag=miregalo26-20',
       merchant: 'Amazon España',
-      price: '29,99 €',
+      price: '24,95 €',
       currency: 'EUR',
       image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&auto=format&fit=crop&q=80',
       description: 'Detalle seleccionado con excelentes valoraciones y envío rápido en 24 horas.',
@@ -217,14 +217,14 @@ export function ProductManager({ initialProducts, merchants = [], totalCount }: 
         <div className="stat-card">
           <span className="stat-label">Average CTR</span>
           <span className="stat-val" style={{ color: '#d97706' }}>
-            {products.length > 0
-              ? (
-                  products.reduce((acc, p) => acc + (p.ctr || 0), 0) / products.length
-                ).toFixed(2)
-              : '0.00'}
-            %
+            {(() => {
+              const active = products.filter((p) => (p.clicks || 0) > 0);
+              if (active.length === 0) return '0.00%';
+              const avg = active.reduce((acc, p) => acc + (p.ctr || 0), 0) / active.length;
+              return `${avg.toFixed(2)}%`;
+            })()}
           </span>
-          <span className="stat-desc">Based on Google &amp; Direct traffic</span>
+          <span className="stat-desc">Products with active traffic</span>
         </div>
       </div>
 
@@ -435,19 +435,53 @@ export function ProductManager({ initialProducts, merchants = [], totalCount }: 
                         <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>Unassigned</span>
                       )}
                     </td>
-                    <td style={{ fontWeight: 600, color: '#0f172a' }}>{p.price}</td>
+                    <td style={{ fontWeight: 600, color: '#0f172a', whiteSpace: 'nowrap' }}>{p.price}</td>
                     <td>
-                      <div style={{ fontWeight: 700, color: '#1e293b' }}>{p.clicks || 0} clicks</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                        CTR: <strong>{p.ctr || 0}%</strong> ({p.impressions || 0} imp.)
-                      </div>
+                      {p.clicks && p.clicks > 0 ? (
+                        <>
+                          <div style={{ fontWeight: 700, color: '#1e293b' }}>
+                            {p.clicks} {p.clicks === 1 ? 'clic' : 'clics'}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                            CTR: <strong>{p.ctr || 0}%</strong> ({p.impressions || p.clicks} imp.)
+                          </div>
+                        </>
+                      ) : (
+                        <div>
+                          <span style={{ fontSize: '0.85rem', color: '#64748b' }}>0 clics</span>
+                          <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>— (Sin clics)</div>
+                        </div>
+                      )}
                     </td>
                     <td>
-                      <div style={{ fontSize: '0.74rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ color: '#16a34a' }}>🔍 Google: {traffic.organic_google} clicks</span>
-                        <span style={{ color: '#2563eb' }}>🔗 Direct: {traffic.direct} clicks</span>
-                        <span style={{ color: '#9333ea' }}>📱 Social: {traffic.social} clicks</span>
-                      </div>
+                      {p.clicks && p.clicks > 0 ? (
+                        <div style={{ fontSize: '0.74rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          {traffic.direct > 0 && (
+                            <span style={{ color: '#2563eb' }}>
+                              🔗 Directo: {traffic.direct} {traffic.direct === 1 ? 'clic' : 'clics'}
+                            </span>
+                          )}
+                          {traffic.organic_google > 0 && (
+                            <span style={{ color: '#16a34a' }}>
+                              🔍 Google: {traffic.organic_google} {traffic.organic_google === 1 ? 'clic' : 'clics'}
+                            </span>
+                          )}
+                          {traffic.social > 0 && (
+                            <span style={{ color: '#9333ea' }}>
+                              📱 Social: {traffic.social} {traffic.social === 1 ? 'clic' : 'clics'}
+                            </span>
+                          )}
+                          {traffic.referral > 0 && (
+                            <span style={{ color: '#d97706' }}>
+                              🌐 Referencia: {traffic.referral} {traffic.referral === 1 ? 'clic' : 'clics'}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: '0.76rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                          Sin tráfico registrado
+                        </span>
+                      )}
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: '6px' }}>
@@ -605,7 +639,7 @@ export function ProductManager({ initialProducts, merchants = [], totalCount }: 
 
               <div className="form-row">
                 <div className="form-group" style={{ flex: 1 }}>
-                  <label className="form-label">Price (e.g. 29,99 €) *</label>
+                  <label className="form-label">Price (e.g. 24,95 €) *</label>
                   <input
                     type="text"
                     required
@@ -621,6 +655,17 @@ export function ProductManager({ initialProducts, merchants = [], totalCount }: 
                     type="text"
                     value={editing.currency || 'EUR'}
                     onChange={(e) => setEditing({ ...editing, currency: e.target.value })}
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label className="form-label">Clicks (Outbound)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editing.clicks ?? 0}
+                    onChange={(e) => setEditing({ ...editing, clicks: parseInt(e.target.value) || 0 })}
                     className="form-input"
                   />
                 </div>
