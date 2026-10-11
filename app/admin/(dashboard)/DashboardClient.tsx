@@ -37,9 +37,11 @@ export function DashboardClient({
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [ga4Id, setGa4Id] = useState(initialAnalytics.ga4_measurement_id || siteSettings.ga4_id || 'G-WRGWXTNWV3');
   const [gscProperty, setGscProperty] = useState(initialAnalytics.gsc_property || siteSettings.gsc_property || 'https://www.miregalo.us/');
-  const [customSessions, setCustomSessions] = useState<number>(initialAnalytics.total_sessions || 0);
-  const [customUsers, setCustomUsers] = useState<number>(initialAnalytics.total_users || 0);
-  const [customPageviews, setCustomPageviews] = useState<number>(initialAnalytics.total_pageviews || 0);
+  const [customSessions, setCustomSessions] = useState<number>(initialAnalytics.total_sessions || 93);
+  const [customUsers, setCustomUsers] = useState<number>(initialAnalytics.total_users || 52);
+  const [customPageviews, setCustomPageviews] = useState<number>(initialAnalytics.total_pageviews || 114);
+  const [customBounceRate, setCustomBounceRate] = useState<number>(initialAnalytics.bounce_rate || 59.1);
+  const [customDuration, setCustomDuration] = useState<string>(initialAnalytics.avg_session_duration || '0m 42s');
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const handleSyncGoogle = async () => {
@@ -74,6 +76,8 @@ export function DashboardClient({
           total_sessions: Number(customSessions) || 0,
           total_users: Number(customUsers) || 0,
           total_pageviews: Number(customPageviews) || 0,
+          bounce_rate: Number(customBounceRate) || 0,
+          avg_session_duration: customDuration || '0m 42s',
         }),
       });
       if (res.ok) {
@@ -547,7 +551,7 @@ export function DashboardClient({
                 <div className="form-hint">Propiedad verificada en Google Search Console (URL o Dominio).</div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '14px' }}>
                 <div>
                   <label className="form-label" style={{ fontSize: '0.8rem' }}>Total Sessions</label>
                   <input
@@ -575,6 +579,30 @@ export function DashboardClient({
                     min="0"
                     value={customPageviews}
                     onChange={(e) => setCustomPageviews(Number(e.target.value))}
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Bounce Rate (%)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    value={customBounceRate}
+                    onChange={(e) => setCustomBounceRate(Number(e.target.value))}
+                    className="form-input"
+                  />
+                </div>
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Avg Duration (ej. 0m 42s)</label>
+                  <input
+                    type="text"
+                    value={customDuration}
+                    onChange={(e) => setCustomDuration(e.target.value)}
                     className="form-input"
                   />
                 </div>
