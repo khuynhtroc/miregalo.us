@@ -46,8 +46,19 @@ export const supabaseDriver: Driver = {
     if (q.limit !== undefined) {
       const from = q.offset ?? 0;
       query = query.range(from, from + q.limit - 1);
+      const { data, error, count } = await query;
+      if (error) {
+        if (isTableMissingError(error)) {
+          console.warn(`[supabase] Warning: Table "${table}" not found in schema cache. Returning empty list.`);
+          return { rows: [] as never, total: 0 };
+        }
+        fail(error, `find ${table}`);
+      }
+      return { rows: (data ?? []) as never, total: count ?? 0 };
     }
-    const { data, error, count } = await query;
+
+    // Default without limit: PostgREST caps at 1000 per request, so fetch all in batches if total > 1000
+    const { data, error, count } = await query.range(0, 999);
     if (error) {
       if (isTableMissingError(error)) {
         console.warn(`[supabase] Warning: Table "${table}" not found in schema cache. Returning empty list.`);
@@ -55,7 +66,27 @@ export const supabaseDriver: Driver = {
       }
       fail(error, `find ${table}`);
     }
-    return { rows: (data ?? []) as never, total: count ?? 0 };
+    const allRows = [...(data ?? [])];
+    const total = count ?? allRows.length;
+    let offset = 1000;
+    while (offset < total) {
+      let pageQuery = sb().from(table).select(q.select ?? '*');
+      if (q.eq) for (const [k, v] of Object.entries(q.eq)) pageQuery = v === null ? pageQuery.is(k, null) : pageQuery.eq(k, v);
+      if (q.contains) pageQuery = pageQuery.contains(q.contains.field, [q.contains.value]);
+      if (q.overlaps) pageQuery = pageQuery.overlaps(q.overlaps.field, q.overlaps.values);
+      if (q.in) pageQuery = pageQuery.in(q.in.field, q.in.values);
+      if (q.search && q.search.term.trim()) {
+        const term = q.search.term.trim().replace(/[%,()]/g, ' ');
+        pageQuery = pageQuery.or(q.search.fields.map((f) => `${f}.ilike.%${term}%`).join(','));
+      }
+      for (const o of q.order ?? []) pageQuery = pageQuery.order(o.field, { ascending: o.asc !== false, nullsFirst: false });
+      const { data: pageData, error: pageErr } = await pageQuery.range(offset, offset + 999);
+      if (pageErr) break;
+      if (!pageData || pageData.length === 0) break;
+      allRows.push(...pageData);
+      offset += 1000;
+    }
+    return { rows: allRows as never, total };
   },
   async findOne(table, eq) {
     let query = sb().from(table).select('*');
