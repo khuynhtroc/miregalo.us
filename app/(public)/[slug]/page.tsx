@@ -427,10 +427,9 @@ export default async function DynamicSlugPage({ params }: PageProps) {
                   )}
                 </span>
                 <span className="article-date" suppressHydrationWarning>
-                  <time dateTime={post.published_at || post.created_at} suppressHydrationWarning>
-                    {fmtDate(post.published_at || post.created_at)}
+                  <time dateTime={post.updated_at || post.published_at || post.created_at} suppressHydrationWarning>
+                    {`Actualizado el ${fmtDate(post.updated_at || post.published_at || post.created_at)}`}
                   </time>
-                  {post.updated_at && <span suppressHydrationWarning>{` · Actualizado el ${fmtDate(post.updated_at)}`}</span>}
                 </span>
               </div>
             </div>
@@ -827,8 +826,11 @@ export default async function DynamicSlugPage({ params }: PageProps) {
                         >
                           {rp.title}
                         </span>
-                        <span style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '3px', display: 'block' }}>
-                          {fmtDate(rp.published_at || rp.created_at)}
+                        <span style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                          <span>Actualizado:</span>
+                          <time dateTime={rp.updated_at || rp.published_at || rp.created_at}>
+                            {fmtDate(rp.updated_at || rp.published_at || rp.created_at)}
+                          </time>
                         </span>
                       </div>
                     </Link>

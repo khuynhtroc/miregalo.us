@@ -38,8 +38,8 @@ export function PostCard({ post, category, variant = 'standard', priority = fals
           <p className="card-description">{post.excerpt}</p>
         )}
         <div className="meta">
-          <time dateTime={post.published_at || post.created_at}>
-            {fmtDate(post.published_at || post.created_at)}
+          <time dateTime={post.updated_at || post.published_at || post.created_at}>
+            {fmtDate(post.updated_at || post.published_at || post.created_at)}
           </time>
         </div>
       </div>

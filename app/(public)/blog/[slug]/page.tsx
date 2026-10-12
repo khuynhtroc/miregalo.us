@@ -222,8 +222,11 @@ export default async function BlogPostPage({ params }: PageProps) {
                         >
                           {rp.title}
                         </span>
-                        <span style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '3px', display: 'block' }}>
-                          {fmtDate(rp.published_at || rp.created_at)}
+                        <span style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                          <span>Actualizado:</span>
+                          <time dateTime={rp.updated_at || rp.published_at || rp.created_at}>
+                            {fmtDate(rp.updated_at || rp.published_at || rp.created_at)}
+                          </time>
                         </span>
                       </div>
                     </Link>
