@@ -21,52 +21,7 @@ export async function GET(
   const rawSlug = decodeURIComponent(joinedSlug || '').trim().replace(/^\/go\//, '').replace(/\/$/, '');
   const flatSlug = rawSlug.replace(/\//g, '-');
 
-  // 1. Find product in DB by exact slug or variations
-  let product =
-    (await db.findOne('products', { slug: rawSlug, active: true })) ||
-    (await db.findOne('products', { slug: flatSlug, active: true }));
-
-  if (!product && rawSlug.startsWith('prod-')) {
-    product =
-      (await db.findOne('products', { slug: rawSlug.replace(/^prod-/, ''), active: true })) ||
-      (await db.findOne('products', { slug: flatSlug.replace(/^prod-/, ''), active: true }));
-  }
-
-  if (!product && !rawSlug.startsWith('prod-')) {
-    product =
-      (await db.findOne('products', { id: `prod-${rawSlug}`, active: true })) ||
-      (await db.findOne('products', { id: `prod-${flatSlug}`, active: true }));
-  }
-
-  let destUrl = product?.url;
-
-  // 2. Check redirect rules if no product URL
-  let redirectRule: any = null;
-  if (!destUrl) {
-    redirectRule =
-      (await db.findOne('redirects', { source: `/go/${rawSlug}/`, active: true })) ||
-      (await db.findOne('redirects', { source: `/go/${rawSlug}`, active: true })) ||
-      (await db.findOne('redirects', { source: `/go/${flatSlug}/`, active: true })) ||
-      (await db.findOne('redirects', { source: `/go/${flatSlug}`, active: true }));
-
-    if (redirectRule) {
-      destUrl = redirectRule.destination;
-    }
-  }
-
-  // 3. Atomically increment click / hit counters
-  if (product) {
-    try {
-      await db.increment('products', product.id, 'clicks');
-    } catch {}
-  }
-  if (redirectRule) {
-    try {
-      await db.increment('redirects', redirectRule.id, 'hits');
-    } catch {}
-  }
-
-  // 4. Fetch dynamic affiliate settings
+  // 1. Fetch dynamic affiliate settings early
   let amazonTag = DEFAULT_SETTINGS.amazon_associates_tag || 'miregalo26-20';
   let awinId = '1436844';
 
@@ -91,6 +46,108 @@ export async function GET(
       awinId = siteSettings.awin_affiliate_id;
     }
   } catch {}
+
+  // 2. Find product in DB by exact slug or variations
+  let product: any =
+    (await db.findOne('products', { slug: rawSlug, active: true })) ||
+    (await db.findOne('products', { slug: flatSlug, active: true }));
+
+  if (!product && rawSlug.startsWith('prod-')) {
+    const stripped = rawSlug.replace(/^prod-/, '');
+    product =
+      (await db.findOne('products', { slug: stripped, active: true })) ||
+      (await db.findOne('products', { id: `prod-${stripped}`, active: true }));
+  }
+
+  if (!product && !rawSlug.startsWith('prod-')) {
+    product =
+      (await db.findOne('products', { id: `prod-${rawSlug}`, active: true })) ||
+      (await db.findOne('products', { id: `prod-${flatSlug}`, active: true }));
+  }
+
+  // 2.1 Dynamic fallback: Resolve product from post.items if not yet registered in products table
+  if (!product) {
+    const itemMatch = rawSlug.match(/^(.+)-item-(\d+)$/i);
+    if (itemMatch) {
+      const postSlug = itemMatch[1];
+      const itemNum = parseInt(itemMatch[2], 10);
+      const itemIdx = itemNum - 1;
+
+      const post: any =
+        (await db.findOne('posts', { slug: postSlug })) ||
+        (await db.findOne('posts', { id: postSlug })) ||
+        (await db.findOne('posts', { id: `post-${postSlug}` }));
+
+      if (post && post.items && Array.isArray(post.items) && post.items[itemIdx]) {
+        const item = post.items[itemIdx];
+        const newProdId = `prod-${rawSlug}`;
+        const prodName = item.heading || `${post.title} #${itemNum}`;
+        const prodUrl =
+          item.url && item.url.startsWith('http') && !item.url.includes('#')
+            ? item.url
+            : `https://www.amazon.es/s?k=${encodeURIComponent(prodName.slice(0, 70))}&tag=${amazonTag}`;
+
+        const newProd = {
+          id: newProdId,
+          slug: rawSlug,
+          name: prodName,
+          url: prodUrl,
+          merchant: item.merchant || 'Amazon España',
+          image: item.image || 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+          price: item.price || '29,99 €',
+          currency: 'EUR',
+          description: item.description_html || '<p>Producto recomendado para regalo.</p>',
+          tags: ['regalos', 'destacado'],
+          clicks: 0,
+          active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        try {
+          product = await db.insert('products', newProd);
+        } catch {
+          product =
+            (await db.findOne('products', { id: newProdId })) ||
+            (await db.findOne('products', { slug: rawSlug }));
+        }
+      }
+    }
+  }
+
+  let destUrl = product?.url;
+
+  // 3. Check redirect rules if no product URL
+  let redirectRule: any = null;
+  if (!destUrl) {
+    redirectRule =
+      (await db.findOne('redirects', { source: `/go/${rawSlug}/`, active: true })) ||
+      (await db.findOne('redirects', { source: `/go/${rawSlug}`, active: true })) ||
+      (await db.findOne('redirects', { source: `/go/${flatSlug}/`, active: true })) ||
+      (await db.findOne('redirects', { source: `/go/${flatSlug}`, active: true }));
+
+    if (redirectRule) {
+      destUrl = redirectRule.destination;
+    }
+  }
+
+  // 4. Atomically increment click / hit counters with fallback update
+  if (product) {
+    try {
+      await db.increment('products', product.id, 'clicks');
+    } catch (err) {
+      console.warn('[Go Router] Increment error, using fallback update:', err);
+      try {
+        const nextClicks = (product.clicks || 0) + 1;
+        await db.update('products', product.id, { clicks: nextClicks });
+      } catch {}
+    }
+  }
+  if (redirectRule) {
+    try {
+      await db.increment('redirects', redirectRule.id, 'hits');
+    } catch {}
+  }
 
   // 5. Intelligent URL processing and affiliate link transformation
   if (destUrl) {
