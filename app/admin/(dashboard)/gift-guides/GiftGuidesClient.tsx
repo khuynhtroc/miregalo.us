@@ -1104,8 +1104,27 @@ export function GiftGuidesClient({
               )}
             </div>
 
-            <div style={{ marginTop: '10px', fontSize: '0.82rem', color: '#64748b' }}>
-              Hiển thị <strong>{filteredScheduledJobs.length}</strong> / {scheduledJobs.length} công việc tạo bài viết Gift Guide tự động theo lịch hẹn.
+            <div style={{ marginTop: '12px', padding: '10px 14px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ fontSize: '0.84rem', color: '#475569' }}>
+                Hiển thị <strong>{filteredScheduledJobs.length}</strong> / {scheduledJobs.length} công việc tạo bài viết Gift Guide tự động theo lịch hẹn.
+              </div>
+              <Link
+                href="/admin/jobs/"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: '#4f46e5',
+                  color: '#ffffff',
+                  padding: '6px 12px',
+                  borderRadius: '6px',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                }}
+              >
+                <span>⏰</span> Mở Bảng Hàng Đợi Toàn Diện (/admin/jobs/) →
+              </Link>
             </div>
           </div>
 
@@ -1173,23 +1192,68 @@ export function GiftGuidesClient({
 
                       <td style={{ fontSize: '0.78rem' }}>
                         <div>🧠 {job.model}</div>
-                        <div style={{ color: '#64748b' }}>📝 Min {job.min_words.toLocaleString()} words</div>
+                        <div style={{ color: '#4f46e5', fontWeight: 600 }}>🎁 Gift Guide (~5.000 từ)</div>
+                        <div style={{ color: '#64748b', fontSize: '0.72rem' }}>🎨 Imagen 3.0 • 🏷️ {job.affiliate_tag || 'miregalo26-20'}</div>
                       </td>
 
                       <td>
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            padding: '3px 8px',
-                            borderRadius: '999px',
-                            fontSize: '0.74rem',
-                            fontWeight: 600,
-                            background: '#f3e8ff',
-                            color: '#7e22ce',
-                          }}
-                        >
-                          {job.status}
-                        </span>
+                        {job.status === 'completed' || job.status === 'published' ? (
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              padding: '3px 8px',
+                              borderRadius: '999px',
+                              fontSize: '0.74rem',
+                              fontWeight: 600,
+                              background: '#dcfce7',
+                              color: '#15803d',
+                            }}
+                          >
+                            ✓ Đã xuất bản
+                          </span>
+                        ) : job.status === 'generating' || job.status === 'researching' ? (
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              padding: '3px 8px',
+                              borderRadius: '999px',
+                              fontSize: '0.74rem',
+                              fontWeight: 600,
+                              background: '#fef9c3',
+                              color: '#854d0e',
+                            }}
+                          >
+                            ⚙️ Đang tạo bài
+                          </span>
+                        ) : job.status === 'failed' ? (
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              padding: '3px 8px',
+                              borderRadius: '999px',
+                              fontSize: '0.74rem',
+                              fontWeight: 600,
+                              background: '#fee2e2',
+                              color: '#b91c1c',
+                            }}
+                          >
+                            ❌ Thất bại
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              padding: '3px 8px',
+                              borderRadius: '999px',
+                              fontSize: '0.74rem',
+                              fontWeight: 600,
+                              background: '#f3e8ff',
+                              color: '#7e22ce',
+                            }}
+                          >
+                            ⏰ Đã lên lịch
+                          </span>
+                        )}
                       </td>
 
                       <td style={{ textAlign: 'right' }}>

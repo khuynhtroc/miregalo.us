@@ -20,7 +20,7 @@ export function AdminNav() {
     { href: '/admin/keywords/', label: 'Keywords (500)', icon: '🎯' },
     { href: '/admin/clusters/', label: 'Clusters', icon: '🔍' },
     { href: '/admin/gsc/', label: 'GSC & SEO Opportunities', icon: '📈' },
-    { href: '/admin/jobs/', label: 'Content Jobs Queue', icon: '⚙️' },
+    { href: '/admin/jobs/', label: 'Lên lịch AI (500 Jobs Queue)', icon: '⏰' },
     { href: '/admin/posts/', label: 'Articles & Guides', icon: '📝' },
     { href: '/admin/pages/', label: 'Pages (FAQs, Policy...)', icon: '📄' },
     { href: '/admin/media/', label: 'Media & Cloud Storage', icon: '📁' },

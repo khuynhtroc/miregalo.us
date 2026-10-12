@@ -2,6 +2,8 @@ import { db } from '@/lib/db';
 import { getCategories } from '@/lib/repo';
 import { GiftGuidesClient, type CompactGiftGuide, type CompactScheduledJob } from './GiftGuidesClient';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Gift Guides Management Hub | Admin Miregalo',
 };
