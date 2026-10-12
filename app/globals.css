@@ -1020,12 +1020,65 @@
   overflow: hidden;
 }
 
-.product-horizontal-media a {
+.product-horizontal-media .product-media-link {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   height: 100%;
+  text-decoration: none;
+}
+
+.product-pin-btn {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  max-width: max-content !important;
+  background-color: #e60023 !important;
+  color: #ffffff !important;
+  border-radius: 999px !important;
+  padding: 4px 10px !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22) !important;
+  z-index: 5 !important;
+  cursor: pointer !important;
+  opacity: 0.92 !important;
+  transition: transform 0.2s ease, background-color 0.2s ease, opacity 0.2s ease !important;
+}
+
+.product-pin-btn:hover {
+  background-color: #ad081b !important;
+  opacity: 1 !important;
+  transform: scale(1.06) !important;
+  color: #ffffff !important;
+}
+
+.product-pin-btn svg {
+  width: 11px !important;
+  height: 11px !important;
+  fill: currentColor !important;
+  flex-shrink: 0 !important;
+}
+
+.product-pin-btn span {
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.product-card-vertical .product-pin-btn {
+  top: auto !important;
+  bottom: 10px !important;
+  right: 10px !important;
 }
 
 .product-horizontal-media .product-img {

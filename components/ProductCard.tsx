@@ -57,22 +57,26 @@ export function ProductCard({ item, index, productSlug, variant = 'card' }: Prod
             target="_blank"
             rel="noopener noreferrer"
             title="Guardar en Pinterest"
+            className="product-pin-btn"
             style={{
               position: 'absolute',
-              top: '8px',
-              right: '8px',
+              bottom: '10px',
+              right: '10px',
               backgroundColor: '#e60023',
               color: '#fff',
-              borderRadius: '16px',
-              padding: '3px 8px',
+              borderRadius: '999px',
+              padding: '4px 9px',
               fontSize: '0.72rem',
-              fontWeight: 600,
+              fontWeight: 700,
               textDecoration: 'none',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '3px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-              zIndex: 3,
+              gap: '4px',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.22)',
+              zIndex: 5,
+              width: 'auto',
+              height: 'auto',
+              maxWidth: 'max-content',
             }}
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
@@ -187,22 +191,26 @@ export function ProductCard({ item, index, productSlug, variant = 'card' }: Prod
             target="_blank"
             rel="noopener noreferrer"
             title="Guardar en Pinterest"
+            className="product-pin-btn"
             style={{
               position: 'absolute',
-              top: '8px',
-              right: '8px',
+              top: '10px',
+              right: '10px',
               backgroundColor: '#e60023',
               color: '#fff',
-              borderRadius: '16px',
-              padding: '3px 8px',
+              borderRadius: '999px',
+              padding: '4px 9px',
               fontSize: '0.72rem',
-              fontWeight: 600,
+              fontWeight: 700,
               textDecoration: 'none',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '3px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-              zIndex: 3,
+              gap: '4px',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.22)',
+              zIndex: 5,
+              width: 'auto',
+              height: 'auto',
+              maxWidth: 'max-content',
             }}
           >
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
@@ -214,6 +222,7 @@ export function ProductCard({ item, index, productSlug, variant = 'card' }: Prod
             href={destUrl}
             target="_blank"
             rel="nofollow sponsored noopener"
+            className="product-media-link"
             tabIndex={-1}
             aria-label={`Ver ${item.heading}`}
           >
