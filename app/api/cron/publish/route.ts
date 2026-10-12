@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 async function handleCronPublish(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const force = searchParams.get('force') === 'true';
-  const limitParam = parseInt(searchParams.get('limit') || '1', 10);
+  const limitParam = parseInt(searchParams.get('limit') || '3', 10);
   const targetJobId = searchParams.get('job_id');
 
   // Verify auth header if CRON_SECRET is configured
@@ -34,18 +34,24 @@ async function handleCronPublish(req: NextRequest) {
 
     const now = new Date();
 
-    // Filter pending/scheduled jobs
-    const pendingJobs = allJobs.filter((j: any) => {
-      if (targetJobId) return j.id === targetJobId;
-      const payload = j.payload || {};
-      const status = payload.status || 'scheduled';
-      if (status !== 'scheduled') return false;
+    // Filter and sort pending/scheduled jobs by scheduled_for ascending
+    const pendingJobs = allJobs
+      .filter((j: any) => {
+        if (targetJobId) return j.id === targetJobId;
+        const payload = j.payload || {};
+        const status = payload.status || 'scheduled';
+        if (status !== 'scheduled') return false;
 
-      if (force) return true;
-      if (!payload.scheduled_for) return true;
-      const scheduledTime = new Date(payload.scheduled_for);
-      return scheduledTime <= now;
-    });
+        if (force) return true;
+        if (!payload.scheduled_for) return true;
+        const scheduledTime = new Date(payload.scheduled_for);
+        return scheduledTime <= now;
+      })
+      .sort((a: any, b: any) => {
+        const timeA = a.payload?.scheduled_for ? new Date(a.payload.scheduled_for).getTime() : 0;
+        const timeB = b.payload?.scheduled_for ? new Date(b.payload.scheduled_for).getTime() : 0;
+        return timeA - timeB;
+      });
 
     if (pendingJobs.length === 0) {
       return NextResponse.json({

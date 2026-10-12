@@ -54,23 +54,29 @@ export default async function AdminGiftGuidesPage() {
     };
   });
 
-  // Format compact scheduled jobs
-  const scheduledJobs: CompactScheduledJob[] = (jobsRes.rows || []).map((j: any) => {
-    const payload = j.payload || {};
-    return {
-      id: j.id,
-      topic: j.topic || payload.topic || j.keyword_id || 'Untitled Job',
-      target_path: j.target_path || payload.target_path || '',
-      cluster: payload.cluster || 'General',
-      silo: payload.silo || 'RECIPIENT',
-      scheduled_for: payload.scheduled_for || null,
-      model: j.model || payload.model || 'gemini-2.5-flash',
-      min_words: payload.min_words || 5000,
-      status: j.status || payload.status || 'scheduled',
-      image_model: payload.image_model || 'imagen-3.0-generate-002',
-      affiliate_tag: payload.affiliate_tag || 'miregalo26-20',
-    };
-  });
+  // Format compact scheduled jobs (sorted chronologically by scheduled_for)
+  const scheduledJobs: CompactScheduledJob[] = (jobsRes.rows || [])
+    .map((j: any) => {
+      const payload = j.payload || {};
+      return {
+        id: j.id,
+        topic: j.topic || payload.topic || j.keyword_id || 'Untitled Job',
+        target_path: j.target_path || payload.target_path || '',
+        cluster: payload.cluster || 'General',
+        silo: payload.silo || 'RECIPIENT',
+        scheduled_for: payload.scheduled_for || null,
+        model: j.model || payload.model || 'gemini-2.5-flash',
+        min_words: payload.min_words || 5000,
+        status: j.status || payload.status || 'scheduled',
+        image_model: payload.image_model || 'imagen-3.0-generate-002',
+        affiliate_tag: payload.affiliate_tag || 'miregalo26-20',
+      };
+    })
+    .sort((a, b) => {
+      const timeA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : Infinity;
+      const timeB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : Infinity;
+      return timeA - timeB;
+    });
 
   return (
     <GiftGuidesClient

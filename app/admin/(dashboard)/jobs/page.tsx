@@ -15,7 +15,7 @@ export default async function AdminJobsPage() {
     const result = r.result || {};
 
     const rawStatus = r.status || payload.status || (r.stage === 'done' ? 'published' : r.stage === 'error' ? 'failed' : 'scheduled');
-    const status =
+    const status: 'published' | 'queued' | 'generating' | 'failed' | 'scheduled' =
       rawStatus === 'completed' || rawStatus === 'published' || r.stage === 'done'
         ? 'published'
         : rawStatus === 'failed' || r.stage === 'error'
@@ -57,6 +57,10 @@ export default async function AdminJobsPage() {
       error: r.error || '',
       log: r.log || null,
     };
+  }).sort((a, b) => {
+    const timeA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : Infinity;
+    const timeB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : Infinity;
+    return timeA - timeB;
   });
 
   return (

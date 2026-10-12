@@ -206,18 +206,24 @@ export function GiftGuidesClient({
     return filteredGuides.slice(start, start + pageSize);
   }, [filteredGuides, currentPage, pageSize]);
 
-  // Filtered scheduled jobs
+  // Filtered scheduled jobs (sorted chronologically)
   const filteredScheduledJobs = useMemo(() => {
     const q = scheduledSearch.toLowerCase().trim();
-    return scheduledJobs.filter((job) => {
-      if (q && !job.topic.toLowerCase().includes(q) && !job.id.toLowerCase().includes(q) && !job.cluster.toLowerCase().includes(q)) {
-        return false;
-      }
-      if (scheduledSilo && job.silo !== scheduledSilo) {
-        return false;
-      }
-      return true;
-    });
+    return scheduledJobs
+      .filter((job) => {
+        if (q && !job.topic.toLowerCase().includes(q) && !job.id.toLowerCase().includes(q) && !job.cluster.toLowerCase().includes(q)) {
+          return false;
+        }
+        if (scheduledSilo && job.silo !== scheduledSilo) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const timeA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : Infinity;
+        const timeB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : Infinity;
+        return timeA - timeB;
+      });
   }, [scheduledJobs, scheduledSearch, scheduledSilo]);
 
   // Reset all filters
