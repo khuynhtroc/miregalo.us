@@ -7,9 +7,13 @@ import type { MediaFile, CloudStorageSettings } from '@/lib/types';
 
 const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads');
 
-// Ensure upload directory exists
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+// Ensure upload directory exists safely (prevent crashing on read-only serverless environments like Vercel)
+try {
+  if (!fs.existsSync(UPLOAD_DIR)) {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  }
+} catch {
+  // Ignored in read-only filesystem environments
 }
 
 export const DEFAULT_STORAGE_SETTINGS: CloudStorageSettings = {
@@ -34,9 +38,13 @@ export const DEFAULT_STORAGE_SETTINGS: CloudStorageSettings = {
 
 /** Get cloud storage configuration */
 export async function getStorageSettings(): Promise<CloudStorageSettings> {
-  const res = await db.find('storage_settings', { limit: 1 });
-  if (res.rows && res.rows.length > 0) {
-    return res.rows[0] as CloudStorageSettings;
+  try {
+    const res = await db.find('storage_settings', { limit: 1 });
+    if (res.rows && res.rows.length > 0) {
+      return res.rows[0] as CloudStorageSettings;
+    }
+  } catch (err) {
+    console.warn('getStorageSettings fallback:', err);
   }
   return DEFAULT_STORAGE_SETTINGS;
 }
@@ -71,16 +79,24 @@ export async function getMediaFiles(options?: {
 }) {
   const { q, type = 'all', provider = 'all', limit = 50, offset = 0 } = options || {};
 
-  const allFilesRes = await db.find('media', {
-    order: [{ field: 'created_at', asc: false }],
-    limit: 1000,
-  });
-
-  let files = (allFilesRes.rows || []) as MediaFile[];
+  let files: MediaFile[] = [];
+  try {
+    const allFilesRes = await db.find('media', {
+      order: [{ field: 'created_at', asc: false }],
+      limit: 1000,
+    });
+    files = (allFilesRes.rows || []) as MediaFile[];
+  } catch (err) {
+    console.warn('getMediaFiles query failed, using empty list:', err);
+  }
 
   // If no files in DB yet, seed with initial catalog media
   if (files.length === 0) {
-    files = await seedInitialMediaFiles();
+    try {
+      files = await seedInitialMediaFiles();
+    } catch {
+      files = [];
+    }
   }
 
   // Filter by search query
