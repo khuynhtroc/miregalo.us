@@ -34,10 +34,33 @@ async function main() {
       const title = (c[0].match(/<h3><a[^>]*>([\s\S]*?)<\/a><\/h3>/) || [])[1]?.trim();
       const img = (c[0].match(/<img[^>]*src="([^"]*)"/) || [])[1];
       console.log(`  [Card ${i + 1}] Category: [${cat}] | Title: "${title}"`);
-      console.log(`         Image: ${img}`);
     });
   } else {
     console.log('Section "Últimas guías de regalos" not found in response');
+  }
+
+  console.log('\n--- LIVE HOME PAGE: DESDE EL BLOG SECTION ---');
+  const blogIdx = html.indexOf('Desde el blog');
+  if (blogIdx !== -1) {
+    const blogChunk = html.substring(blogIdx, blogIdx + 25000);
+    const topicRegex = /<section class="blog-topic">[\s\S]*?<\/section>/g;
+    const topics = [...blogChunk.matchAll(topicRegex)];
+    console.log(`Found ${topics.length} blog topic columns:`);
+    topics.forEach((t, i) => {
+      const heading = (t[0].match(/<div class="blog-topic-heading">\s*<h3><a[^>]*>([\s\S]*?)<\/a><\/h3>/) || [])[1]?.trim();
+      const firstTitle = (t[0].match(/<h3><a[^>]*>([\s\S]*?)<\/a><\/h3>/g) || [])[1];
+      const cleanFirstTitle = firstTitle ? firstTitle.replace(/<[^>]*>/g, '').trim() : '(NO POST)';
+      const img = (t[0].match(/<img[^>]*src="([^"]*)"/) || [])[1] || '(NO IMAGE)';
+      console.log(`  [Topic ${i + 1}] ${heading} | First: ${cleanFirstTitle} | Img: ${img}`);
+    });
+    const ulLists = [...blogChunk.matchAll(/<ul class="article-link-list">([\s\S]*?)<\/ul>/g)];
+    console.log(`Total sublink lists in blog section: ${ulLists.length}`);
+    ulLists.forEach((ul, idx) => {
+      const lis = [...ul[1].matchAll(/<li[^>]*><a[^>]*>([\s\S]*?)<\/a><\/li>/g)];
+      console.log(`  Column ${idx + 1} sublinks: ${lis.map((l) => l[1].trim()).join(' | ')}`);
+    });
+  } else {
+    console.log('Section "Desde el blog" not found');
   }
 }
 
