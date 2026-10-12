@@ -15,6 +15,7 @@ export function AdminNav() {
 
   const navItems = [
     { href: '/admin/', label: 'Dashboard', icon: '📊' },
+    { href: '/admin/gift-guides/', label: 'Gift Guides Hub', icon: '🎁' },
     { href: '/admin/urls/', label: 'URL Catalog (92)', icon: '🗺️' },
     { href: '/admin/keywords/', label: 'Keywords (500)', icon: '🎯' },
     { href: '/admin/clusters/', label: 'Clusters', icon: '🔍' },
