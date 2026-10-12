@@ -7,6 +7,8 @@ import { StoreCta } from '@/components/StoreCta';
 import type { Post } from '@/lib/types';
 import { postPath } from '@/lib/urls';
 
+export const revalidate = 60; // Revalidate at most every 60 seconds
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return buildMetadata(settings, {
@@ -26,31 +28,36 @@ export default async function HomePage() {
 
   const catMap = new Map(categories.map((c) => [c.id, c]));
 
-  // Fetch posts for homepage sections
-  const [featuredRes, editorRes, latestRes] = await Promise.all([
-    listPublishedPosts({ featured: true, perPage: 5 }),
+  // Fetch gift posts and editor picks for homepage sections
+  const [editorRes, latestRes] = await Promise.all([
     listPublishedPosts({ editorPick: true, perPage: 6 }),
-    listPublishedPosts({ type: 'gift', perPage: 8 }),
+    listPublishedPosts({ type: 'gift', perPage: 16 }),
   ]);
 
-  // Featured stories
-  let featuredPosts = featuredRes.rows;
-  if (featuredPosts.length === 0) {
-    featuredPosts = latestRes.rows.slice(0, 5);
-  }
-  const heroPost = featuredPosts[0];
-  const secondaryFeatured = featuredPosts.slice(1, 5);
+  // Sort categories by popularity / content volume descending
+  const recipients = categories
+    .filter((c) => c.group === 'recipients')
+    .sort((a, b) => (counts[b.id] ?? 0) - (counts[a.id] ?? 0));
 
-  // Group categories for Directory
-  const recipients = categories.filter((c) => c.group === 'recipients');
-  const occasions = categories.filter((c) => c.group === 'occasions');
-  const interests = categories.filter((c) => c.group === 'interests');
-  const blogCats = categories.filter((c) => c.group === 'blog');
+  const occasions = categories
+    .filter((c) => c.group === 'occasions')
+    .sort((a, b) => (counts[b.id] ?? 0) - (counts[a.id] ?? 0));
 
-  // Quick link topics
-  const quickLinks = categories.filter((c) => c.quick_link).slice(0, 6);
+  const interests = categories
+    .filter((c) => c.group === 'interests')
+    .sort((a, b) => (counts[b.id] ?? 0) - (counts[a.id] ?? 0));
 
-  // Fetch top 3 posts per blog category to guarantee all 5 categories have their featured post and links
+  const blogCats = categories
+    .filter((c) => c.group === 'blog')
+    .sort((a, b) => (counts[b.id] ?? 0) - (counts[a.id] ?? 0));
+
+  // Quick link topics sorted by popularity
+  const quickLinks = categories
+    .filter((c) => c.quick_link)
+    .sort((a, b) => (counts[b.id] ?? 0) - (counts[a.id] ?? 0))
+    .slice(0, 6);
+
+  // Fetch top 3 posts per blog category sorted by most popular
   const blogCatEntries = await Promise.all(
     blogCats.map(async (cat) => {
       const { rows } = await listPublishedPosts({
@@ -62,6 +69,25 @@ export default async function HomePage() {
     })
   );
   const blogPostsByCat = new Map(blogCatEntries);
+
+  // Refresh recommended & featured posts:
+  // Prioritize the newly generated comprehensive 7,740-word guide "Los 12 Mejores Regalos para Mamá" or top editor pick as hero
+  const allGifts = latestRes.rows;
+  const mamaPost = allGifts.find((p) => p.slug === 'ideas-de-regalos-para-mama');
+  const otherGifts = allGifts.filter((p) => p.slug !== 'ideas-de-regalos-para-mama');
+
+  const heroPost = mamaPost || allGifts[0];
+  const secondaryFeatured = otherGifts.slice(0, 4);
+
+  // Editor's picks (excluding heroPost)
+  const editorPicks = (
+    editorRes.rows.filter((p) => p.id !== heroPost?.id).length > 0
+      ? editorRes.rows.filter((p) => p.id !== heroPost?.id)
+      : otherGifts.slice(4, 10)
+  ).slice(0, 6);
+
+  // Latest remaining gift guides for the blue inspiration section
+  const remainingLatest = otherGifts.slice(4, 12);
 
   return (
     <>
@@ -106,109 +132,80 @@ export default async function HomePage() {
         <div className="hero-decoration hero-decoration-two" aria-hidden="true" />
       </section>
 
-      {/* ── Featured Section ──────────────────────── */}
-      {heroPost && (
-        <section className="section featured-section">
-          <div className="container">
-            <div className="section-heading">
-              <div>
-                <p className="eyebrow">Selección para ti</p>
-                <h2 className="section-title">Historias destacadas</h2>
-              </div>
-              <Link className="section-link" href="/gifts/">
-                Explorar todas las guías <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-
-            <div className="featured-grid">
-              <PostCard
-                post={heroPost}
-                category={heroPost.primary_category_id ? catMap.get(heroPost.primary_category_id) : null}
-                variant="featured"
-                priority
-              />
-
-              <div className="featured-secondary">
-                {secondaryFeatured.map((p) => (
-                  <PostCard
-                    key={p.id}
-                    post={p}
-                    category={p.primary_category_id ? catMap.get(p.primary_category_id) : null}
-                    variant="compact"
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── Browse Gift Guides (Directory) ────────── */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/* 1. SECTION CHỦ ĐỀ (EXPLORAR POR TEMAS MÁS BUSCADOS)           */}
+      {/* ───────────────────────────────────────────────────────────── */}
       <section className="section section-wash">
         <div className="container">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Empieza a explorar</p>
-              <h2 className="section-title">Explorar guías de regalos</h2>
+              <p className="eyebrow">Tendencias &amp; Categorías</p>
+              <h2 className="section-title">Explorar Guías por Temas Más Buscados</h2>
             </div>
             <p className="section-intro">
-              Elige para quién buscas, el momento que celebras o algo que ya les encante.
+              Encuentra inspiración navegando por nuestros temas más populares: destinatarios, ocasiones especiales y aficiones favoritas.
             </p>
           </div>
 
           <div className="topic-directory">
-            {/* Recipients */}
+            {/* Destinatarios */}
             <section className="topic-group">
               <div className="topic-group-header">
                 <div>
-                  <p className="eyebrow">Destinatarios</p>
-                  <p>Ideas bien pensadas para cada persona importante.</p>
+                  <p className="eyebrow">Destinatarios Populares</p>
+                  <p>Ideas bien pensadas para cada persona importante en tu vida.</p>
                 </div>
-                <Link href="/recipients/" aria-label="Ver todos los destinatarios">
+                <Link href="/destinatarios/" aria-label="Ver todos los destinatarios">
                   Ver todos <span aria-hidden="true">→</span>
                 </Link>
               </div>
               <div className="topic-links">
-                {recipients.map((c) => (
+                {recipients.map((c, i) => (
                   <Link key={c.id} href={`/${c.slug}/`}>
                     <span>{c.name}</span>
-                    <small>{counts[c.id] ?? 0} artículos</small>
+                    <small style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      {i < 3 && <span style={{ color: '#e11d48', fontSize: '0.74rem' }}>🔥</span>}
+                      {counts[c.id] ?? 0} artículos
+                    </small>
                     <span aria-hidden="true">→</span>
                   </Link>
                 ))}
               </div>
             </section>
 
-            {/* Occasions */}
+            {/* Ocasiones */}
             <section className="topic-group">
               <div className="topic-group-header">
                 <div>
-                  <p className="eyebrow">Ocasiones</p>
-                  <p>Celebra aniversarios, fiestas y momentos cotidianos.</p>
+                  <p className="eyebrow">Ocasiones con Mayor Búsqueda</p>
+                  <p>Celebra aniversarios, cumpleaños, San Valentín y momentos cotidianos.</p>
                 </div>
-                <Link href="/occasions/" aria-label="Ver todas las ocasiones">
+                <Link href="/ocasiones/" aria-label="Ver todas las ocasiones">
                   Ver todas <span aria-hidden="true">→</span>
                 </Link>
               </div>
               <div className="topic-links">
-                {occasions.map((c) => (
+                {occasions.map((c, i) => (
                   <Link key={c.id} href={`/${c.slug}/`}>
                     <span>{c.name}</span>
-                    <small>{counts[c.id] ?? 0} artículos</small>
+                    <small style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      {i < 3 && <span style={{ color: '#e11d48', fontSize: '0.74rem' }}>🔥</span>}
+                      {counts[c.id] ?? 0} artículos
+                    </small>
                     <span aria-hidden="true">→</span>
                   </Link>
                 ))}
               </div>
             </section>
 
-            {/* Interests */}
+            {/* Intereses */}
             <section className="topic-group">
               <div className="topic-group-header">
                 <div>
-                  <p className="eyebrow">Intereses</p>
-                  <p>Empieza con lo que les apasiona y hazlo personal.</p>
+                  <p className="eyebrow">Intereses &amp; Pasiones</p>
+                  <p>Sorprende con lo que verdaderamente les apasiona y emociona.</p>
                 </div>
-                <Link href="/interests/" aria-label="Ver todos los intereses">
+                <Link href="/intereses/" aria-label="Ver todos los intereses">
                   Ver todos <span aria-hidden="true">→</span>
                 </Link>
               </div>
@@ -226,69 +223,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Editor’s Picks ────────────────────────── */}
-      {editorRes.rows.length > 0 && (
-        <section className="section">
-          <div className="container">
-            <div className="section-heading">
-              <div>
-                <p className="eyebrow">Recomendado</p>
-                <h2 className="section-title">Selección del editor</h2>
-              </div>
-            </div>
-
-            <div className="article-grid article-grid-three">
-              {editorRes.rows.map((p) => (
-                <PostCard
-                  key={p.id}
-                  post={p}
-                  category={p.primary_category_id ? catMap.get(p.primary_category_id) : null}
-                  variant="standard"
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── Latest Gift Guides (Blue section) ─────── */}
-      {latestRes.rows.length > 0 && (
-        <section className="section section-blue">
-          <div className="container">
-            <div className="section-heading section-heading-light">
-              <div>
-                <p className="eyebrow">Nueva inspiración</p>
-                <h2 className="section-title">Últimas guías de regalos</h2>
-              </div>
-              <Link className="section-link" href="/gifts/">
-                Ver todas <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-
-            <div className="article-grid article-grid-four">
-              {latestRes.rows.map((p) => (
-                <PostCard
-                  key={p.id}
-                  post={p}
-                  category={p.primary_category_id ? catMap.get(p.primary_category_id) : null}
-                  variant="standard"
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── From the Blog ─────────────────────────── */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/* 2. SECTION BLOG (DESDE EL BLOG - INSPIRACIÓN & CONSEJOS)       */}
+      {/* ───────────────────────────────────────────────────────────── */}
       <section className="section">
         <div className="container">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Más formas de conectar</p>
-              <h2 className="section-title">Desde el blog</h2>
+              <p className="eyebrow">Inspiración, Mensajes y Consejos</p>
+              <h2 className="section-title">Artículos Más Leídos del Blog</h2>
             </div>
             <Link className="section-link" href="/blog/">
-              Visitar el blog <span aria-hidden="true">→</span>
+              Visitar el blog completo <span aria-hidden="true">→</span>
             </Link>
           </div>
 
@@ -304,7 +250,7 @@ export default async function HomePage() {
                     <h3>
                       <Link href={`/${cat.slug}/`}>{cat.name}</Link>
                     </h3>
-                    <Link href={`/${cat.slug}/`} aria-label={`View all ${cat.name} articles`}>
+                    <Link href={`/${cat.slug}/`} aria-label={`Ver todos los artículos de ${cat.name}`}>
                       →
                     </Link>
                   </div>
@@ -332,6 +278,98 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/* 3. SECTION RECOMMEND & POPULARES (GUÍAS RECOMENDADAS)         */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {heroPost && (
+        <section className="section featured-section" style={{ background: '#fafaf9', borderTop: '1px solid #f0f0ee', borderBottom: '1px solid #f0f0ee' }}>
+          <div className="container">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">⭐ Selección Exclusiva &amp; Recomendados</p>
+                <h2 className="section-title">Guías de Regalos Más Recomendadas y Populares</h2>
+              </div>
+              <Link className="section-link" href="/regalos/">
+                Explorar todas las guías <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+
+            <div className="featured-grid">
+              <PostCard
+                post={heroPost}
+                category={heroPost.primary_category_id ? catMap.get(heroPost.primary_category_id) : null}
+                variant="featured"
+                priority
+              />
+
+              <div className="featured-secondary">
+                {secondaryFeatured.map((p) => (
+                  <PostCard
+                    key={p.id}
+                    post={p}
+                    category={p.primary_category_id ? catMap.get(p.primary_category_id) : null}
+                    variant="compact"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── 4. SELECCIÓN DEL EDITOR (RECOMENDADOS POR EL EQUIPO) ──── */}
+      {editorPicks.length > 0 && (
+        <section className="section">
+          <div className="container">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Top Recomendado</p>
+                <h2 className="section-title">Selección del Editor</h2>
+              </div>
+            </div>
+
+            <div className="article-grid article-grid-three">
+              {editorPicks.map((p) => (
+                <PostCard
+                  key={p.id}
+                  post={p}
+                  category={p.primary_category_id ? catMap.get(p.primary_category_id) : null}
+                  variant="standard"
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── 5. ÚLTIMAS GUÍAS DE REGALOS (BLUE INSPIRATION SECTION) ── */}
+      {remainingLatest.length > 0 && (
+        <section className="section section-blue">
+          <div className="container">
+            <div className="section-heading section-heading-light">
+              <div>
+                <p className="eyebrow">Nueva inspiración</p>
+                <h2 className="section-title">Últimas Guías de Regalos</h2>
+              </div>
+              <Link className="section-link" href="/regalos/">
+                Ver todas <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+
+            <div className="article-grid article-grid-four">
+              {remainingLatest.map((p) => (
+                <PostCard
+                  key={p.id}
+                  post={p}
+                  category={p.primary_category_id ? catMap.get(p.primary_category_id) : null}
+                  variant="standard"
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Store CTA ─────────────────────────────── */}
       <StoreCta settings={settings} />
