@@ -2,6 +2,7 @@ import 'server-only';
 import { db } from '@/lib/db';
 import { callGemini, generateAiImage } from './gemini';
 import { matchProductsForItems, searchProducts } from './product-matcher';
+import { resolveItemImage } from './image-resolver';
 import { getR2Config, uploadBufferToR2 } from '@/lib/storage/r2';
 import type { Post, Category, GiftItem, FaqItem, Redirect } from '@/lib/types';
 import { randomUUID } from 'crypto';
@@ -106,7 +107,7 @@ async function generateAndUploadHeroImage(topic: string, slug: string): Promise<
     console.warn('[MultiStage] AI image generation skipped or failed:', err);
   }
 
-  return 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg';
+  return 'https://media.miregalo.us/media/heroes/hero_regalos_destinatarios.jpg';
 }
 
 /**
@@ -266,6 +267,8 @@ Responde ÚNICAMENTE en JSON:
   // Kết nối và tạo GiftItem cùng redirect Amazon Affiliate tag miregalo26-20
   const createdRedirects: Redirect[] = [];
   const cleanSlug = slug.replace(/\//g, '-').replace(/^-+|-+$/g, '');
+  const usedItemImages = new Set<string>();
+
   items = productPlan.map((p: any, index: number) => {
     const itemId = index + 1;
     const rev = reviewsMap.get(itemId);
@@ -318,7 +321,7 @@ Responde ÚNICAMENTE en JSON:
       merchant: 'Amazon',
       url: redirectSlug,
       button_label: 'Ver oferta en Amazon',
-      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: resolveItemImage(p.heading, usedItemImages),
     };
   });
 

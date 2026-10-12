@@ -30,7 +30,7 @@ export async function matchProductsForItems(items: GiftItem[]): Promise<GiftItem
         button_label: item.button_label || 'Ver en Tienda',
         merchant: item.merchant || matched.merchant || 'Miregalo Store',
         price: item.price || matched.price || undefined,
-        image: item.image || matched.image || undefined,
+        image: matched.image || item.image || undefined,
       };
     }
 

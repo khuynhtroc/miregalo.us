@@ -97,7 +97,7 @@ function generateWithTemplateEngine(
   const defaultItems: GiftItem[] = [
     {
       heading: `Lámina Personalizada de Recuerdos Especiales`,
-      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&auto=format&fit=crop&q=80',
       url: '/go/engraved-star-map-print/',
       button_label: 'Ver en Tienda',
       price: '45,00 €',
@@ -107,7 +107,7 @@ function generateWithTemplateEngine(
     },
     {
       heading: `Joya Grabada con Fecha Significativa`,
-      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&auto=format&fit=crop&q=80',
       url: '/go/custom-name-necklace/',
       button_label: 'Ver en Tienda',
       price: '69,00 €',
@@ -117,7 +117,7 @@ function generateWithTemplateEngine(
     },
     {
       heading: `Organizador de Cuero Hecho a Mano`,
-      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&auto=format&fit=crop&q=80',
       url: '/go/leather-travel-wallet/',
       button_label: 'Ver en Tienda',
       price: '55,00 €',
@@ -127,7 +127,7 @@ function generateWithTemplateEngine(
     },
     {
       heading: `Manta Ultrasuave con Mensaje Personalizado`,
-      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&auto=format&fit=crop&q=80',
       url: '/go/photo-memory-blanket/',
       button_label: 'Ver en Tienda',
       price: '49,90 €',
@@ -137,7 +137,7 @@ function generateWithTemplateEngine(
     },
     {
       heading: `Set de Experiencias Gourmet para Degustación`,
-      image: 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+      image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&auto=format&fit=crop&q=80',
       url: 'https://miregalo.us',
       button_label: 'Ver en Tienda',
       price: '59,00 €',
