@@ -14,9 +14,20 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
 
 /* ───────────────────────── Categories ───────────────────────── */
 
+function sanitizeCategory(c: Category): Category {
+  if (!c) return c;
+  if (c.hero_image) {
+    c.hero_image = c.hero_image
+      .replace(/^https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+      .replace(/^https?:\/\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+      .replace(/^https?:\/\/cdn\.loveable\.us\//i, 'https://media.miregalo.us/media/');
+  }
+  return c;
+}
+
 export const getCategories = cache(async (): Promise<Category[]> => {
   const { rows } = await db.find('categories', { order: [{ field: 'sort_order' }, { field: 'name' }] });
-  return rows;
+  return rows.map(sanitizeCategory);
 });
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
@@ -52,6 +63,58 @@ export async function getAuthorById(id: string | null) {
 }
 
 /* ───────────────────────── Posts ───────────────────────── */
+
+function sanitizePostMedia<T extends Partial<Post>>(p: T): T {
+  if (!p) return p;
+  if (p.hero_image) {
+    p.hero_image = p.hero_image
+      .replace(/^https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+      .replace(/^https?:\/\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+      .replace(/^https?:\/\/cdn\.loveable\.us\//i, 'https://media.miregalo.us/media/');
+  }
+  if (p.og_image) {
+    p.og_image = p.og_image
+      .replace(/^https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+      .replace(/^https?:\/\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+      .replace(/^https?:\/\/cdn\.loveable\.us\//i, 'https://media.miregalo.us/media/');
+  }
+  if (p.content_html) {
+    p.content_html = p.content_html
+      .replace(/\s+srcset=["'][^"']*["']/gi, '')
+      .replace(/\s+sizes=["'][^"']*["']/gi, '')
+      .replace(/\s+tamaños=["'][^"']*["']/gi, '')
+      .replace(/https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/')
+      .replace(/https?:\/\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/')
+      .replace(/https?:\/\/cdn\.loveable\.us\//gi, 'https://media.miregalo.us/media/')
+      .replace(/https?:\/\/blog\.loveable\.us\/blog\/([a-zA-Z0-9_-]+)\/?/gi, '/blog/regalos-$1/')
+      .replace(/https?:\/\/blog\.loveable\.us\/([a-zA-Z0-9_-]+)\/?/gi, '/blog/regalos-$1/')
+      .replace(/https?:\/\/blog-admin\.loveable\.ai[^\s"'<>]+/gi, '#')
+      .replace(/https?:\/\/loveable\.us\/[^\s"'<>]+/gi, '#')
+      .replace(/https?:\/\/loveable\.ai\/[^\s"'<>]+/gi, '#');
+  }
+  if (p.intro_html) {
+    p.intro_html = p.intro_html
+      .replace(/\s+srcset=["'][^"']*["']/gi, '')
+      .replace(/\s+sizes=["'][^"']*["']/gi, '')
+      .replace(/\s+tamaños=["'][^"']*["']/gi, '')
+      .replace(/https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/')
+      .replace(/https?:\/\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/')
+      .replace(/https?:\/\/cdn\.loveable\.us\//gi, 'https://media.miregalo.us/media/');
+  }
+  if (Array.isArray(p.items)) {
+    p.items = p.items.map((it) => {
+      if (!it.image) return it;
+      return {
+        ...it,
+        image: it.image
+          .replace(/^https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+          .replace(/^https?:\/\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+          .replace(/^https?:\/\/cdn\.loveable\.us\//i, 'https://media.miregalo.us/media/'),
+      };
+    });
+  }
+  return p;
+}
 
 const CARD_FIELDS =
   'id,type,slug,title,excerpt,hero_image,hero_alt,primary_category_id,category_ids,author_id,status,featured,editor_pick,published_at,updated_at,created_at';
@@ -91,14 +154,14 @@ export async function listPublishedPosts(opts: PostListOpts = {}): Promise<{ row
   });
   let rows = res.rows;
   if (opts.excludeId) rows = rows.filter((r) => r.id !== opts.excludeId).slice(0, perPage);
-  return { rows, total: res.total };
+  return { rows: rows.map(sanitizePostMedia), total: res.total };
 }
 
 export async function getPublishedPost(type: PostType | PostType[], slug: string): Promise<Post | null> {
   const types = Array.isArray(type) ? type : [type];
   for (const t of types) {
     const p = await db.findOne('posts', { type: t, slug, status: 'published' });
-    if (p) return p;
+    if (p) return sanitizePostMedia(p);
   }
   return null;
 }
@@ -223,7 +286,7 @@ export async function getAllPublishedForSitemap() {
     select: 'id,type,slug,title,hero_image,robots,canonical_url,published_at,updated_at,category_ids,excerpt',
     order: [{ field: 'published_at', asc: false }],
   });
-  return rows;
+  return rows.map(sanitizePostMedia);
 }
 
 /** Resolve the set of category ids that a hub page aggregates. */
