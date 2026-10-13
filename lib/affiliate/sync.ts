@@ -1,3 +1,4 @@
+import { DEFAULT_AMAZON_TAG } from '@/lib/commerce';
 import { db } from '@/lib/db';
 import type { Post, Product, Redirect } from '@/lib/types';
 import type {
@@ -12,22 +13,22 @@ const DEFAULT_SETTINGS: AffiliateSettings = {
   platforms: {
     amazon: {
       id: 'amazon',
-      name: 'Amazon España (Associates)',
+      name: 'Amazon.com (Associates US)',
       tagOrId: 'miregalo26-20',
-      domain: 'https://www.amazon.es',
+      domain: 'https://www.amazon.com',
       active: true,
       commissionRate: '3% - 12%',
-      notes: 'Primary merchant for fast Prime 24h fulfillment in Spain and Europe.',
+      notes: 'Primary merchant for US shoppers (Prime fulfillment in the United States).',
       targetWeight: 60,
     },
     awin: {
       id: 'awin',
-      name: 'Awin Network (El Corte Inglés, Fnac, Etsy)',
+      name: 'Awin Network (Etsy)',
       tagOrId: '128945',
       domain: 'https://www.awin1.com',
       active: true,
       commissionRate: '5% - 15%',
-      notes: 'Leading European affiliate network for department stores and craft makers.',
+      notes: 'Affiliate network used for Etsy (US) links.',
       targetWeight: 15,
     },
     ebay: {
@@ -96,15 +97,16 @@ function buildPlatformAffiliateUrl(
   switch (platformId) {
     case 'amazon':
       return {
-        url: `https://www.amazon.es/s?k=${encodedTitle}&tag=${config.tagOrId}`,
-        merchant: 'Amazon España',
-        buttonLabel: 'Ver en Amazon España',
+        url: `https://www.amazon.com/s?k=${encodedTitle}&tag=${config.tagOrId}`,
+        merchant: 'Amazon',
+        buttonLabel: 'Ver en Amazon',
       };
     case 'awin':
       return {
-        url: `https://www.awin1.com/cread.php?awinmid=15678&awinaffid=${config.tagOrId}&ued=https%3A%2F%2Fwww.elcorteingles.es%2Fbuscar%2F%3Fterm%3D${encodedTitle}`,
-        merchant: 'El Corte Inglés (Awin)',
-        buttonLabel: 'Ver en El Corte Inglés',
+        // El Corte Inglés is Spain-only; US site falls back to amazon.com search.
+        url: `https://www.amazon.com/s?k=${encodedTitle}&tag=${DEFAULT_AMAZON_TAG}`,
+        merchant: 'Amazon',
+        buttonLabel: 'Ver en Amazon',
       };
     case 'ebay':
       return {
@@ -120,8 +122,8 @@ function buildPlatformAffiliateUrl(
       };
     default:
       return {
-        url: `https://www.amazon.es/?tag=${config.tagOrId || 'miregalo26-20'}`,
-        merchant: 'Amazon España',
+        url: `https://www.amazon.com/?tag=${config.tagOrId || 'miregalo26-20'}`,
+        merchant: 'Amazon',
         buttonLabel: 'Comprar Producto',
       };
   }
@@ -265,8 +267,8 @@ export async function syncPostItemsWithAffiliateNetworks(
           merchant: targetAff.merchant,
           merchant_id: `mch-${assignedPlatform}`,
           image: item.image || 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&auto=format&fit=crop&q=80',
-          price: item.price || '29,99 €',
-          currency: 'EUR',
+          price: item.price || '',
+          currency: 'USD',
           description: item.description_html || '<p>Producto recomendado para regalo.</p>',
           tags: [assignedPlatform, 'regalos', 'destacado'],
           clicks: 0,

@@ -1,3 +1,4 @@
+import { normalizeMerchant } from '@/lib/commerce';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
@@ -215,7 +216,7 @@ export default async function RegalosSiloPage() {
                   merchant: product.merchant,
                   price: product.price,
                   description_html: `<p>${product.description}</p>`,
-                  button_label: `Ver en ${product.merchant}`,
+                  button_label: `Ver en ${normalizeMerchant(product.merchant)}`,
                   url: product.url,
                 }}
               />

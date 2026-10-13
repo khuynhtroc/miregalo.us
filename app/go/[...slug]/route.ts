@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { DEFAULT_SETTINGS } from '@/lib/settings-defaults';
+import { amazonSearchUrl, toUsMerchantUrl, DEFAULT_AMAZON_TAG } from '@/lib/commerce';
 
 interface AffiliatePlatformSettings {
   platforms?: {
@@ -22,7 +23,7 @@ export async function GET(
   const flatSlug = rawSlug.replace(/\//g, '-');
 
   // 1. Fetch dynamic affiliate settings early
-  let amazonTag = DEFAULT_SETTINGS.amazon_associates_tag || 'miregalo26-20';
+  let amazonTag = DEFAULT_SETTINGS.amazon_associates_tag || DEFAULT_AMAZON_TAG;
   let awinId = '1436844';
 
   try {
@@ -85,17 +86,17 @@ export async function GET(
         const prodUrl =
           item.url && item.url.startsWith('http') && !item.url.includes('#')
             ? item.url
-            : `https://www.amazon.es/s?k=${encodeURIComponent(prodName.slice(0, 70))}&tag=${amazonTag}`;
+            : amazonSearchUrl(prodName, amazonTag);
 
         const newProd = {
           id: newProdId,
           slug: rawSlug,
           name: prodName,
           url: prodUrl,
-          merchant: item.merchant || 'Amazon España',
+          merchant: item.merchant || 'Amazon',
           image: item.image || 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
-          price: item.price || '29,99 €',
-          currency: 'EUR',
+          price: item.price || '',
+          currency: 'USD',
           description: item.description_html || '<p>Producto recomendado para regalo.</p>',
           tags: ['regalos', 'destacado'],
           clicks: 0,
@@ -161,24 +162,25 @@ export async function GET(
       !destUrl.startsWith('http');
 
     if (isDefunct) {
-      // Convert defunct store links into targeted Amazon España search for the product
+      // Convert defunct store links into targeted amazon.com search for the product
       const keyword = (product?.name || rawSlug.replace(/^(prod|item)-/i, '').replace(/[-_]+/g, ' ')).trim();
-      destUrl = `https://www.amazon.es/s?k=${encodeURIComponent(keyword.slice(0, 70))}&tag=${amazonTag}`;
+      destUrl = amazonSearchUrl(keyword, amazonTag);
     } else {
       try {
         const u = new URL(destUrl);
 
-        // Amazon URLs
-        if (u.hostname.includes('amazon.') || u.hostname.includes('amzn.')) {
-          const asinMatch = u.pathname.match(/(?:dp|gp\/product|exec\/obidos\/ASIN|o\/ASIN)\/([A-Z0-9]{10})/i);
-          const asin = asinMatch ? asinMatch[1] : null;
+        const keyword = (product?.name || rawSlug.replace(/^(prod|item)-/i, '').replace(/[-_]+/g, ' ')).trim();
+        const isSpainOnlyAwin = u.hostname.includes('awin1.com') && /elcorteingles|amazon\./i.test(u.searchParams.get('ued') || '');
 
-          u.searchParams.set('tag', amazonTag);
-          if (asin) {
-            destUrl = `https://${u.hostname}/dp/${asin}/?tag=${amazonTag}`;
-          } else {
-            destUrl = u.toString();
-          }
+        // Amazon URLs (any marketplace) and Spain-only merchants -> US equivalents on amazon.com
+        if (
+          u.hostname.includes('amazon.') ||
+          u.hostname.includes('amzn.') ||
+          u.hostname.includes('elcorteingles.') ||
+          u.hostname.endsWith('ebay.es') ||
+          isSpainOnlyAwin
+        ) {
+          destUrl = toUsMerchantUrl(destUrl, keyword, amazonTag);
         }
         // Awin network URLs
         else if (u.hostname.includes('awin1.com')) {
@@ -204,9 +206,9 @@ export async function GET(
       .trim();
 
     if (rawSearch && rawSearch.length > 2 && rawSearch.toLowerCase() !== 'amazon' && rawSearch.toLowerCase() !== 'regalo destacado') {
-      destUrl = `https://www.amazon.es/s?k=${encodeURIComponent(rawSearch)}&tag=${amazonTag}`;
+      destUrl = amazonSearchUrl(rawSearch, amazonTag);
     } else {
-      destUrl = `https://www.amazon.es/?tag=${amazonTag}`;
+      destUrl = `https://www.amazon.com/?tag=${amazonTag}`;
     }
   }
 

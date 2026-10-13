@@ -151,7 +151,7 @@ export async function generateMultiStageArticle(
   // STAGE 1: Dàn ý & Đề xuất 12 sản phẩm chi tiết qua Gemini AI
   // -------------------------------------------------------------
   const stage1Prompt = `
-Eres el redactor jefe y experto en SEO y regalos para "Miregalo" (portal líder en España y Latinoamérica).
+Eres el redactor jefe y experto en SEO y regalos para "Miregalo" (guía de regalos en español para la comunidad hispana de Estados Unidos).
 Diseña la estructura editorial para una MEGAYUDA DE COMPRAS en ESPAÑOL NATIVO de más de 5.000 palabras sobre: "${cleanTopic}" (Destinatario principal: ${recipientName}, Cluster: ${cluster}).
 
 Genera un JSON con:
@@ -162,8 +162,8 @@ Genera un JSON con:
 5. "items_plan": Lista de exactamente 12 productos únicos, variados y de alta calidad adaptados a ${recipientName}. Para cada producto:
    - "heading": Nombre específico y atractivo del producto en español.
    - "category": Categoría temática (tecnología, moda, relax, gourmet, personalización, hogar...).
-   - "price": Precio estimado en euros (ej: "39,99 €").
-   - "amazon_query": Término de búsqueda para Amazon España (ej: "manta eléctrica franela suave").
+   - "price": Déjalo vacío (""); el precio real se consulta en Amazon.com.
+   - "amazon_query": Término de búsqueda para Amazon.com (EE. UU.) (ej: "manta eléctrica franela suave").
 
 Responde ÚNICAMENTE en JSON válido:
 {
@@ -201,18 +201,18 @@ Responde ÚNICAMENTE en JSON válido:
   const productPlan = (stage1Data?.items_plan && stage1Data.items_plan.length >= 10)
     ? stage1Data.items_plan.slice(0, 12)
     : [
-        { heading: `Caja de Experiencias y Escapada con Encanto para ${recipientName}`, price: '59,90 €', amazon_query: 'smartbox escapada con encanto dos personas' },
-        { heading: `Joya Personalizada Grabada en Plata de Ley 925`, price: '45,00 €', amazon_query: 'collar personalizado plata de ley grabado' },
-        { heading: `Álbum de Recuerdos Prémium con Encuadernación Artesanal`, price: '29,99 €', amazon_query: 'album fotos scrapbook vintage artesanal' },
-        { heading: `Masajeador Térmico Cervical y Lumbar Ergonómico`, price: '49,99 €', amazon_query: 'masajeador cervical cuello calor shiatsu' },
-        { heading: `Lámpara de Luna 3D con Foto Personalizada y Control Táctil`, price: '32,50 €', amazon_query: 'lampara luna 3d personalizada luz led' },
-        { heading: `Set Gourmet de Cata de Aceites de Oliva Virgen Extra Ecológicos`, price: '38,00 €', amazon_query: 'cesta gourmet aceites oliva virgen extra regalo' },
-        { heading: `Bufanda de Cachemira Pura Tejida con Acabado Extra Suave`, price: '55,00 €', amazon_query: 'bufanda cachemira suave invierno mujer hombre' },
-        { heading: `Taza Térmica Inteligente con Control Preciso de Temperatura`, price: '39,95 €', amazon_query: 'taza termica inteligente cafe temperatura' },
-        { heading: `Huerto Urbano Doméstico con Kit Completo de Aromáticas`, price: '27,90 €', amazon_query: 'huerto urbano interior kit semillas aromaticas cocina' },
-        { heading: `Vela Aromática de Cera de Soja Natural en Envase de Cerámica`, price: '22,50 €', amazon_query: 'vela aromatica cera de soja artesanal regalo' },
-        { heading: `Manta Eléctrica Térmica con Niveles de Calor Regulables`, price: '42,00 €', amazon_query: 'manta termica franela sofa cama lavable' },
-        { heading: `Cesta Spa Relajante de Baño con Aceites Esenciales Botánicos`, price: '36,00 €', amazon_query: 'cesta spa bano aceites esenciales mujer' },
+        { heading: `Caja de Experiencias y Escapada con Encanto para ${recipientName}`, price: '', amazon_query: 'smartbox escapada con encanto dos personas' },
+        { heading: `Joya Personalizada Grabada en Plata de Ley 925`, price: '', amazon_query: 'collar personalizado plata de ley grabado' },
+        { heading: `Álbum de Recuerdos Prémium con Encuadernación Artesanal`, price: '', amazon_query: 'album fotos scrapbook vintage artesanal' },
+        { heading: `Masajeador Térmico Cervical y Lumbar Ergonómico`, price: '', amazon_query: 'masajeador cervical cuello calor shiatsu' },
+        { heading: `Lámpara de Luna 3D con Foto Personalizada y Control Táctil`, price: '', amazon_query: 'lampara luna 3d personalizada luz led' },
+        { heading: `Set Gourmet de Cata de Aceites de Oliva Virgen Extra Ecológicos`, price: '', amazon_query: 'cesta gourmet aceites oliva virgen extra regalo' },
+        { heading: `Bufanda de Cachemira Pura Tejida con Acabado Extra Suave`, price: '', amazon_query: 'bufanda cachemira suave invierno mujer hombre' },
+        { heading: `Taza Térmica Inteligente con Control Preciso de Temperatura`, price: '', amazon_query: 'taza termica inteligente cafe temperatura' },
+        { heading: `Huerto Urbano Doméstico con Kit Completo de Aromáticas`, price: '', amazon_query: 'huerto urbano interior kit semillas aromaticas cocina' },
+        { heading: `Vela Aromática de Cera de Soja Natural en Envase de Cerámica`, price: '', amazon_query: 'vela aromatica cera de soja artesanal regalo' },
+        { heading: `Manta Eléctrica Térmica con Niveles de Calor Regulables`, price: '', amazon_query: 'manta termica franela sofa cama lavable' },
+        { heading: `Cesta Spa Relajante de Baño con Aceites Esenciales Botánicos`, price: '', amazon_query: 'cesta spa bano aceites esenciales mujer' },
       ];
 
   // -------------------------------------------------------------
@@ -275,7 +275,7 @@ Responde ÚNICAMENTE en JSON:
     const redirectSlug = `/go/${cleanSlug}-item-${itemId}/`;
 
     const query = encodeURIComponent(p.amazon_query || p.heading);
-    const amazonDestination = `https://www.amazon.es/s?k=${query}&tag=${affiliateTag}`;
+    const amazonDestination = `https://www.amazon.com/s?k=${query}&tag=${affiliateTag}`;
 
     createdRedirects.push({
       id: `redir-${cleanSlug}-item-${itemId}`,
@@ -314,10 +314,10 @@ Responde ÚNICAMENTE en JSON:
         'Excelente relación calidad-precio y materiales prémium de larga duración',
         'Diseño cuidado que garantiza un impacto emocional inmediato',
         'Presentación atractiva lista para regalar sin necesidad de envoltorios adicionales',
-        'Garantía de satisfacción y envío seguro en Amazon España',
+        'Garantía de satisfacción y envío seguro en Amazon.com',
       ],
       cons: rev?.cons || ['Conviene comprobar las dimensiones o disponibilidad con antelación'],
-      price: p.price || '39,99 €',
+      price: p.price || '',
       merchant: 'Amazon',
       url: redirectSlug,
       button_label: 'Ver oferta en Amazon',
@@ -345,7 +345,7 @@ ESTRUCTURA EXIGIDA:
 2. <h3>2. Criterios de Selección según Estilos de Vida y Aficiones</h3>
    (Detallar al menos 4 perfiles de ${recipientName}: amante del hogar y confort, entusiasta de la gastronomía y experiencias, persona activa o profesional, y amante de los detalles sentimentales y artesanales).
 3. <h3>3. Guía de Presupuestos y Franjas de Precio</h3>
-   (Desglosar minuciosamente qué buscar y qué esperar en cada franja: menos de 25 €, de 25 € a 60 €, y más de 60 €).
+   (Desglosar minuciosamente qué buscar y qué esperar en cada franja: menos de $25, de $25 a $60, y más de $60).
 4. <h3>4. Los 7 Errores Más Graves al Comprar y Cómo Evitarlos</h3>
    (Analizar cada error con un párrafo completo de explicación y alternativa inteligente).
 5. <h3>5. El Arte de la Presentación: Envoltorio, Tarjetas Manuscritas y Ceremonial de Entrega</h3>
@@ -396,9 +396,9 @@ Responde ÚNICAMENTE en JSON:
 <h3>3. Guía de Presupuestos y Franjas de Precio</h3>
 <p>Tener claridad sobre el rango de inversión permite tomar decisiones sensatas sin renunciar a la excelencia:</p>
 <ul>
-  <li><strong>Franja accesible (Menos de 25 €):</strong> Lejos de ser opciones menores, en este segmento encontramos velas botánicas de cera de soja, sets de cultivo doméstico o libros de autor con encuadernación especial. La clave aquí es primar el buen gusto y el envoltorio sobre el tamaño del artículo.</li>
-  <li><strong>Franja intermedia (De 25 € a 60 €):</strong> Es la zona más equilibrada en cuanto a relación calidad-precio. Engloba lámparas 3D personalizadas, prendas de abrigo en lana pura, sets gourmet de gama alta o masajeadores shiatsu. Ideal para aniversarios, navidades o cumpleaños señalados.</li>
-  <li><strong>Franja prémium (Más de 60 €):</strong> Reservada para momentos excepcionales o regalos grupales. Comprende cajas de escapada rural con estancia y cena gourmet, piezas de joyería fina o dispositivos de relajación avanzada. Su impacto reside en la exclusividad y la experiencia integral que proporcionan.</li>
+  <li><strong>Franja accesible (Menos de $25):</strong> Lejos de ser opciones menores, en este segmento encontramos velas botánicas de cera de soja, sets de cultivo doméstico o libros de autor con encuadernación especial. La clave aquí es primar el buen gusto y el envoltorio sobre el tamaño del artículo.</li>
+  <li><strong>Franja intermedia (De $25 a $60):</strong> Es la zona más equilibrada en cuanto a relación calidad-precio. Engloba lámparas 3D personalizadas, prendas de abrigo en lana pura, sets gourmet de gama alta o masajeadores shiatsu. Ideal para aniversarios, navidades o cumpleaños señalados.</li>
+  <li><strong>Franja prémium (Más de $60):</strong> Reservada para momentos excepcionales o regalos grupales. Comprende cajas de escapada rural con estancia y cena gourmet, piezas de joyería fina o dispositivos de relajación avanzada. Su impacto reside en la exclusividad y la experiencia integral que proporcionan.</li>
 </ul>
 
 <h3>4. Los 7 Errores Más Graves al Comprar y Cómo Evitarlos</h3>
@@ -520,7 +520,7 @@ Responde ÚNICAMENTE en JSON:
         },
         {
           q: `¿Qué precauciones debo tomar al comprar regalos por internet?`,
-          a: `Comprueba siempre que el vendedor cuente con valoraciones verificadas, política de devoluciones gratuita y clara, y tiempos de entrega garantizados. En nuestra guía, todos los enlaces conducen a tiendas oficiales y distribuidores autorizados en Amazon España con pasarela de pago segura y soporte al cliente en español.`,
+          a: `Comprueba siempre que el vendedor cuente con valoraciones verificadas, política de devoluciones gratuita y clara, y tiempos de entrega garantizados. En nuestra guía, todos los enlaces conducen a tiendas oficiales y distribuidores autorizados en Amazon.com con pasarela de pago segura y soporte al cliente en español.`,
         },
         {
           q: `¿Es mejor un regalo útil para el día a día o un capricho que nunca se compraría?`,

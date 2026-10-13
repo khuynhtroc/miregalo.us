@@ -80,7 +80,7 @@ export function getCatalogContent(catalogUrl: CatalogUrl): CatalogPageDetails {
   const tips = [
     {
       title: 'Define el presupuesto y estilo',
-      desc: 'Desde pequeños detalles simbólicos (menos de 20 €) hasta regalos prémium. Lo importante es que refleje vuestra conexión.',
+      desc: 'Desde pequeños detalles simbólicos (menos de $20) hasta regalos prémium. Lo importante es que refleje vuestra conexión.',
     },
     {
       title: 'Prioriza la utilidad o la emoción',
