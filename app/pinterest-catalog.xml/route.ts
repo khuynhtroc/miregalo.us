@@ -5,8 +5,22 @@ import { stripHtml } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
+function cleanXmlString(str: string): string {
+  return (str || '').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+}
+
+function xmlEscape(str: string): string {
+  return cleanXmlString(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 function cdata(str: string): string {
-  return `<![CDATA[${(str || '').replace(/]]>/g, ']]]]><![CDATA[>')}]]>`;
+  const clean = cleanXmlString(str).replace(/]]>/g, ']]]]><![CDATA[>');
+  return `<![CDATA[${clean}]]>`;
 }
 
 function cleanPrice(priceRaw?: string, currencyRaw?: string): string {
@@ -48,7 +62,9 @@ export async function GET(req: NextRequest) {
       .map((p: any) => {
         const title = stripHtml(p.name || '').slice(0, 150);
         const rawDesc = stripHtml(p.description || '');
-        const desc = rawDesc.length > 20 ? rawDesc.slice(0, 4500) : `${title} - Recomendación exclusiva disponible en Miregalo. Encuentra los mejores regalos e ideas originales con precios actualizados.`;
+        const desc = rawDesc.length > 20
+          ? rawDesc.slice(0, 4500)
+          : `${title} - Recomendación exclusiva disponible en Miregalo. Encuentra los mejores regalos e ideas originales con precios actualizados.`;
         const link = `${SITE_URL}/p/${p.slug}/`;
         const imageLink = p.image && p.image.startsWith('http')
           ? p.image
@@ -60,8 +76,8 @@ export async function GET(req: NextRequest) {
       <g:id>${cdata(p.id || p.slug)}</g:id>
       <g:title>${cdata(title)}</g:title>
       <g:description>${cdata(desc)}</g:description>
-      <g:link>${link}</g:link>
-      <g:image_link>${imageLink}</g:image_link>
+      <g:link>${xmlEscape(link)}</g:link>
+      <g:image_link>${xmlEscape(imageLink)}</g:image_link>
       <g:price>${price}</g:price>
       <g:availability>in stock</g:availability>
       <g:condition>new</g:condition>
@@ -76,7 +92,7 @@ export async function GET(req: NextRequest) {
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
   <channel>
     <title>Miregalo - Catálogo de Productos y Regalos</title>
-    <link>${SITE_URL}</link>
+    <link>${xmlEscape(SITE_URL)}</link>
     <description>Catálogo oficial de productos de afiliados y guías de regalos para Pinterest</description>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
 ${itemsXml}
@@ -91,7 +107,7 @@ ${itemsXml}
     });
   } catch (err: any) {
     console.error('[Pinterest Catalog Feed Error]:', err);
-    return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><error>${err.message}</error>`, {
+    return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><error>${xmlEscape(err.message)}</error>`, {
       status: 500,
       headers: { 'Content-Type': 'application/xml; charset=utf-8' },
     });
