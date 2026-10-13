@@ -8,7 +8,7 @@ import {
   getPublishedPost,
   getRelatedPosts,
 } from '@/lib/repo';
-import { postMetadata, blogPostingSchema, breadcrumbSchema } from '@/lib/seo';
+import { postMetadata, blogPostingSchema, breadcrumbSchema, faqSchema } from '@/lib/seo';
 import { postPath } from '@/lib/urls';
 import { fmtDate } from '@/lib/format';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
@@ -53,7 +53,8 @@ export default async function BlogPostPage({ params }: PageProps) {
         data={[
           breadcrumbSchema(breadcrumbs),
           blogPostingSchema(settings, post, author),
-        ]}
+          faqSchema(post.faqs),
+        ].filter(Boolean)}
       />
 
       <Breadcrumbs crumbs={breadcrumbs} />
