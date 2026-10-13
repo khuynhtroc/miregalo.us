@@ -28,7 +28,7 @@ export const GROUP_HUB: Record<string, string> = {
 };
 
 export const RESERVED_ROOT_SLUGS = new Set([
-  'admin', 'api', 'author', 'search', 'go', 'page', 'regalos', 'blog', 'rss.xml', 'robots.txt', 'sitemap-index.xml', 'sitemap.xml', 'sitemap-0.xml', '_next',
+  'admin', 'api', 'author', 'search', 'go', 'page', 'regalos', 'blog', 'p', 'rss.xml', 'robots.txt', 'sitemap-index.xml', 'sitemap.xml', 'sitemap-0.xml', 'pinterest-catalog.xml', 'pinterest-catalog.csv', '_next',
 ]);
 
 /** URL patterns (all trailing slash):
