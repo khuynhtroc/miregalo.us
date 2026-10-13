@@ -59,13 +59,11 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <JsonLd data={[websiteSchema(settings), orgSchema(settings)]} />
         {/* Ahrefs Web Analytics */}
-        {(settings.ahrefs_key || 'TxPIIr+hGAIJpqeul2OREw') && (
-          <script
-            src="https://analytics.ahrefs.com/analytics.js"
-            data-key={settings.ahrefs_key || 'TxPIIr+hGAIJpqeul2OREw'}
-            async
-          />
-        )}
+        <script
+          src="https://analytics.ahrefs.com/analytics.js"
+          data-key={(settings.ahrefs_key || 'TxPIlr+hGAIJpqeul2OREw').trim()}
+          async
+        />
         {settings.head_scripts && (() => {
           const raw = settings.head_scripts.trim();
           if (!raw) return null;

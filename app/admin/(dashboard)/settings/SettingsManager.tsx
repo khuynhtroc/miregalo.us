@@ -488,7 +488,7 @@ export function SettingsManager({
                     type="text"
                     value={settings.ahrefs_key ?? ''}
                     onChange={(e) => setSettings({ ...settings, ahrefs_key: e.target.value })}
-                    placeholder="e.g. TxPIIr+hGAIJpqeul2OREw"
+                    placeholder="e.g. TxPIlr+hGAIJpqeul2OREw"
                   />
                   <div className="form-hint">Embeds <code>analytics.ahrefs.com/analytics.js</code> into &lt;head&gt;</div>
                 </div>

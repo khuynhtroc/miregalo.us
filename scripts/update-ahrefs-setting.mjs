@@ -6,7 +6,7 @@ const url = 'https://tvgipyhvvtovgttnyivw.supabase.co';
 const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2Z2lweWh2dnRvdmd0dG55aXZ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MTI0Mzg2OCwiZXhwIjoyMTA2ODE5ODY4fQ.n03zTL69UhHEk524ItXwcOtqu1MtvL1iu9uOoXH-oi0';
 const sb = createClient(url, key);
 
-const AHREFS_KEY = 'TxPIIr+hGAIJpqeul2OREw';
+const AHREFS_KEY = 'TxPIlr+hGAIJpqeul2OREw';
 
 async function main() {
   console.log('--- UPDATING AHREFS WEB ANALYTICS SETTINGS ---');
