@@ -12,6 +12,30 @@ function cleanPrice(priceRaw?: string, currencyRaw?: string): string {
   return `${num.toFixed(2)} ${curr}`;
 }
 
+function cleanImageUrl(rawUrl?: string): string {
+  if (!rawUrl) return `${SITE_URL}/favicon.png`;
+  let url = rawUrl.trim();
+  url = url.replace(/https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/');
+  url = url.replace(/https?:\/\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/');
+  if (!url.startsWith('http')) {
+    url = `${SITE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+  }
+  return url;
+}
+
+function cleanDescription(rawDesc?: string, title?: string): string {
+  let desc = stripHtml(rawDesc || '')
+    .replace(/storage\.googleapis\.com\/loveable\.appspot\.com/gi, 'media.miregalo.us/media')
+    .replace(/loveable\.appspot\.com/gi, 'media.miregalo.us')
+    .replace(/loveable\.(us|ai)/gi, 'miregalo.us')
+    .replace(/loveable/gi, 'Miregalo')
+    .trim();
+  if (desc.length < 20) {
+    desc = `${title} - Selección oficial en Miregalo.`;
+  }
+  return desc.slice(0, 4500);
+}
+
 function escapeCsv(field: string): string {
   if (!field) return '""';
   const clean = field.replace(/"/g, '""').replace(/[\r\n]+/g, ' ');
@@ -62,17 +86,18 @@ export async function GET(req: NextRequest) {
       .filter((p: any) => p && p.slug && p.name)
       .map((p: any) => {
         const id = p.id || p.slug;
-        const title = stripHtml(p.name || '').slice(0, 150);
-        const rawDesc = stripHtml(p.description || '');
-        const desc = rawDesc.length > 20 ? rawDesc.slice(0, 4500) : `${title} - Selección oficial en Miregalo.`;
+        const title = stripHtml(p.name || '')
+          .replace(/loveable/gi, 'Miregalo')
+          .slice(0, 150);
+        const desc = cleanDescription(p.description, title);
         const link = `${SITE_URL}/p/${p.slug}/`;
-        const imageLink = p.image && p.image.startsWith('http')
-          ? p.image
-          : `${SITE_URL}${p.image?.startsWith('/') ? '' : '/'}${p.image || 'favicon.png'}`;
+        const imageLink = cleanImageUrl(p.image);
         const price = cleanPrice(p.price, p.currency);
         const availability = 'in stock';
         const condition = 'new';
-        const brand = stripHtml(p.merchant || 'Amazon España').slice(0, 70);
+        const brand = stripHtml(p.merchant || 'Amazon España')
+          .replace(/loveable/gi, 'Miregalo Selección')
+          .slice(0, 70);
         const googleCategory = 'Home & Garden';
 
         return [

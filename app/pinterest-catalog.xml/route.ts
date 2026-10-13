@@ -30,6 +30,30 @@ function cleanPrice(priceRaw?: string, currencyRaw?: string): string {
   return `${num.toFixed(2)} ${curr}`;
 }
 
+function cleanImageUrl(rawUrl?: string): string {
+  if (!rawUrl) return `${SITE_URL}/favicon.png`;
+  let url = rawUrl.trim();
+  url = url.replace(/https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/');
+  url = url.replace(/https?:\/\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/');
+  if (!url.startsWith('http')) {
+    url = `${SITE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+  }
+  return url;
+}
+
+function cleanDescription(rawDesc?: string, title?: string): string {
+  let desc = stripHtml(rawDesc || '')
+    .replace(/storage\.googleapis\.com\/loveable\.appspot\.com/gi, 'media.miregalo.us/media')
+    .replace(/loveable\.appspot\.com/gi, 'media.miregalo.us')
+    .replace(/loveable\.(us|ai)/gi, 'miregalo.us')
+    .replace(/loveable/gi, 'Miregalo')
+    .trim();
+  if (desc.length < 20) {
+    desc = `${title} - Recomendación exclusiva disponible en Miregalo. Encuentra los mejores regalos e ideas originales con precios actualizados.`;
+  }
+  return desc.slice(0, 4500);
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const limitParam = parseInt(searchParams.get('limit') || '5000', 10);
@@ -60,17 +84,16 @@ export async function GET(req: NextRequest) {
     const itemsXml = products
       .filter((p: any) => p && p.slug && p.name)
       .map((p: any) => {
-        const title = stripHtml(p.name || '').slice(0, 150);
-        const rawDesc = stripHtml(p.description || '');
-        const desc = rawDesc.length > 20
-          ? rawDesc.slice(0, 4500)
-          : `${title} - Recomendación exclusiva disponible en Miregalo. Encuentra los mejores regalos e ideas originales con precios actualizados.`;
+        const title = stripHtml(p.name || '')
+          .replace(/loveable/gi, 'Miregalo')
+          .slice(0, 150);
+        const desc = cleanDescription(p.description, title);
         const link = `${SITE_URL}/p/${p.slug}/`;
-        const imageLink = p.image && p.image.startsWith('http')
-          ? p.image
-          : `${SITE_URL}${p.image?.startsWith('/') ? '' : '/'}${p.image || 'favicon.png'}`;
+        const imageLink = cleanImageUrl(p.image);
         const price = cleanPrice(p.price, p.currency);
-        const brand = stripHtml(p.merchant || 'Amazon España').slice(0, 70);
+        const brand = stripHtml(p.merchant || 'Amazon España')
+          .replace(/loveable/gi, 'Miregalo Selección')
+          .slice(0, 70);
 
         return `    <item>
       <g:id>${cdata(p.id || p.slug)}</g:id>

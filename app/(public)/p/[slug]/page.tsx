@@ -66,6 +66,27 @@ async function resolveProduct(rawSlug: string) {
     }
   }
 
+  if (product) {
+    if (product.image) {
+      product.image = product.image
+        .replace(/https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/')
+        .replace(/https?:\/\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/');
+    }
+    if (product.description) {
+      product.description = product.description
+        .replace(/storage\.googleapis\.com\/loveable\.appspot\.com/gi, 'media.miregalo.us/media')
+        .replace(/loveable\.appspot\.com/gi, 'media.miregalo.us')
+        .replace(/loveable\.(us|ai)/gi, 'miregalo.us')
+        .replace(/loveable/gi, 'Miregalo');
+    }
+    if (product.name) {
+      product.name = product.name.replace(/loveable/gi, 'Miregalo');
+    }
+    if (product.merchant) {
+      product.merchant = product.merchant.replace(/loveable/gi, 'Miregalo Selección');
+    }
+  }
+
   return { product, post };
 }
 
