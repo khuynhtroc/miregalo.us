@@ -40,6 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
         ...(settings.pinterest_verification || process.env.PINTEREST_VERIFICATION
           ? { 'p:domain_verify': settings.pinterest_verification || process.env.PINTEREST_VERIFICATION }
           : {}),
+        'google-adsense-account': 'ca-pub-2959580292222970',
       },
     },
   };
@@ -58,6 +59,13 @@ export default async function RootLayout({
         <link rel="icon" type="image/png" href={settings.favicon_url || '/favicon.png'} />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <JsonLd data={[websiteSchema(settings), orgSchema(settings)]} />
+        {/* Google AdSense Site Verification & Ad Script */}
+        <meta name="google-adsense-account" content="ca-pub-2959580292222970" />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2959580292222970"
+          crossOrigin="anonymous"
+        />
         {/* Ahrefs Web Analytics */}
         <script
           src="https://analytics.ahrefs.com/analytics.js"
