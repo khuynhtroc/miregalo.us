@@ -28,10 +28,14 @@ export async function generateMetadata(): Promise<Metadata> {
     description: settings.site_description,
     icons: {
       icon: [
-        { url: settings.favicon_url || '/favicon.png' },
-        { url: '/favicon.ico' },
+        { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
+        { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+        { url: '/favicon-192x192.png', sizes: '192x192', type: 'image/png' },
+        { url: '/favicon.ico', sizes: 'any' },
       ],
-      apple: '/apple-touch-icon.png',
+      apple: [
+        { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      ],
     },
     verification: {
       google: settings.gsc_verification || undefined,
@@ -56,8 +60,11 @@ export default async function RootLayout({
   return (
     <html lang={settings.locale || 'es'} className={poppins.variable} suppressHydrationWarning>
       <head>
-        <link rel="icon" type="image/png" href={settings.favicon_url || '/favicon.png'} />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <JsonLd data={[websiteSchema(settings), orgSchema(settings)]} />
         {/* Google AdSense Site Verification & Ad Script */}
         <meta name="google-adsense-account" content="ca-pub-2959580292222970" />
