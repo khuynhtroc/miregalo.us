@@ -1,5 +1,6 @@
 import type { GiftItem } from '@/lib/types';
 import { slugify } from '@/lib/urls';
+import { displayPrice, normalizeMerchant, PRICE_FALLBACK_LABEL } from '@/lib/commerce';
 
 interface ProductCardProps {
   item: GiftItem;
@@ -16,7 +17,17 @@ function stripHtml(html?: string): string {
     .trim();
 }
 
-export function ProductCard({ item, index, productSlug, variant = 'card' }: ProductCardProps) {
+export function ProductCard({ item: rawItem, index, productSlug, variant = 'card' }: ProductCardProps) {
+  // US market: normalise merchant labels and hide unknown/EUR prices.
+  const item: GiftItem = {
+    ...rawItem,
+    merchant: rawItem.merchant ? normalizeMerchant(rawItem.merchant) : rawItem.merchant,
+    price: displayPrice(rawItem.price, (rawItem as any).currency) || '',
+    button_label:
+      rawItem.button_label && /españa|corte ingl|amazon\.es/i.test(rawItem.button_label)
+        ? 'Ver en Amazon'
+        : rawItem.button_label,
+  };
   const number = index + 1;
   // Smart destination URL resolver:
   // 1. Explicit productSlug -> /go/${productSlug}/
@@ -116,7 +127,7 @@ export function ProductCard({ item, index, productSlug, variant = 'card' }: Prod
 
           <div className="product-card-price-row">
             <span className="product-price">
-              {item.price ? item.price : 'Consultar precio'}
+              {item.price ? item.price : PRICE_FALLBACK_LABEL}
             </span>
             <span className="product-status-tag">
               {item.merchant || 'Amazon'}

@@ -8,6 +8,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
 import { stripHtml } from '@/lib/format';
 import { PostCard } from '@/components/PostCard';
+import { displayPrice, usdPriceValue, normalizeMerchant, PRICE_FALLBACK_LABEL } from '@/lib/commerce';
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -55,10 +56,10 @@ async function resolveProduct(rawSlug: string) {
         slug: cleanSlug,
         name: item.heading || `${post.title} #${itemNum}`,
         url: item.url || `/go/${cleanSlug}`,
-        merchant: item.merchant || 'Amazon España',
+        merchant: item.merchant || 'Amazon',
         image: item.image || 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
-        price: item.price || '29,99 €',
-        currency: 'EUR',
+        price: item.price || '',
+        currency: 'USD',
         description: item.description_html || '<p>Producto recomendado para regalo.</p>',
         tags: ['regalos', 'destacado'],
         active: true,
@@ -138,9 +139,11 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   const cleanDesc = rawDesc || `Producto seleccionado por el equipo de ${settings.site_name}.`;
 
   // Parse price
-  const priceStr = product.price || '29,99 €';
-  const numericPrice = parseFloat(priceStr.replace(/[^0-9,.]/g, '').replace(',', '.')) || 29.99;
-  const currency = product.currency || (priceStr.includes('€') ? 'EUR' : 'USD');
+  // Only known USD prices are shown; legacy EUR placeholders are hidden (never converted blindly).
+  const knownPrice = displayPrice(product.price, product.currency);
+  const priceStr = knownPrice || PRICE_FALLBACK_LABEL;
+  const numericPrice = usdPriceValue(product.price, product.currency);
+  const merchantLabel = normalizeMerchant(product.merchant);
 
   // Related guides
   const { rows: relatedGuides } = await listPublishedPosts({ perPage: 3 });
@@ -154,21 +157,24 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     description: cleanDesc,
     brand: {
       '@type': 'Brand',
-      name: product.merchant || 'Amazon España',
+      name: merchantLabel,
     },
-    offers: {
-      '@type': 'Offer',
-      url: `${SITE_URL}/go/${product.slug}`,
-      priceCurrency: currency,
-      price: numericPrice.toFixed(2),
-      priceValidUntil: '2027-12-31',
-      availability: 'https://schema.org/InStock',
-      itemCondition: 'https://schema.org/NewCondition',
-      seller: {
-        '@type': 'Organization',
-        name: product.merchant || 'Amazon España',
-      },
-    },
+    ...(numericPrice != null
+      ? {
+          offers: {
+            '@type': 'Offer',
+            url: `${SITE_URL}/go/${product.slug}`,
+            priceCurrency: 'USD',
+            price: numericPrice.toFixed(2),
+            availability: 'https://schema.org/InStock',
+            itemCondition: 'https://schema.org/NewCondition',
+            seller: {
+              '@type': 'Organization',
+              name: merchantLabel,
+            },
+          },
+        }
+      : {}),
   };
 
   const breadcrumbsSchema = {
@@ -281,7 +287,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                   borderRadius: '9999px',
                 }}
               >
-                🏷️ {product.merchant || 'Tienda Oficial'}
+                🏷️ {merchantLabel}
               </span>
             </div>
           </div>
@@ -328,7 +334,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                   {priceStr}
                 </span>
                 <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                  (Precio orientativo verificado)
+                  {knownPrice ? '(Precio orientativo, puede variar)' : '(Precio actualizado en la tienda)'}
                 </span>
               </div>
 

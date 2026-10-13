@@ -1,3 +1,4 @@
+import { normalizeMerchant } from '@/lib/commerce';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -301,7 +302,7 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
                   merchant: product.merchant,
                   price: product.price,
                   description_html: `<p>${product.description}</p>`,
-                  button_label: `Ver en ${product.merchant}`,
+                  button_label: `Ver en ${normalizeMerchant(product.merchant)}`,
                   url: product.url,
                 }}
               />
