@@ -29,6 +29,7 @@
     "@types/node": "^22.10.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "png-to-ico": "^3.0.2",
     "typescript": "^5.7.0"
   }
 }
