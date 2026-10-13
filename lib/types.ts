@@ -229,6 +229,7 @@ export interface SiteSettings {
   bing_verification: string;
   pinterest_verification?: string;
   pinterest_tag_id?: string;
+  ahrefs_key?: string;
   head_scripts: string;
   body_scripts: string;
   robots_extra: string;

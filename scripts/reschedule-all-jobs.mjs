@@ -22,9 +22,9 @@ async function main() {
     process.exit(1);
   }
 
-  // Filter out job-kw-001 (already published)
+  // Filter out job-kw-001 (already published) and Halloween jobs (scheduled separately)
   const scheduledJobs = allJobs.filter(
-    (j) => j.id !== 'job-kw-001' && j.payload?.status === 'scheduled'
+    (j) => j.id !== 'job-kw-001' && !j.id.startsWith('job-hw-') && j.payload?.status === 'scheduled'
   );
 
   console.log(`Found ${scheduledJobs.length} scheduled jobs to re-sequence.`);

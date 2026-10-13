@@ -36,6 +36,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   bing_verification: '',
   pinterest_verification: 'aa17ebb2f5874bb384abd7511116e441',
   pinterest_tag_id: '',
+  ahrefs_key: 'TxPIIr+hGAIJpqeul2OREw',
   head_scripts: '',
   body_scripts: '',
   robots_extra: '',

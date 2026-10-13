@@ -480,6 +480,18 @@ export function SettingsManager({
                   />
                   <div className="form-hint">Enables the official Google Search script and box on /search/</div>
                 </div>
+
+                <div className="form-group">
+                  <label className="form-label">Ahrefs Web Analytics Key (data-key)</label>
+                  <input
+                    className="form-input"
+                    type="text"
+                    value={settings.ahrefs_key ?? ''}
+                    onChange={(e) => setSettings({ ...settings, ahrefs_key: e.target.value })}
+                    placeholder="e.g. TxPIIr+hGAIJpqeul2OREw"
+                  />
+                  <div className="form-hint">Embeds <code>analytics.ahrefs.com/analytics.js</code> into &lt;head&gt;</div>
+                </div>
               </div>
 
               <div className="form-row">

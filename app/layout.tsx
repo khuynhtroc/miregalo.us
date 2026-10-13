@@ -58,6 +58,14 @@ export default async function RootLayout({
         <link rel="icon" type="image/png" href={settings.favicon_url || '/favicon.png'} />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <JsonLd data={[websiteSchema(settings), orgSchema(settings)]} />
+        {/* Ahrefs Web Analytics */}
+        {(settings.ahrefs_key || 'TxPIIr+hGAIJpqeul2OREw') && (
+          <script
+            src="https://analytics.ahrefs.com/analytics.js"
+            data-key={settings.ahrefs_key || 'TxPIIr+hGAIJpqeul2OREw'}
+            async
+          />
+        )}
         {settings.head_scripts && (() => {
           const raw = settings.head_scripts.trim();
           if (!raw) return null;
