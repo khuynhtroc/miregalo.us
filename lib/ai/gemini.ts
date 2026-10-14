@@ -26,16 +26,22 @@ export async function callGemini(options: GenerateTextOptions): Promise<string |
   const ai = getGeminiClient();
   if (!ai) return null;
 
-  let requestedModel = options.model || 'gemini-3.5-flash';
-  if (requestedModel.includes('2.5') || requestedModel.includes('2.0') || requestedModel.includes('1.5')) {
-    requestedModel = 'gemini-3.5-flash';
+  let requestedModel = options.model || 'gemini-3.1-flash-lite';
+  if (
+    requestedModel.includes('2.5') ||
+    requestedModel.includes('2.0') ||
+    requestedModel.includes('1.5') ||
+    requestedModel.includes('3.8') ||
+    requestedModel.includes('3.5')
+  ) {
+    requestedModel = 'gemini-3.1-flash-lite';
   }
 
   const modelsToTry = [
     requestedModel,
-    'gemini-3.5-flash',
     'gemini-3.1-flash-lite',
     'gemini-flash-lite-latest',
+    'gemini-3.5-flash',
   ];
   const uniqueModels = Array.from(new Set(modelsToTry));
 
