@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { db } from '@/lib/db';
 import { generateMultiStageArticle } from '@/lib/ai/multi-stage-generator';
 
@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
 async function handleCronPublish(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const force = searchParams.get('force') === 'true';
+  const syncMode = searchParams.get('sync') === 'true';
   const limitParam = parseInt(searchParams.get('limit') || '1', 10);
   const targetJobId = searchParams.get('job_id');
 
@@ -160,82 +161,152 @@ async function handleCronPublish(req: NextRequest) {
         continue;
       }
 
-      console.log(`[Cron] Starting multi-stage AI generation for job ${job.id}: "${payload.topic}"`);
-
-      // Update stage to draft / processing
-      await db.update('content_jobs', job.id, {
-        stage: 'draft',
-        updated_at: new Date().toISOString(),
-        payload: { ...payload, status: 'processing' },
-      });
-
-      try {
-        const genResult = await generateMultiStageArticle({
-          topic: payload.topic,
-          cluster: payload.cluster,
-          silo: payload.silo,
-          keyword_id: job.keyword_id || undefined,
-          target_slug: payload.target_path,
-          min_words: payload.min_words || 5000,
-          affiliate_tag: payload.affiliate_tag || 'miregalo26-20',
-          publish: true,
+      if (syncMode) {
+        console.log(`[Cron Sync] Starting multi-stage AI generation for job ${job.id}: "${payload.topic}"`);
+        await db.update('content_jobs', job.id, {
+          stage: 'draft',
+          updated_at: new Date().toISOString(),
+          payload: { ...payload, status: 'processing' },
         });
 
-        const nowIso = new Date().toISOString();
-        // Mark as done
-        await db.update('content_jobs', job.id, {
-          stage: 'done',
-          updated_at: nowIso,
-          payload: { ...payload, status: 'published' },
-          result: {
-            post_id: genResult.post.id,
+        try {
+          const genResult = await generateMultiStageArticle({
+            topic: payload.topic,
+            cluster: payload.cluster,
+            silo: payload.silo,
+            keyword_id: job.keyword_id || undefined,
+            target_slug: payload.target_path,
+            min_words: payload.min_words || 5000,
+            affiliate_tag: payload.affiliate_tag || 'miregalo26-20',
+            publish: true,
+          });
+
+          const nowIso = new Date().toISOString();
+          await db.update('content_jobs', job.id, {
+            stage: 'done',
+            updated_at: nowIso,
+            payload: { ...payload, status: 'published' },
+            result: {
+              post_id: genResult.post.id,
+              slug: genResult.post.slug,
+              word_count: genResult.wordCount,
+              item_count: genResult.itemCount,
+              hero_image: genResult.heroImageUrl,
+              published_at: nowIso,
+            },
+          });
+
+          results.push({
+            job_id: job.id,
+            topic: payload.topic,
             slug: genResult.post.slug,
             word_count: genResult.wordCount,
-            item_count: genResult.itemCount,
-            hero_image: genResult.heroImageUrl,
-            published_at: nowIso,
-          },
-        });
+            items: genResult.itemCount,
+            mode: 'ai_generation',
+            status: 'success',
+          });
+          aiGenerationCount++;
+        } catch (err: unknown) {
+          const errorMsg = err instanceof Error ? err.message : String(err);
+          console.error(`[Cron Sync] Error processing job ${job.id}:`, err);
+          await db.update('content_jobs', job.id, {
+            stage: 'error',
+            error: errorMsg,
+            updated_at: new Date().toISOString(),
+            payload: { ...payload, status: 'failed' },
+          });
 
-        results.push({
-          job_id: job.id,
-          topic: payload.topic,
-          slug: genResult.post.slug,
-          word_count: genResult.wordCount,
-          items: genResult.itemCount,
-          mode: 'ai_generation',
-          status: 'success',
-        });
-        aiGenerationCount++;
-      } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? err.message : String(err);
-        console.error(`[Cron] Error processing job ${job.id}:`, err);
+          results.push({
+            job_id: job.id,
+            topic: payload.topic,
+            mode: 'ai_generation',
+            status: 'error',
+            error: errorMsg,
+          });
+          aiGenerationCount++;
+        }
+      } else {
+        // ── ASYNCHRONOUS BACKGROUND WORKER (after) ──
+        // Immediately lock job in Supabase so subsequent cron ticks won't re-pick it
+        const startIso = new Date().toISOString();
         await db.update('content_jobs', job.id, {
-          stage: 'error',
-          error: errorMsg,
-          updated_at: new Date().toISOString(),
-          payload: { ...payload, status: 'failed' },
+          stage: 'draft',
+          updated_at: startIso,
+          payload: { ...payload, status: 'processing' },
         });
 
         results.push({
           job_id: job.id,
           topic: payload.topic,
           mode: 'ai_generation',
-          status: 'error',
-          error: errorMsg,
+          status: 'dispatched_to_background',
+          message: 'Article is generating in background via Next.js after() worker',
         });
         aiGenerationCount++;
+
+        // Schedule background worker to execute after HTTP response is returned
+        after(async () => {
+          console.log(`[Cron Background] Starting multi-stage AI generation for job ${job.id}: "${payload.topic}"`);
+          try {
+            const genResult = await generateMultiStageArticle({
+              topic: payload.topic,
+              cluster: payload.cluster,
+              silo: payload.silo,
+              keyword_id: job.keyword_id || undefined,
+              target_slug: payload.target_path,
+              min_words: payload.min_words || 5000,
+              affiliate_tag: payload.affiliate_tag || 'miregalo26-20',
+              publish: true,
+            });
+
+            const finishIso = new Date().toISOString();
+            await db.update('content_jobs', job.id, {
+              stage: 'done',
+              updated_at: finishIso,
+              payload: { ...payload, status: 'published' },
+              result: {
+                post_id: genResult.post.id,
+                slug: genResult.post.slug,
+                word_count: genResult.wordCount,
+                item_count: genResult.itemCount,
+                hero_image: genResult.heroImageUrl,
+                published_at: finishIso,
+              },
+            });
+
+            console.log(`[Cron Background] Finished job ${job.id} -> /${genResult.post.slug}/ (${genResult.wordCount} words)`);
+
+            // Automated Pinterest Pinning
+            try {
+              const { pinNextOldestPost } = await import('@/lib/social/pinterest');
+              await pinNextOldestPost();
+            } catch (pinErr: any) {
+              console.warn('[Cron Background] Pinterest pinning error:', pinErr?.message || pinErr);
+            }
+          } catch (err: unknown) {
+            const errorMsg = err instanceof Error ? err.message : String(err);
+            console.error(`[Cron Background] Error processing job ${job.id}:`, err);
+            await db.update('content_jobs', job.id, {
+              stage: 'error',
+              error: errorMsg,
+              updated_at: new Date().toISOString(),
+              payload: { ...payload, status: 'failed' },
+            });
+          }
+        });
       }
     }
 
-    // Execute automated Pinterest FIFO Pinning (1 post per cron run)
-    let pinterestPinResult = null;
-    try {
-      const { pinNextOldestPost } = await import('@/lib/social/pinterest');
-      pinterestPinResult = await pinNextOldestPost();
-    } catch (pinErr: any) {
-      console.warn('[Cron] Pinterest pinning error:', pinErr?.message || pinErr);
-      pinterestPinResult = { success: false, error: pinErr?.message || String(pinErr) };
+    // Schedule background Pinterest Pinning if syncMode is false and no AI background job was dispatched
+    if (!syncMode && aiGenerationCount === 0) {
+      after(async () => {
+        try {
+          const { pinNextOldestPost } = await import('@/lib/social/pinterest');
+          await pinNextOldestPost();
+        } catch (pinErr: any) {
+          console.warn('[Cron] Pinterest pinning error:', pinErr?.message || pinErr);
+        }
+      });
     }
 
     return NextResponse.json({
@@ -243,7 +314,7 @@ async function handleCronPublish(req: NextRequest) {
       processed: results.length,
       healed_zombies: healedCount,
       results,
-      pinterest: pinterestPinResult,
+      sync_mode: syncMode,
       remaining_queued: pendingJobs.length - results.length,
     });
   } catch (err: unknown) {
