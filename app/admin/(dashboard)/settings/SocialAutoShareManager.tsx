@@ -114,6 +114,15 @@ export function SocialAutoShareManager() {
     setTestingChannel(`${channel}_post`);
     setTestResult(null);
     try {
+      // Auto-save settings first so the backend always has the latest tokens
+      if (settings) {
+        await fetch('/api/admin/social/settings/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings),
+        });
+      }
+
       const res = await fetch('/api/admin/social/test/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
