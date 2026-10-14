@@ -1,6 +1,6 @@
 import type { GiftItem } from '@/lib/types';
 import { slugify } from '@/lib/urls';
-import { displayPrice, normalizeMerchant } from '@/lib/commerce';
+import { displayPrice, normalizeMerchant, NEUTRAL_CTA_LABEL, neutralizeMerchantHtml, filterPros } from '@/lib/commerce';
 
 interface ProductCardProps {
   item: GiftItem;
@@ -23,10 +23,8 @@ export function ProductCard({ item: rawItem, index, productSlug, variant = 'card
     ...rawItem,
     merchant: rawItem.merchant ? normalizeMerchant(rawItem.merchant) : rawItem.merchant,
     price: displayPrice(rawItem.price, (rawItem as any).currency) || '',
-    button_label:
-      rawItem.button_label && /españa|corte ingl|amazon\.es/i.test(rawItem.button_label)
-        ? 'Ver en Amazon'
-        : rawItem.button_label,
+    pros: filterPros(rawItem.pros),
+    description_html: neutralizeMerchantHtml(rawItem.description_html),
   };
   const number = index + 1;
   // Smart destination URL resolver:
@@ -47,7 +45,8 @@ export function ProductCard({ item: rawItem, index, productSlug, variant = 'card
   } else {
     destUrl = `/go/item-${number}/`;
   }
-  const buttonLabel = item.button_label || (item.merchant ? `Ver en ${item.merchant}` : 'Ver en Tienda');
+  // Neutral CTA: no merchant names in UI.
+  const buttonLabel = NEUTRAL_CTA_LABEL;
   const cleanDesc = stripHtml(item.description_html);
   const imageUrl = item.image || 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg';
 
@@ -60,9 +59,6 @@ export function ProductCard({ item: rawItem, index, productSlug, variant = 'card
         {/* Media Container */}
         <div className="product-card-media" style={{ position: 'relative' }}>
           <span className="product-badge-number">#{number}</span>
-          {item.merchant && (
-            <span className="product-badge-merchant">{item.merchant}</span>
-          )}
           <a
             href={`https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent('https://www.miregalo.us' + destUrl)}&media=${encodeURIComponent(imageUrl)}&description=${encodeURIComponent(item.heading)}`}
             target="_blank"

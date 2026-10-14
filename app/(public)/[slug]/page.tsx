@@ -1,3 +1,4 @@
+import { neutralizeMerchantHtml } from '@/lib/commerce';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -288,7 +289,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
               <div
                 className="article-content prose"
                 style={{ marginBottom: '28px' }}
-                dangerouslySetInnerHTML={{ __html: post.intro_html }}
+                dangerouslySetInnerHTML={{ __html: neutralizeMerchantHtml(post.intro_html) }}
               />
             )}
 
@@ -299,7 +300,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
                 className="article-content prose"
                 suppressHydrationWarning
                 style={{ marginTop: isContactPage ? '36px' : '0' }}
-                dangerouslySetInnerHTML={{ __html: post.content_html }}
+                dangerouslySetInnerHTML={{ __html: neutralizeMerchantHtml(post.content_html) }}
               />
             )}
 
@@ -482,7 +483,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
             <div
               className="article-content prose"
               style={{ marginBottom: '32px' }}
-              dangerouslySetInnerHTML={{ __html: post.intro_html }}
+              dangerouslySetInnerHTML={{ __html: neutralizeMerchantHtml(post.intro_html) }}
             />
           )}
 
@@ -660,7 +661,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
               className="article-content prose"
               suppressHydrationWarning
               style={{ marginTop: '40px' }}
-              dangerouslySetInnerHTML={{ __html: post.content_html }}
+              dangerouslySetInnerHTML={{ __html: neutralizeMerchantHtml(post.content_html) }}
             />
           )}
 

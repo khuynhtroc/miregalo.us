@@ -91,3 +91,28 @@ export function toUsMerchantUrl(rawUrl: string, fallbackKeyword: string, tag = D
     return amazonSearchUrl(fallbackKeyword, tag);
   }
 }
+
+/** Neutral, merchant-free CTA label used across the public UI. */
+export const NEUTRAL_CTA_LABEL = 'Ver producto';
+
+const MERCHANT_RE = '(?:Amazon(?:\\.com|\\.es)?(?: España)?|Etsy(?: España)?|eBay(?:\\.es)?|Walmart|Target|El Corte Ingl[eé]s|AliExpress|la tienda|tienda)';
+
+/**
+ * Replace merchant-named CTA text injected in DB HTML (e.g. ">Ver en Amazon<", ">Comprar en Etsy<")
+ * with the neutral label. Only touches short text nodes that are entirely a CTA; prose is untouched.
+ */
+export function neutralizeMerchantHtml(html?: string | null): string {
+  if (!html) return '';
+  const re = new RegExp(
+    `>(\\s*)(?:Ver|Comprar|Consultar|Ver precio|Ver oferta|Ver producto)(?: (?:y comprar|precio))? (?:en|on) ${MERCHANT_RE}(\\s*(?:→|↗|»)?\\s*)<`,
+    'gi',
+  );
+  return html.replace(re, `>$1${NEUTRAL_CTA_LABEL}$2<`);
+}
+
+/** Boilerplate "pros" bullets auto-added by old seed scripts that make unverifiable review claims. */
+const FABRICATED_PRO_RE = /valoraciones? verificadas|rese[ñn]as? verificadas|opiniones? verificadas|compradores satisfechos|miles de (clientes|compradores)|\b(4|5)[.,]?\d? estrellas|m[aá]s vendido/i;
+
+export function filterPros(pros?: string[] | null): string[] {
+  return (pros || []).filter((p) => p && !FABRICATED_PRO_RE.test(p));
+}

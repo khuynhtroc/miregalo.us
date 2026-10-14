@@ -216,7 +216,7 @@ export default async function RegalosSiloPage() {
                   merchant: product.merchant,
                   price: product.price,
                   description_html: `<p>${product.description}</p>`,
-                  button_label: `Ver en ${normalizeMerchant(product.merchant)}`,
+                  button_label: 'Ver producto',
                   url: product.url,
                 }}
               />
