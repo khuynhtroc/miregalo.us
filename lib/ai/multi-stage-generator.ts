@@ -577,7 +577,7 @@ Responde ÚNICAMENTE en JSON:
   // Nếu chưa chạm ngưỡng 5.000 từ, tự động bổ sung ma trận kịch bản chuyên sâu
   if (currentWords < targetWords) {
     const additionalAnalysisHtml = `
-<h2>Análisis Editorial Avanzado: Matriz de Decisiones y Kịch Bản Tặng Quà cho ${recipientName}</h2>
+<h2>Análisis Editorial Avanzado: Matriz de Decisiones y Criterios de Selección para ${recipientName}</h2>
 <p>Para aquellos compradores que buscan una certeza absoluta antes de tomar la decisión definitiva, hemos elaborado este estudio pormenorizado que cruza diferentes situaciones de entrega con las alternativas más idóneas de nuestro catálogo. Cada festividad o circunstancia vital impone unas expectativas concretas que conviene dominar con soltura.</p>
 
 <h3>Escenario A: Celebraciones de Cumpleaños y Fechas de Nacimiento</h3>

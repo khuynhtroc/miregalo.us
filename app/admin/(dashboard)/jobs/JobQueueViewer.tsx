@@ -54,6 +54,7 @@ export function JobQueueViewer({ initialJobs }: JobQueueViewerProps) {
   const [selectedJob, setSelectedJob] = useState<NormalizedContentJob | null>(null);
   const [runningId, setRunningId] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isRunningQueue, setIsRunningQueue] = useState(false);
 
   // Clusters list
   const clusters = useMemo(() => {
@@ -170,6 +171,37 @@ export function JobQueueViewer({ initialJobs }: JobQueueViewerProps) {
     }
   };
 
+  // Run overdue scheduled queue immediately
+  const handleRunOverdueQueue = async () => {
+    setIsRunningQueue(true);
+    setMsg(null);
+    try {
+      const res = await fetch('/api/cron/publish?force=false&limit=1', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        const processed = data.processed || 0;
+        const remaining = data.remaining_queued !== undefined ? data.remaining_queued : 'N/A';
+        const details = (data.results || []).map((r: any) => `• ${r.topic} (${r.status})`).join('; ');
+        setMsg({
+          type: 'success',
+          text: `⚡ Đã kích hoạt Cron thành công: Xử lý ${processed} bài! (Còn lại chờ xuất bản: ${remaining})${details ? ' - ' + details : ''}`,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        setMsg({
+          type: 'error',
+          text: `❌ Lỗi khi kích hoạt hàng đợi: ${data.error || data.message || 'Unknown error'}`,
+        });
+      }
+    } catch {
+      setMsg({ type: 'error', text: '❌ Lỗi kết nối khi gọi Cron Publish' });
+    } finally {
+      setIsRunningQueue(false);
+    }
+  };
+
   const formatDateStr = (dateString?: string | null) => {
     if (!dateString) return 'Chưa hẹn lịch';
     try {
@@ -283,6 +315,53 @@ export function JobQueueViewer({ initialJobs }: JobQueueViewerProps) {
 
   return (
     <div>
+      {/* ── Action Toolbar: Trigger Scheduled Queue ── */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #ede9fe 100%)',
+          padding: '14px 20px',
+          borderRadius: '12px',
+          border: '1px solid #ddd6fe',
+          marginBottom: '20px',
+        }}
+      >
+        <div>
+          <div style={{ fontWeight: 700, color: '#4c1d95', fontSize: '0.98rem' }}>
+            ⚡ Hệ thống Điều phối Xuất bản Tự động (Auto-Publish Pipeline)
+          </div>
+          <div style={{ color: '#6d28d9', fontSize: '0.84rem', marginTop: '2px' }}>
+            Hệ thống tự động kích hoạt xuất bản bài viết đúng hẹn theo lịch trình. Bạn cũng có thể kích hoạt thủ công ngay tại đây:
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={handleRunOverdueQueue}
+          disabled={isRunningQueue}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 18px',
+            background: isRunningQueue ? '#94a3b8' : 'linear-gradient(135deg, #7c3aed, #4f46e5)',
+            color: '#ffffff',
+            borderRadius: '8px',
+            border: 'none',
+            fontWeight: 600,
+            fontSize: '0.88rem',
+            cursor: isRunningQueue ? 'not-allowed' : 'pointer',
+            boxShadow: '0 4px 6px -1px rgba(124, 58, 237, 0.25)',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          {isRunningQueue ? '⏳ Đang xử lý bài viết...' : '⚡ Xử lý ngay các bài đến hạn (Run Due Jobs)'}
+        </button>
+      </div>
+
       {/* ── KPI Stat Cards ────────────────────────────── */}
       <div className="stat-grid" style={{ marginBottom: '22px' }}>
         <div className="stat-card">

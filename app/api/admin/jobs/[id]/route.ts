@@ -4,6 +4,9 @@ import { getSession } from '@/lib/auth';
 import { processContentJob } from '@/lib/ai/job-queue';
 import { generateMultiStageArticle } from '@/lib/ai/multi-stage-generator';
 
+export const dynamic = 'force-dynamic';
+export const maxDuration = 300;
+
 interface Context {
   params: Promise<{ id: string }>;
 }
@@ -39,6 +42,51 @@ export async function POST(_req: NextRequest, { params }: Context) {
 
   const payload = job.payload || {};
   const topic = job.topic || payload.topic;
+
+  // 1. Fast-path: If job references a pre-authored post (e.g. planned post), publish immediately without AI generation
+  let plannedPost: any = null;
+  if (job.result?.post_id) {
+    plannedPost = await db.findOne('posts', { id: job.result.post_id });
+  }
+  if (!plannedPost && (job.result?.slug || payload.target_path)) {
+    const targetSlug = (job.result?.slug || payload.target_path || '').replace(/^\/|\/$/g, '');
+    if (targetSlug) {
+      plannedPost = await db.findOne('posts', { slug: targetSlug });
+    }
+  }
+
+  if (plannedPost && plannedPost.status !== 'published') {
+    const nowIso = new Date().toISOString();
+    await db.update('posts', plannedPost.id, {
+      status: 'published',
+      published_at: nowIso,
+      updated_at: nowIso,
+    });
+    const updatedJob = await db.update('content_jobs', id, {
+      stage: 'done',
+      updated_at: nowIso,
+      payload: { ...payload, status: 'published' },
+      result: {
+        ...job.result,
+        post_id: plannedPost.id,
+        slug: plannedPost.slug,
+        word_count: plannedPost.content_html ? plannedPost.content_html.split(/\s+/).length : 5000,
+        item_count: plannedPost.items?.length || 10,
+        hero_image: plannedPost.hero_image,
+        published_at: nowIso,
+      },
+    });
+    return NextResponse.json({
+      success: true,
+      job: {
+        ...updatedJob,
+        topic,
+        status: 'completed',
+      },
+      generatedPost: plannedPost,
+      wordCount: plannedPost.content_html ? plannedPost.content_html.split(/\s+/).length : 5000,
+    });
+  }
 
   // If this is a queued scheduled job with payload, execute via multi-stage generator
   if (topic) {
