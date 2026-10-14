@@ -247,7 +247,7 @@ ${scrapedData ? `- Contenido original de referencia en inglés: \n${JSON.stringi
 
 REGLAS ESTRICTAS:
 1. IDIOMA: Todo el texto generado DEBE ser en ESPAÑOL fluido, natural, persuasivo y elegante (es-ES / es-Latam neutro).
-2. TÍTULO: Llamativo, optimizado para CTR y SEO, menor a 65 caracteres.
+2. TÍTULO Y TEMPORALIDAD: Llamativo, optimizado para CTR y SEO, menor a 65 caracteres. AÑO DE REFERENCIA: Estamos en el año 2026 (si incluyes referencias de año o tendencias, usa SIEMPRE 2026, NUNCA 2024 ni 2025).
 3. EXCERPT: Gancho cautivador de 140 a 160 caracteres.
 4. INTRO_HTML: 2 párrafos en HTML con etiquetas <p> explicando el contexto, por qué es difícil elegir y qué criterios de selección usamos.
 5. ITEMS (si es gift guide): 6 a 8 productos de regalo recomendados. Cada uno con:

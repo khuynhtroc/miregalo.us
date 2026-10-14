@@ -154,6 +154,8 @@ export async function generateMultiStageArticle(
 Eres el redactor jefe y experto en SEO y regalos para "Miregalo" (guía de regalos en español para la comunidad hispana de Estados Unidos).
 Diseña la estructura editorial para una MEGAYUDA DE COMPRAS en ESPAÑOL NATIVO de más de 5.000 palabras sobre: "${cleanTopic}" (Destinatario principal: ${recipientName}, Cluster: ${cluster}).
 
+REGLA TEMPORAL: Estamos en el año 2026. Si el título o contenido incluye referencias temporales, usa SIEMPRE 2026 (NUNCA 2024 ni 2025).
+
 Genera un JSON con:
 1. "title": Título H1 llamativo y optimizado para CTR (ej. "Los 12 Mejores Regalos para ${recipientName}: Ideas Únicas y Emocionantes para Acertar").
 2. "seo_title": Título SEO menor a 60 caracteres.
