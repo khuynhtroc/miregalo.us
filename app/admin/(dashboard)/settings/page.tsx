@@ -13,34 +13,50 @@ export default async function AdminSettingsPage({
   searchParams?: Promise<{ tab?: string }>;
 }) {
   const resolvedParams = searchParams ? await searchParams : {};
-  const [settings, affiliateSettings, merchantsRes, postsRes, productsRes, redirectsRes] =
-    await Promise.all([
-      getSettings(),
-      getAffiliateSettings(),
-      db.find('merchants', { order: [{ field: 'name', asc: true }], limit: 100 }),
-      db.find('posts', { limit: 5000 }),
-      db.find('products', { limit: 100 }),
-      db.find('redirects', { limit: 5000 }),
-    ]);
 
-  const dbDriver = process.env.DB_DRIVER === 'local' ? 'Local JSON' : 'Supabase';
+  // 1. Fetch core settings and merchants safely
+  const [settings, affiliateSettings, merchantsRes] = await Promise.all([
+    getSettings().catch(() => ({}) as any),
+    getAffiliateSettings().catch(() => ({}) as any),
+    db.find('merchants', { order: [{ field: 'name', asc: true }], limit: 100 }).catch(() => ({ rows: [] })),
+  ]);
 
+  // 2. Fetch lightweight projections for stats without fetching heavy post content (prevents statement_timeout)
+  let totalPosts = 0;
   let totalItemsCount = 0;
   let itemsWithGoCount = 0;
   const merchantCounts: Record<string, number> = {};
+  let sampleProducts: any[] = [];
+  let totalAffiliateProducts = 0;
+  let totalGoRedirects = 0;
 
-  for (const post of postsRes.rows) {
-    if (post.items) {
-      for (const item of post.items) {
-        totalItemsCount++;
-        if (item.url?.startsWith('/go/')) itemsWithGoCount++;
-        const m = item.merchant || 'Amazon España';
-        merchantCounts[m] = (merchantCounts[m] || 0) + 1;
+  try {
+    const [postsRes, productsRes, redirectsRes] = await Promise.all([
+      db.find('posts', { select: 'id, items', limit: 1000 }).catch(() => ({ rows: [], total: 0 })),
+      db.find('products', { select: 'id, title, merchant, price, url', limit: 100 }).catch(() => ({ rows: [], total: 0 })),
+      db.find('redirects', { select: 'id, source', limit: 1000 }).catch(() => ({ rows: [], total: 0 })),
+    ]);
+
+    totalPosts = postsRes.total || postsRes.rows.length;
+    for (const post of (postsRes.rows as any[])) {
+      if (post?.items && Array.isArray(post.items)) {
+        for (const item of post.items) {
+          totalItemsCount++;
+          if (item?.url?.startsWith('/go/')) itemsWithGoCount++;
+          const m = item?.merchant || 'Amazon España';
+          merchantCounts[m] = (merchantCounts[m] || 0) + 1;
+        }
       }
     }
+
+    sampleProducts = productsRes.rows.slice(0, 50);
+    totalAffiliateProducts = productsRes.total || productsRes.rows.length;
+    totalGoRedirects = (redirectsRes.rows as any[]).filter((r) => r?.source?.startsWith('/go/')).length;
+  } catch (err) {
+    console.warn('[AdminSettings] Non-critical error loading stats:', err);
   }
 
-  const goRedirects = redirectsRes.rows.filter((r) => r.source.startsWith('/go/'));
+  const dbDriver = process.env.DB_DRIVER === 'local' ? 'Local JSON' : 'Supabase';
 
   return (
     <SettingsManager
@@ -48,14 +64,14 @@ export default async function AdminSettingsPage({
       initialAffiliateSettings={affiliateSettings}
       initialMerchants={merchantsRes.rows}
       initialStats={{
-        totalPosts: postsRes.rows.length,
+        totalPosts,
         totalItems: totalItemsCount,
         itemsWithGo: itemsWithGoCount,
-        totalAffiliateProducts: productsRes.rows.length,
-        totalGoRedirects: goRedirects.length,
+        totalAffiliateProducts,
+        totalGoRedirects,
         merchantDistribution: merchantCounts,
       }}
-      sampleProducts={productsRes.rows.slice(0, 50)}
+      sampleProducts={sampleProducts}
       initialTab={resolvedParams?.tab}
       dbDriver={dbDriver}
     />
