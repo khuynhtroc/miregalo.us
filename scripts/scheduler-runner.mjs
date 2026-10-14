@@ -15,7 +15,7 @@ if (fs.existsSync(envPath)) {
 }
 
 const siteUrl = env.NEXT_PUBLIC_SITE_URL || 'https://www.miregalo.us';
-const cronEndpoint = `${siteUrl}/api/cron/publish`;
+const cronEndpoint = `${siteUrl}/api/cron/publish/`;
 
 console.log(`[Scheduler Runner] Running scheduled article check at: ${new Date().toISOString()}`);
 console.log(`[Scheduler Runner] Calling endpoint: ${cronEndpoint}`);

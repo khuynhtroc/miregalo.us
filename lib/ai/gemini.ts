@@ -26,15 +26,20 @@ export async function callGemini(options: GenerateTextOptions): Promise<string |
   const ai = getGeminiClient();
   if (!ai) return null;
 
+  let requestedModel = options.model || 'gemini-3.5-flash';
+  if (requestedModel.includes('2.5') || requestedModel.includes('2.0') || requestedModel.includes('1.5')) {
+    requestedModel = 'gemini-3.5-flash';
+  }
+
   const modelsToTry = [
-    options.model || 'gemini-3.8-flash',
-    'gemini-3.8-flash',
-    'gemini-3-flash-preview',
+    requestedModel,
+    'gemini-3.5-flash',
     'gemini-3.1-flash-lite',
     'gemini-flash-lite-latest',
   ];
+  const uniqueModels = Array.from(new Set(modelsToTry));
 
-  for (const model of modelsToTry) {
+  for (const model of uniqueModels) {
     try {
       const config: Record<string, unknown> = {};
       if (options.systemInstruction) config.systemInstruction = options.systemInstruction;
@@ -52,7 +57,7 @@ export async function callGemini(options: GenerateTextOptions): Promise<string |
       }
     } catch (err: any) {
       console.warn(`[Gemini] Model ${model} call error:`, err?.message || err);
-      await new Promise((r) => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 300));
     }
   }
 

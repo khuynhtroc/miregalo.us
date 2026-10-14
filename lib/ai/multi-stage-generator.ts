@@ -181,7 +181,7 @@ Responde ÚNICAMENTE en JSON válido:
   try {
     const resText = await callGemini({
       prompt: stage1Prompt,
-      model: 'gemini-3.8-flash',
+      model: 'gemini-3.5-flash',
       systemInstruction: 'Eres un editor profesional de Miregalo. Responde siempre con JSON válido en español.',
       responseMimeType: 'application/json',
     });
@@ -246,17 +246,107 @@ Responde ÚNICAMENTE en JSON:
 }
 `.trim();
 
+  // -------------------------------------------------------------
+  // STAGE 3 Prompt: Cẩm nang mua sắm chi tiết (> 1.600 từ)
+  // -------------------------------------------------------------
+  const stage3Prompt = `
+Escribe una GUÍA DE COMPRA Y CONSEJOS EDITORIALES EN PROFUNDIDAD en formato HTML (usando <h2>, <h3>, <h4>, <p>, <ul>, <li>) para el artículo "${title}" enfocado a "${recipientName}".
+Para cumplir los estándares de excelencia editorial de Miregalo, la sección debe ser SUMAMENTE EXTENSA, SUPERANDO LAS 1.600 PALABRAS en español fluido y profesional.
+
+ESTRUCTURA EXIGIDA:
+<h2>Guía de Compra Definitiva: Cómo Acertar al Regalar a ${recipientName}</h2>
+1. <h3>1. Análisis Psicológico y Emocional del Regalo Perfecto</h3>
+   (Al menos 4 párrafos extensos analizando el significado del detalle, la conexión afectiva y cómo transformar un objeto en un recuerdo duradero).
+2. <h3>2. Criterios de Selección según Estilos de Vida y Aficiones</h3>
+   (Detallar al menos 4 perfiles de ${recipientName}: amante del hogar y confort, entusiasta de la gastronomía y experiencias, persona activa o profesional, y amante de los detalles sentimentales y artesanales).
+3. <h3>3. Guía de Presupuestos y Franjas de Precio</h3>
+   (Desglosar minuciosamente qué buscar y qué esperar en cada franja: menos de $25, de $25 a $60, y más de $60).
+4. <h3>4. Los 7 Errores Más Graves al Comprar y Cómo Evitarlos</h3>
+   (Analizar cada error con un párrafo completo de explicación y alternativa inteligente).
+5. <h3>5. El Arte de la Presentación: Envoltorio, Tarjetas Manuscritas y Ceremonial de Entrega</h3>
+   (Consejos prácticos paso a paso para maximizar el factor sorpresa).
+6. <h3>6. Personalización Inteligente: Cuándo Aporta Valor y Cuándo Resulta Excesiva</h3>
+   (Criterios estéticos para no caer en lo cursi ni en lo impersonal).
+7. <h3>7. Checklist de Verificación Antes de Finalizar tu Compra</h3>
+   (Lista de verificación completa con 6 puntos clave).
+
+Responde ÚNICAMENTE en JSON:
+{
+  "buyer_guide_html": "<h2>...</h2>..."
+}
+`.trim();
+
+  // -------------------------------------------------------------
+  // STAGE 4 Prompt: Mở bài, 8 FAQs và Lời kết (~900 từ)
+  // -------------------------------------------------------------
+  const stage4Prompt = `
+Para el artículo "${title}" enfocado en "${recipientName}", redacta:
+1. "intro_html": 3 párrafos cautivadores en HTML (<p>...</p>) sumando unas 220 palabras, explicando la dificultad de elegir, la importancia emocional de este detalle y el rigor analítico de nuestra selección.
+2. "faqs": Exactamente 8 preguntas frecuentes minuciosas con respuestas LARGAS y bien fundamentadas (cada respuesta de 80-110 palabras en español).
+3. "conclusion_html": 3 párrafos de conclusión editorial en HTML (<p>...</p>) sumando unas 200 palabras con resumen y llamada a la acción.
+
+Responde ÚNICAMENTE en JSON:
+{
+  "intro_html": "<p>...</p><p>...</p><p>...</p>",
+  "faqs": [
+    { "q": "¿...?", "a": "..." }
+  ],
+  "conclusion_html": "<p>...</p><p>...</p><p>...</p>"
+}
+`.trim();
+
+  // -------------------------------------------------------------
+  // PARALLEL DISPATCH: Reviews + Buyer Guide + FAQs + Hero Image
+  // -------------------------------------------------------------
   let reviewsData: any = null;
-  try {
-    const resReviews = await callGemini({
+  let guideData: any = null;
+  let stage4Data: any = null;
+
+  const [resReviews, resGuide, resStage4, heroImageUrl] = await Promise.all([
+    callGemini({
       prompt: stage2Prompt,
-      model: 'gemini-3.8-flash',
+      model: 'gemini-3.5-flash',
       systemInstruction: 'Eres un analista de productos exhaustivo. Escribe textos largos, detallados y elegantes en español.',
       responseMimeType: 'application/json',
-    });
-    if (resReviews) reviewsData = JSON.parse(resReviews);
-  } catch (err) {
-    console.warn('[MultiStage] Stage 2 Gemini call error:', err);
+    }).catch((err) => {
+      console.warn('[MultiStage] Stage 2 Gemini call error:', err);
+      return null;
+    }),
+
+    callGemini({
+      prompt: stage3Prompt,
+      model: 'gemini-3.5-flash',
+      systemInstruction: 'Eres un ensayista y redactor de guías de compra prémium. Escribe contenido muy largo, profundo y estructurado en español.',
+      responseMimeType: 'application/json',
+    }).catch((err) => {
+      console.warn('[MultiStage] Stage 3 Gemini call error:', err);
+      return null;
+    }),
+
+    callGemini({
+      prompt: stage4Prompt,
+      model: 'gemini-3.5-flash',
+      systemInstruction: 'Eres un escritor profesional en español. Genera textos muy ricos, empáticos y amplios.',
+      responseMimeType: 'application/json',
+    }).catch((err) => {
+      console.warn('[MultiStage] Stage 4 Gemini call error:', err);
+      return null;
+    }),
+
+    generateAndUploadHeroImage(cleanTopic, slug).catch((err) => {
+      console.warn('[MultiStage] Hero image error:', err);
+      return 'https://media.miregalo.us/media/heroes/hero_regalos_destinatarios.jpg';
+    }),
+  ]);
+
+  if (resReviews) {
+    try { reviewsData = JSON.parse(resReviews); } catch {}
+  }
+  if (resGuide) {
+    try { guideData = JSON.parse(resGuide); } catch {}
+  }
+  if (resStage4) {
+    try { stage4Data = JSON.parse(resStage4); } catch {}
   }
 
   const reviewsMap = new Map<number, any>();
@@ -332,47 +422,8 @@ Responde ÚNICAMENTE en JSON:
   }
 
   // -------------------------------------------------------------
-  // STAGE 3: Cẩm nang mua sắm siêu chi tiết (> 1.600 từ)
+  // STAGE 3: Cẩm nang mua sắm siêu chi tiết (sử dụng kết quả song song)
   // -------------------------------------------------------------
-  const stage3Prompt = `
-Escribe una GUÍA DE COMPRA Y CONSEJOS EDITORIALES EN PROFUNDIDAD en formato HTML (usando <h2>, <h3>, <h4>, <p>, <ul>, <li>) para el artículo "${title}" enfocado a "${recipientName}".
-Para cumplir los estándares de excelencia editorial de Miregalo, la sección debe ser SUMAMENTE EXTENSA, SUPERANDO LAS 1.600 PALABRAS en español fluido y profesional.
-
-ESTRUCTURA EXIGIDA:
-<h2>Guía de Compra Definitiva: Cómo Acertar al Regalar a ${recipientName}</h2>
-1. <h3>1. Análisis Psicológico y Emocional del Regalo Perfecto</h3>
-   (Al menos 4 párrafos extensos analizando el significado del detalle, la conexión afectiva y cómo transformar un objeto en un recuerdo duradero).
-2. <h3>2. Criterios de Selección según Estilos de Vida y Aficiones</h3>
-   (Detallar al menos 4 perfiles de ${recipientName}: amante del hogar y confort, entusiasta de la gastronomía y experiencias, persona activa o profesional, y amante de los detalles sentimentales y artesanales).
-3. <h3>3. Guía de Presupuestos y Franjas de Precio</h3>
-   (Desglosar minuciosamente qué buscar y qué esperar en cada franja: menos de $25, de $25 a $60, y más de $60).
-4. <h3>4. Los 7 Errores Más Graves al Comprar y Cómo Evitarlos</h3>
-   (Analizar cada error con un párrafo completo de explicación y alternativa inteligente).
-5. <h3>5. El Arte de la Presentación: Envoltorio, Tarjetas Manuscritas y Ceremonial de Entrega</h3>
-   (Consejos prácticos paso a paso para maximizar el factor sorpresa).
-6. <h3>6. Personalización Inteligente: Cuándo Aporta Valor y Cuándo Resulta Excesiva</h3>
-   (Criterios estéticos para no caer en lo cursi ni en lo impersonal).
-7. <h3>7. Checklist de Verificación Antes de Finalizar tu Compra</h3>
-   (Lista de verificación completa con 6 puntos clave).
-
-Responde ÚNICAMENTE en JSON:
-{
-  "buyer_guide_html": "<h2>...</h2>..."
-}
-`.trim();
-
-  let guideData: any = null;
-  try {
-    const resGuide = await callGemini({
-      prompt: stage3Prompt,
-      model: 'gemini-3.8-flash',
-      systemInstruction: 'Eres un ensayista y redactor de guías de compra prémium. Escribe contenido muy largo, profundo y estructurado en español.',
-      responseMimeType: 'application/json',
-    });
-    if (resGuide) guideData = JSON.parse(resGuide);
-  } catch (err) {
-    console.warn('[MultiStage] Stage 3 Gemini call error:', err);
-  }
 
   // Fallback Buyer's Guide dài hơn 1.500 từ
   const defaultBuyerGuide = `
@@ -458,36 +509,8 @@ ${guideData?.buyer_guide_html || defaultBuyerGuide}
 `.trim();
 
   // -------------------------------------------------------------
-  // STAGE 4: Mở bài, 8 FAQs và Lời kết (~900 từ)
+  // STAGE 4: Mở bài, 8 FAQs và Lời kết (sử dụng kết quả song song)
   // -------------------------------------------------------------
-  const stage4Prompt = `
-Para el artículo "${title}" enfocado en "${recipientName}", redacta:
-1. "intro_html": 3 párrafos cautivadores en HTML (<p>...</p>) sumando unas 220 palabras, explicando la dificultad de elegir, la importancia emocional de este detalle y el rigor analítico de nuestra selección.
-2. "faqs": Exactamente 8 preguntas frecuentes minuciosas con respuestas LARGAS y bien fundamentadas (cada respuesta de 80-110 palabras en español).
-3. "conclusion_html": 3 párrafos de conclusión editorial en HTML (<p>...</p>) sumando unas 200 palabras con resumen y llamada a la acción.
-
-Responde ÚNICAMENTE en JSON:
-{
-  "intro_html": "<p>...</p><p>...</p><p>...</p>",
-  "faqs": [
-    { "q": "¿...?", "a": "..." }
-  ],
-  "conclusion_html": "<p>...</p><p>...</p><p>...</p>"
-}
-`.trim();
-
-  let stage4Data: any = null;
-  try {
-    const resStage4 = await callGemini({
-      prompt: stage4Prompt,
-      model: 'gemini-3.8-flash',
-      systemInstruction: 'Eres un escritor profesional en español. Genera textos muy ricos, empáticos y amplios.',
-      responseMimeType: 'application/json',
-    });
-    if (resStage4) stage4Data = JSON.parse(resStage4);
-  } catch (err) {
-    console.warn('[MultiStage] Stage 4 Gemini call error:', err);
-  }
 
   introHtml = stage4Data?.intro_html || `
 <p>Encontrar el regalo idóneo para <strong>${recipientName}</strong> suele convertirse en una travesía repleta de dudas y comparaciones interminables. Con frecuencia recorremos escaparates o exploramos decenas de catálogos digitales solo para toparnos con propuestas repetitivas, impersonales o de calidad cuestionable. Sin embargo, cuando se trata de una figura tan querida y significativa, el objetivo va mucho más allá de cumplir con una fecha del calendario: buscamos expresar admiración sincera, gratitud incondicional y un cariño que perdure en el tiempo.</p>
@@ -617,9 +640,8 @@ Responde ÚNICAMENTE en JSON:
   }
 
   // -------------------------------------------------------------
-  // STAGE 7: Sinh ảnh AI Hero Image & Upload Cloudflare R2
+  // STAGE 7: Hero Image đã được xử lý song song tại bước Dispatch
   // -------------------------------------------------------------
-  const heroImageUrl = await generateAndUploadHeroImage(cleanTopic, slug);
 
   // -------------------------------------------------------------
   // STAGE 8: Lắp ráp bài Post hoàn chỉnh và Lưu vào Supabase
