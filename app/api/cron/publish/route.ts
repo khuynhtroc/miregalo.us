@@ -94,7 +94,7 @@ async function handleCronPublish(req: NextRequest) {
       });
     }
 
-    const results = [];
+    const results: any[] = [];
     let aiGenerationCount = 0;
     // Allow max 1 heavy AI generation per invocation to avoid Cloudflare 100s timeout
     const maxAiRuns = targetJobId ? 1 : Math.max(1, Math.min(limitParam, 1));
@@ -196,6 +196,14 @@ async function handleCronPublish(req: NextRequest) {
             },
           });
 
+          // Social Auto-Sharing across enabled channels
+          try {
+            const { sharePostToAllChannels } = await import('@/lib/social');
+            await sharePostToAllChannels(genResult.post);
+          } catch (socialErr: any) {
+            console.warn('[Cron Sync] Social auto-share error:', socialErr?.message || socialErr);
+          }
+
           results.push({
             job_id: job.id,
             topic: payload.topic,
@@ -276,12 +284,12 @@ async function handleCronPublish(req: NextRequest) {
 
             console.log(`[Cron Background] Finished job ${job.id} -> /${genResult.post.slug}/ (${genResult.wordCount} words)`);
 
-            // Automated Pinterest Pinning
+            // Automated Multi-Channel Social Auto-Sharing (Facebook, X, Medium, Pinterest, Webhook)
             try {
-              const { pinNextOldestPost } = await import('@/lib/social/pinterest');
-              await pinNextOldestPost();
-            } catch (pinErr: any) {
-              console.warn('[Cron Background] Pinterest pinning error:', pinErr?.message || pinErr);
+              const { sharePostToAllChannels } = await import('@/lib/social');
+              await sharePostToAllChannels(genResult.post);
+            } catch (socialErr: any) {
+              console.warn('[Cron Background] Social auto-share error:', socialErr?.message || socialErr);
             }
           } catch (err: unknown) {
             const errorMsg = err instanceof Error ? err.message : String(err);
@@ -297,14 +305,21 @@ async function handleCronPublish(req: NextRequest) {
       }
     }
 
-    // Schedule background Pinterest Pinning if syncMode is false and no AI background job was dispatched
-    if (!syncMode && aiGenerationCount === 0) {
+    // Schedule background Social Auto-Sharing for fast-activated posts if no AI background job was dispatched
+    if (!syncMode && aiGenerationCount === 0 && results.some((r) => r.mode === 'fast_activation')) {
       after(async () => {
         try {
-          const { pinNextOldestPost } = await import('@/lib/social/pinterest');
-          await pinNextOldestPost();
-        } catch (pinErr: any) {
-          console.warn('[Cron] Pinterest pinning error:', pinErr?.message || pinErr);
+          const { sharePostToAllChannels } = await import('@/lib/social');
+          // Find the most recently published fast-activated post to share
+          const latestFastResult = results.find((r) => r.mode === 'fast_activation');
+          if (latestFastResult?.slug) {
+            const post = await db.findOne('posts', { slug: latestFastResult.slug });
+            if (post) {
+              await sharePostToAllChannels(post);
+            }
+          }
+        } catch (socialErr: any) {
+          console.warn('[Cron Fast-Path] Social auto-share error:', socialErr?.message || socialErr);
         }
       });
     }

@@ -5,6 +5,7 @@ import type { SiteSettings, Merchant, Product } from '@/lib/types';
 import type { AffiliateSettings } from '@/lib/affiliate/types';
 import { AffiliateManager } from '../affiliate-links/AffiliateManager';
 import { MerchantManager } from '../merchants/MerchantManager';
+import { SocialAutoShareManager } from './SocialAutoShareManager';
 
 interface SettingsManagerProps {
   initialSettings: SiteSettings;
@@ -25,6 +26,7 @@ interface SettingsManagerProps {
 
 const TABS = [
   { id: 'frontend', label: 'Frontend & Branding', icon: '🎨' },
+  { id: 'social', label: 'Social Auto-Share', icon: '📢' },
   { id: 'affiliate', label: 'Affiliate Networks & Sync', icon: '🔗' },
   { id: 'merchants', label: 'Merchants & Stores', icon: '🏪' },
   { id: 'seo', label: 'SEO & Search Console', icon: '📈' },
@@ -210,6 +212,13 @@ export function SettingsManager({
           </button>
         ))}
       </div>
+
+      {/* ── TAB: SOCIAL AUTO-SHARE ───────────────────── */}
+      {activeTab === 'social' && (
+        <div>
+          <SocialAutoShareManager />
+        </div>
+      )}
 
       {/* ── TAB 2: AFFILIATE NETWORKS & SYNC ─────────── */}
       {activeTab === 'affiliate' && (
