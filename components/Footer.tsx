@@ -93,7 +93,7 @@ export function Footer({ settings, categories }: FooterProps) {
       {/* Mandatory Amazon Associates & Affiliate Disclosure */}
       <div className="container footer-affiliate-note">
         <p>
-          <strong>Aviso legal de afiliados:</strong> Miregalo participa en el Programa de Afiliados de Amazon EU y otras plataformas publicitarias de afiliación. <em>En calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.</em> Los enlaces hacia tiendas externas no implican ningún recargo sobre el precio final y nos permiten mantener nuestras guías editoriales 100% gratuitas e independientes.{' '}
+          <strong>Aviso de afiliados:</strong> Miregalo participa en el Programa de Afiliados de Amazon Services LLC (Amazon Associates) y en otros programas de afiliados. <em>Como Afiliado de Amazon, gano ingresos por las compras que califican.</em> Si compras a través de nuestros enlaces, podemos recibir una comisión sin costo adicional para ti; esto no influye en nuestras recomendaciones.{' '}
           <Link href="/divulgacion-de-afiliados/">Conoce más sobre nuestra política de afiliación</Link>.
         </p>
       </div>

@@ -250,31 +250,6 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 }}
               />
             </div>
-            <div
-              style={{
-                marginTop: '16px',
-                display: 'flex',
-                gap: '12px',
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-              }}
-            >
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '0.875rem',
-                  color: '#16a34a',
-                  fontWeight: 600,
-                  backgroundColor: '#f0fdf4',
-                  padding: '6px 14px',
-                  borderRadius: '9999px',
-                }}
-              >
-                ✓ En Stock • Envío Rápido
-              </span>
-            </div>
           </div>
 
           {/* Details Column */}
@@ -353,7 +328,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                   marginBottom: '16px',
                 }}
               >
-                <span>Ver precio y comprar en la tienda</span>
+                <span>Ver producto</span>
                 <span aria-hidden="true">↗</span>
               </a>
 

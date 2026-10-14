@@ -1,3 +1,4 @@
+import { neutralizeMerchantHtml } from '@/lib/commerce';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -132,7 +133,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           <div
             className="article-content prose"
             suppressHydrationWarning
-            dangerouslySetInnerHTML={{ __html: post.content_html }}
+            dangerouslySetInnerHTML={{ __html: neutralizeMerchantHtml(post.content_html) }}
           />
 
           <StoreCta settings={settings} variant="in-article" />
