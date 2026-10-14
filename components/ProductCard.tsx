@@ -1,6 +1,6 @@
 import type { GiftItem } from '@/lib/types';
 import { slugify } from '@/lib/urls';
-import { displayPrice, normalizeMerchant, PRICE_FALLBACK_LABEL } from '@/lib/commerce';
+import { displayPrice, normalizeMerchant } from '@/lib/commerce';
 
 interface ProductCardProps {
   item: GiftItem;
@@ -125,14 +125,11 @@ export function ProductCard({ item: rawItem, index, productSlug, variant = 'card
             </a>
           </h3>
 
-          <div className="product-card-price-row">
-            <span className="product-price">
-              {item.price ? item.price : PRICE_FALLBACK_LABEL}
-            </span>
-            <span className="product-status-tag">
-              {item.merchant || 'Amazon'}
-            </span>
-          </div>
+          {item.price && (
+            <div className="product-card-price-row">
+              <span className="product-price">{item.price}</span>
+            </div>
+          )}
 
           {cleanDesc && (
             <p className="product-card-desc">
@@ -253,9 +250,6 @@ export function ProductCard({ item: rawItem, index, productSlug, variant = 'card
         <div className="product-horizontal-content">
           <div className="product-horizontal-meta">
             {item.price && <span className="product-price">{item.price}</span>}
-            {item.merchant && (
-              <span className="product-merchant-pill">{item.merchant}</span>
-            )}
           </div>
 
           {item.description_html ? (

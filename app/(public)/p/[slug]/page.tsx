@@ -8,7 +8,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
 import { stripHtml } from '@/lib/format';
 import { PostCard } from '@/components/PostCard';
-import { displayPrice, usdPriceValue, normalizeMerchant, PRICE_FALLBACK_LABEL } from '@/lib/commerce';
+import { displayPrice, usdPriceValue, normalizeMerchant } from '@/lib/commerce';
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -141,7 +141,6 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   // Parse price
   // Only known USD prices are shown; legacy EUR placeholders are hidden (never converted blindly).
   const knownPrice = displayPrice(product.price, product.currency);
-  const priceStr = knownPrice || PRICE_FALLBACK_LABEL;
   const numericPrice = usdPriceValue(product.price, product.currency);
   const merchantLabel = normalizeMerchant(product.merchant);
 
@@ -275,32 +274,12 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               >
                 ✓ En Stock • Envío Rápido
               </span>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '0.875rem',
-                  color: '#4b5563',
-                  backgroundColor: '#f3f4f6',
-                  padding: '6px 14px',
-                  borderRadius: '9999px',
-                }}
-              >
-                🏷️ {merchantLabel}
-              </span>
             </div>
           </div>
 
           {/* Details Column */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{ color: '#f59e0b', fontSize: '1.1rem' }}>★★★★★</span>
-                <span style={{ fontSize: '0.875rem', color: '#6b7280', fontWeight: 500 }}>
-                  Recomendado por editores
-                </span>
-              </div>
 
               <h1
                 style={{
@@ -314,6 +293,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 {product.name}
               </h1>
 
+              {knownPrice && (
               <div
                 style={{
                   display: 'flex',
@@ -331,12 +311,13 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                     color: '#e11d48',
                   }}
                 >
-                  {priceStr}
+                  {knownPrice}
                 </span>
                 <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                  {knownPrice ? '(Precio orientativo, puede variar)' : '(Precio actualizado en la tienda)'}
+                  (Precio orientativo, puede variar)
                 </span>
               </div>
+              )}
 
               <div
                 style={{
