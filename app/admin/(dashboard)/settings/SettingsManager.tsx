@@ -473,7 +473,19 @@ export function SettingsManager({
                     onChange={(e) => setSettings({ ...settings, ga4_id: e.target.value })}
                     placeholder="e.g. G-WRGWXTNWV3"
                   />
-                  <div className="form-hint">Loads gtag.js asynchronously via Next.js Script</div>
+                  <div className="form-hint">Nhúng gtag.js trực tiếp vào &lt;head&gt; để xác minh Google Search Console &amp; theo dõi lượt truy cập</div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Google Tag Manager Container ID (GTM)</label>
+                  <input
+                    className="form-input"
+                    type="text"
+                    value={settings.gtm_id || ''}
+                    onChange={(e) => setSettings({ ...settings, gtm_id: e.target.value })}
+                    placeholder="e.g. GTM-NLLPRRXN"
+                  />
+                  <div className="form-hint">Nhúng script vào &lt;head&gt; và noscript vào &lt;body&gt; chuẩn xác minh GSC</div>
                 </div>
               </div>
 

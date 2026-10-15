@@ -56,10 +56,45 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const settings = await getSettings();
+  const gtmId = (settings.gtm_id || 'GTM-NLLPRRXN').trim();
+  const ga4Id = (settings.ga4_id || 'G-WRGWXTNWV3').trim();
 
   return (
     <html lang={settings.locale || 'es'} className={poppins.variable} suppressHydrationWarning>
       <head>
+        {/* Google Tag Manager (GTM) - Required as high as possible in <head> for GSC verification */}
+        {gtmId && (
+          <script
+            id="google-tag-manager"
+            dangerouslySetInnerHTML={{
+              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${gtmId}');`,
+            }}
+          />
+        )}
+
+        {/* Google Analytics 4 (GA4) - Required directly in <head> for GSC verification */}
+        {ga4Id && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}
+            />
+            <script
+              id="google-analytics-init"
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${ga4Id}');`,
+              }}
+            />
+          </>
+        )}
+
         <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
         <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
@@ -99,25 +134,19 @@ export default async function RootLayout({
         })()}
       </head>
       <body className={poppins.className} suppressHydrationWarning>
-        {children}
-
-        {/* Analytics & Custom Scripts loaded safely with Next.js Script */}
-        {settings.ga4_id && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${settings.ga4_id}`}
-              strategy="afterInteractive"
+        {/* Google Tag Manager (noscript) - Required immediately after opening <body> for GSC verification */}
+        {gtmId && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0"
+              width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
             />
-            <Script id="ga4-init" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${settings.ga4_id}');
-              `}
-            </Script>
-          </>
+          </noscript>
         )}
+
+        {children}
 
         {/* Pinterest Tag Conversion Tracking */}
         {(settings.pinterest_tag_id || process.env.PINTEREST_TAG_ID) && (

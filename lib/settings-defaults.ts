@@ -30,7 +30,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   affiliate_disclosure:
     'Este artículo contiene recomendaciones editoriales independientes. Si compras a través de nuestros enlaces, podemos recibir una pequeña comisión sin coste adicional para ti. En calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.',
   posts_per_page: 24,
-  ga4_id: '',
+  ga4_id: 'G-WRGWXTNWV3',
+  gtm_id: 'GTM-NLLPRRXN',
   gsc_verification: '',
   gsc_property: '',
   bing_verification: '',

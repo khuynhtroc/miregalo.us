@@ -224,6 +224,7 @@ export interface SiteSettings {
   affiliate_disclosure: string;
   posts_per_page: number;
   ga4_id: string;
+  gtm_id?: string;
   gsc_verification: string;
   gsc_property: string;
   bing_verification: string;
