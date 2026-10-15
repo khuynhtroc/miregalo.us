@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { neutralizeMerchantHtml } from '@/lib/commerce';
 import { notFound, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
@@ -27,6 +28,7 @@ import {
 import { RESERVED_ROOT_SLUGS, postPath } from '@/lib/urls';
 import { PostCard } from '@/components/PostCard';
 import { ProductCard } from '@/components/ProductCard';
+import { AdBanner } from '@/components/AdBanner';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { Pagination } from '@/components/Pagination';
 import { StoreCta } from '@/components/StoreCta';
@@ -496,17 +498,35 @@ export default async function DynamicSlugPage({ params }: PageProps) {
             />
           )}
 
-          {/* Numbered Product List */}
+          {/* Option 1 - Placement 1: In-Article Ad Banner (Before product list) */}
+          {settings.adsense_enabled !== false && (
+            <AdBanner
+              variant="in-article"
+              clientId={settings.adsense_client_id}
+              slotId={settings.adsense_slot_in_article}
+            />
+          )}
+
+          {/* Numbered Product List with Option 1 - Placement 2: Native In-Feed Ads */}
           {post.items && post.items.length > 0 && (
             <div className="article-content">
               {post.items.map((item, idx) => (
-                <ProductCard
-                  key={idx}
-                  item={item}
-                  index={idx}
-                  productSlug={`${post.slug}-item-${idx + 1}`}
-                  variant="row"
-                />
+                <Fragment key={idx}>
+                  <ProductCard
+                    item={item}
+                    index={idx}
+                    productSlug={`${post.slug}-item-${idx + 1}`}
+                    variant="row"
+                  />
+                  {/* Insert native ad after item 4 and item 8 */}
+                  {(idx === 3 || idx === 7) && settings.adsense_enabled !== false && (
+                    <AdBanner
+                      variant="in-feed"
+                      clientId={settings.adsense_client_id}
+                      slotId={settings.adsense_slot_in_feed}
+                    />
+                  )}
+                </Fragment>
               ))}
             </div>
           )}
@@ -662,6 +682,15 @@ export default async function DynamicSlugPage({ params }: PageProps) {
               suppressHydrationWarning
               style={{ marginTop: '40px' }}
               dangerouslySetInnerHTML={{ __html: neutralizeMerchantHtml(post.content_html) }}
+            />
+          )}
+
+          {/* Option 1 - Placement 3: Multiplex / Matched Content Ad (Before FAQs) */}
+          {settings.adsense_enabled !== false && (
+            <AdBanner
+              variant="multiplex"
+              clientId={settings.adsense_client_id}
+              slotId={settings.adsense_slot_multiplex}
             />
           )}
 
@@ -839,6 +868,15 @@ export default async function DynamicSlugPage({ params }: PageProps) {
                 ))}
               </ul>
             </div>
+          )}
+
+          {/* Option 1 - Placement 4: Sticky Sidebar Ad Banner */}
+          {settings.adsense_enabled !== false && (
+            <AdBanner
+              variant="sidebar"
+              clientId={settings.adsense_client_id}
+              slotId={settings.adsense_slot_sidebar}
+            />
           )}
         </aside>
       </div>

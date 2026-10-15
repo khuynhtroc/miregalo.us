@@ -18,6 +18,7 @@ import { extractTocItems } from '@/lib/toc';
 import { PostCard } from '@/components/PostCard';
 import { StoreCta } from '@/components/StoreCta';
 import { JsonLd } from '@/components/JsonLd';
+import { AdBanner } from '@/components/AdBanner';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -130,11 +131,29 @@ export default async function BlogPostPage({ params }: PageProps) {
             />
           )}
 
+          {/* Option 1 - Placement 1: In-Article Ad Banner (Before article prose) */}
+          {settings.adsense_enabled !== false && (
+            <AdBanner
+              variant="in-article"
+              clientId={settings.adsense_client_id}
+              slotId={settings.adsense_slot_in_article}
+            />
+          )}
+
           <div
             className="article-content prose"
             suppressHydrationWarning
             dangerouslySetInnerHTML={{ __html: neutralizeMerchantHtml(post.content_html) }}
           />
+
+          {/* Option 1 - Placement 3: Multiplex / Matched Content Ad */}
+          {settings.adsense_enabled !== false && (
+            <AdBanner
+              variant="multiplex"
+              clientId={settings.adsense_client_id}
+              slotId={settings.adsense_slot_multiplex}
+            />
+          )}
 
           <StoreCta settings={settings} variant="in-article" />
         </article>
@@ -236,6 +255,15 @@ export default async function BlogPostPage({ params }: PageProps) {
                 ))}
               </ul>
             </div>
+          )}
+
+          {/* Option 1 - Placement 4: Sticky Sidebar Ad Banner */}
+          {settings.adsense_enabled !== false && (
+            <AdBanner
+              variant="sidebar"
+              clientId={settings.adsense_client_id}
+              slotId={settings.adsense_slot_sidebar}
+            />
           )}
         </aside>
       </div>

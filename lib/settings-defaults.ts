@@ -48,4 +48,10 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   ebay_campaign_id: '5338901234',
   walmart_partner_id: 'wm-giftblog-987',
   default_affiliate_strategy: 'smart_distribution',
+  adsense_enabled: true,
+  adsense_client_id: 'ca-pub-2959580292222970',
+  adsense_slot_in_article: '',
+  adsense_slot_in_feed: '',
+  adsense_slot_sidebar: '',
+  adsense_slot_multiplex: '',
 };

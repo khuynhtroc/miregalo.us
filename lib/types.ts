@@ -241,6 +241,12 @@ export interface SiteSettings {
   ebay_campaign_id?: string;
   walmart_partner_id?: string;
   default_affiliate_strategy?: string;
+  adsense_enabled?: boolean;
+  adsense_client_id?: string;
+  adsense_slot_in_article?: string;
+  adsense_slot_in_feed?: string;
+  adsense_slot_sidebar?: string;
+  adsense_slot_multiplex?: string;
 }
 
 export interface ContentJob {

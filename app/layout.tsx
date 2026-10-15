@@ -136,14 +136,11 @@ gtag('config', '${ga4Id}');`,
       <body className={poppins.className} suppressHydrationWarning>
         {/* Google Tag Manager (noscript) - Required immediately after opening <body> for GSC verification */}
         {gtmId && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-              height="0"
-              width="0"
-              style={{ display: 'none', visibility: 'hidden' }}
-            />
-          </noscript>
+          <noscript
+            dangerouslySetInnerHTML={{
+              __html: `<iframe src="https://www.googletagmanager.com/ns.html?id=${gtmId}" height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
+            }}
+          />
         )}
 
         {children}

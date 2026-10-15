@@ -29,7 +29,7 @@ const TABS = [
   { id: 'social', label: 'Social Auto-Share', icon: '📢' },
   { id: 'affiliate', label: 'Affiliate Networks & Sync', icon: '🔗' },
   { id: 'merchants', label: 'Merchants & Stores', icon: '🏪' },
-  { id: 'seo', label: 'SEO & Search Console', icon: '📈' },
+  { id: 'seo', label: 'SEO, Search Console & AdSense', icon: '📈' },
   { id: 'backend', label: 'Database & Supabase', icon: '🗄️' },
   { id: 'scripts', label: 'Custom Scripts & Code', icon: '💻' },
 ] as const;
@@ -574,6 +574,101 @@ export function SettingsManager({
                   <a href="/rss.xml" target="_blank" rel="noopener noreferrer" style={{ color: '#3349b5' }}>
                     /rss.xml ↗
                   </a>
+                </div>
+              </div>
+
+              {/* ── GOOGLE ADSENSE MONETIZATION (OPTION 1) ───────────────── */}
+              <div style={{ marginTop: '28px', paddingTop: '24px', borderTop: '2px dashed #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span>💰</span> Google AdSense &amp; Bố cục Quảng cáo (Phương án 1 - Cân bằng Vàng)
+                    </h3>
+                    <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '0.85rem' }}>
+                      Tối ưu doanh thu hiển thị kết hợp affiliate tự nhiên, không gây khó chịu cho người đọc
+                    </p>
+                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', color: settings.adsense_enabled !== false ? '#16a34a' : '#64748b' }}>
+                    <input
+                      type="checkbox"
+                      checked={settings.adsense_enabled !== false}
+                      onChange={(e) => setSettings({ ...settings, adsense_enabled: e.target.checked })}
+                    />
+                    <span>{settings.adsense_enabled !== false ? '✅ Đang Bật AdSense' : '⏸️ Đang Tắt AdSense'}</span>
+                  </label>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '16px' }}>
+                  <label className="form-label">AdSense Publisher Client ID</label>
+                  <input
+                    className="form-input"
+                    type="text"
+                    value={settings.adsense_client_id ?? 'ca-pub-2959580292222970'}
+                    onChange={(e) => setSettings({ ...settings, adsense_client_id: e.target.value })}
+                    placeholder="ca-pub-2959580292222970"
+                  />
+                  <div className="form-hint">Mã tài khoản AdSense của bạn (đã được tích hợp sẵn vào &lt;head&gt; toàn website)</div>
+                </div>
+
+                <div style={{ background: '#f0fdf4', padding: '14px 16px', borderRadius: '8px', border: '1px solid #bbf7d0', marginBottom: '18px' }}>
+                  <strong style={{ fontSize: '0.85rem', color: '#166534', display: 'block', marginBottom: '4px' }}>
+                    💡 Hướng dẫn cấu hình Ad Slot ID (Phương án 1):
+                  </strong>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: '#15803d', lineHeight: 1.5 }}>
+                    Bạn <strong>không cần phải chèn thủ công mã script HTML</strong> vào bài viết. Hệ thống đã tự động bố trí sẵn 4 vị trí vàng. Nếu bạn tạo các đơn vị quảng cáo riêng trong tài khoản Google AdSense, hãy dán mã số <strong>Slot ID</strong> (chuỗi ~10 chữ số) tương ứng bên dưới. <em>Nếu để trống, hệ thống sẽ tự động dùng chế độ Responsive Auto-Format của AdSense.</em>
+                  </p>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">1. In-Article Slot ID (Đầu bài sau Intro &amp; Mục lục)</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      value={settings.adsense_slot_in_article ?? ''}
+                      onChange={(e) => setSettings({ ...settings, adsense_slot_in_article: e.target.value })}
+                      placeholder="Để trống = Responsive Tự động"
+                    />
+                    <div className="form-hint">Banner ngang đón đầu khi độc giả vừa lướt qua tóm tắt</div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">2. In-Feed Slot ID (Giữa danh sách sau Top 4 &amp; Top 8)</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      value={settings.adsense_slot_in_feed ?? ''}
+                      onChange={(e) => setSettings({ ...settings, adsense_slot_in_feed: e.target.value })}
+                      placeholder="Để trống = In-feed Fluid Tự động"
+                    />
+                    <div className="form-hint">Thẻ native card đan xen tự nhiên giữa danh sách quà tặng</div>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">3. Sticky Sidebar Slot ID (Cột phải Desktop)</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      value={settings.adsense_slot_sidebar ?? ''}
+                      onChange={(e) => setSettings({ ...settings, adsense_slot_sidebar: e.target.value })}
+                      placeholder="Để trống = Banner dọc Tự động"
+                    />
+                    <div className="form-hint">Banner dọc trượt êm theo màn hình khi độc giả cuộn đọc bài viết</div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">4. Multiplex / Matched Content Slot ID (Cuối bài trước FAQ)</label>
+                    <input
+                      className="form-input"
+                      type="text"
+                      value={settings.adsense_slot_multiplex ?? ''}
+                      onChange={(e) => setSettings({ ...settings, adsense_slot_multiplex: e.target.value })}
+                      placeholder="Để trống = Multiplex Tự động"
+                    />
+                    <div className="form-hint">Lưới đề xuất nội dung/quảng cáo, giữ chân người đọc &amp; tăng click</div>
+                  </div>
                 </div>
               </div>
             </div>
