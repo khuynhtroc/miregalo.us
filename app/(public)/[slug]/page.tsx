@@ -36,7 +36,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { ContactForm } from '@/components/ContactForm';
 import { TableOfContents } from '@/components/TableOfContents';
 import { SocialShareBar } from '@/components/SocialShareBar';
-import { extractTocItems } from '@/lib/toc';
+import { extractTocItems, cleanContentHtml, cleanItemHeading } from '@/lib/toc';
 import { fmtDate } from '@/lib/format';
 
 interface PageProps {
@@ -379,7 +379,22 @@ export default async function DynamicSlugPage({ params }: PageProps) {
   const primaryCat = post.primary_category_id ? catMap.get(post.primary_category_id) : null;
   const author = await getAuthorById(post.author_id);
   const relatedPosts = await getRelatedPosts(post, 8);
-  const tocItems = extractTocItems(post);
+
+  const cleanedItems = post.items?.map((it) => ({
+    ...it,
+    heading: cleanItemHeading(it.heading) || it.heading,
+  }));
+  const displayPost = {
+    ...post,
+    items: cleanedItems,
+  };
+  const tocItems = extractTocItems(displayPost);
+  const cleanedContentHtml = cleanContentHtml(
+    post.content_html,
+    post.intro_html,
+    Boolean(post.items && post.items.length > 0),
+    Boolean(post.faqs && post.faqs.length > 0)
+  );
 
   const breadcrumbs = [
     ...(primaryCat
@@ -460,26 +475,6 @@ export default async function DynamicSlugPage({ params }: PageProps) {
             label="Inspirar y compartir ideas:"
           />
 
-          {/* Prominent Pre-Content Affiliate Disclosure (FTC & Amazon Associates Operating Agreement Compliant) */}
-          <div className="affiliate-disclosure-box">
-            <div className="affiliate-disclosure-header">
-              <span className="affiliate-disclosure-icon" aria-hidden="true">⚖️</span>
-              <strong>Aviso de Afiliación y Transparencia Editorial</strong>
-            </div>
-            <p className="affiliate-disclosure-body">
-              {settings.affiliate_disclosure ? (
-                <span>{settings.affiliate_disclosure} </span>
-              ) : (
-                <span>
-                  Este artículo contiene recomendaciones editoriales independientes. Si compras a través de nuestros enlaces, podemos percibir una pequeña comisión sin ningún coste añadido para ti. <em>En calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.</em>{' '}
-                </span>
-              )}
-              <Link href="/divulgacion-de-afiliados/" className="affiliate-disclosure-link">
-                Más información sobre nuestra política de afiliados
-              </Link>.
-            </p>
-          </div>
-
           {/* Intro HTML */}
           {post.intro_html && (
             <div
@@ -508,9 +503,9 @@ export default async function DynamicSlugPage({ params }: PageProps) {
           )}
 
           {/* Numbered Product List with Option 1 - Placement 2: Native In-Feed Ads */}
-          {post.items && post.items.length > 0 && (
+          {displayPost.items && displayPost.items.length > 0 && (
             <div className="article-content">
-              {post.items.map((item, idx) => (
+              {displayPost.items.map((item, idx) => (
                 <Fragment key={idx}>
                   <ProductCard
                     item={item}
@@ -676,12 +671,12 @@ export default async function DynamicSlugPage({ params }: PageProps) {
           )}
 
           {/* Bottom Line / Conclusion HTML */}
-          {post.content_html && (
+          {cleanedContentHtml && (
             <div
               className="article-content prose"
               suppressHydrationWarning
               style={{ marginTop: '40px' }}
-              dangerouslySetInnerHTML={{ __html: neutralizeMerchantHtml(post.content_html) }}
+              dangerouslySetInnerHTML={{ __html: neutralizeMerchantHtml(cleanedContentHtml) }}
             />
           )}
 
@@ -767,6 +762,26 @@ export default async function DynamicSlugPage({ params }: PageProps) {
               </div>
             </div>
           )}
+
+          {/* Affiliate Disclosure Box (Bottom of Article) */}
+          <div className="affiliate-disclosure-box" style={{ marginTop: '36px' }}>
+            <div className="affiliate-disclosure-header">
+              <span className="affiliate-disclosure-icon" aria-hidden="true">⚖️</span>
+              <strong>Aviso de Afiliación y Transparencia Editorial</strong>
+            </div>
+            <p className="affiliate-disclosure-body">
+              {settings.affiliate_disclosure ? (
+                <span>{settings.affiliate_disclosure} </span>
+              ) : (
+                <span>
+                  Este artículo contiene recomendaciones editoriales independientes. Si compras a través de nuestros enlaces, podemos percibir una pequeña comisión sin ningún coste añadido para ti. <em>En calidad de Afiliado de Amazon, obtengo ingresos por las compras adscritas que cumplen los requisitos aplicables.</em>{' '}
+                </span>
+              )}
+              <Link href="/divulgacion-de-afiliados/" className="affiliate-disclosure-link">
+                Más información sobre nuestra política de afiliados
+              </Link>.
+            </p>
+          </div>
 
           <StoreCta settings={settings} variant="in-article" />
         </article>
