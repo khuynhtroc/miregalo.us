@@ -7,5 +7,13 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
-  }
+  },
+  "vars": {
+    "NEXT_PUBLIC_SITE_URL": "https://www.miregalo.us",
+    "DB_DRIVER": "supabase"
+  },
+  "routes": [
+    { "pattern": "miregalo.us/*", "zone_name": "miregalo.us" },
+    { "pattern": "www.miregalo.us/*", "zone_name": "miregalo.us" }
+  ]
 }
