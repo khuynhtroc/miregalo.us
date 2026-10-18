@@ -13,3 +13,5 @@ data/translated-articles-cache.json
 scratch/
 npm-debug.log*
 .DS_Store
+.open-next
+.wrangler
