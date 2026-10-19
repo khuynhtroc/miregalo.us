@@ -144,6 +144,12 @@ async function handleCronPublish(req: NextRequest) {
           },
         });
 
+        // Auto-Index on Google
+        try {
+          const { autoSubmitPostIndexing } = await import('@/lib/indexing/google');
+          autoSubmitPostIndexing(plannedPost.slug).catch(() => {});
+        } catch {}
+
         results.push({
           job_id: job.id,
           topic: payload.topic || plannedPost.title,
@@ -203,6 +209,12 @@ async function handleCronPublish(req: NextRequest) {
           } catch (socialErr: any) {
             console.warn('[Cron Sync] Social auto-share error:', socialErr?.message || socialErr);
           }
+
+          // Auto-Index on Google
+          try {
+            const { autoSubmitPostIndexing } = await import('@/lib/indexing/google');
+            autoSubmitPostIndexing(genResult.post.slug).catch(() => {});
+          } catch {}
 
           results.push({
             job_id: job.id,
@@ -291,6 +303,12 @@ async function handleCronPublish(req: NextRequest) {
             } catch (socialErr: any) {
               console.warn('[Cron Background] Social auto-share error:', socialErr?.message || socialErr);
             }
+
+            // Auto-Index on Google
+            try {
+              const { autoSubmitPostIndexing } = await import('@/lib/indexing/google');
+              autoSubmitPostIndexing(genResult.post.slug).catch(() => {});
+            } catch {}
           } catch (err: unknown) {
             const errorMsg = err instanceof Error ? err.message : String(err);
             console.error(`[Cron Background] Error processing job ${job.id}:`, err);

@@ -3,6 +3,8 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import type { Post } from '@/lib/types';
+import { autoSubmitPostIndexing, submitUrlToGoogle } from '@/lib/indexing/google';
+import { SITE_URL } from '@/lib/urls';
 
 export async function GET(
   _req: NextRequest,
@@ -45,6 +47,13 @@ export async function PUT(
       console.warn('revalidatePath warning:', e);
     }
 
+    // Auto-submit URL to Google Indexing if status is published
+    if (updated?.status === 'published' && updated?.slug) {
+      autoSubmitPostIndexing(updated.slug, 'post').catch((err) => {
+        console.warn('[Auto Indexing] Error triggering on post update:', err);
+      });
+    }
+
     return NextResponse.json(updated);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
@@ -61,7 +70,17 @@ export async function DELETE(
 
   const { id } = await params;
   try {
+    const existing = await db.findOne('posts', { id });
     await db.remove('posts', id);
+
+    // Notify Google of URL deletion if previously published
+    if (existing?.slug && existing?.status === 'published') {
+      const fullUrl = `${SITE_URL}/${existing.slug.replace(/^\/|\/$/g, '')}/`;
+      submitUrlToGoogle(fullUrl, 'URL_DELETED').catch((err) => {
+        console.warn('[Auto Indexing] Error notifying Google of deleted URL:', err);
+      });
+    }
+
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';

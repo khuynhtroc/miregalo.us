@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import type { Post } from '@/lib/types';
+import { autoSubmitPostIndexing } from '@/lib/indexing/google';
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -71,6 +72,13 @@ export async function POST(req: NextRequest) {
       }
     } catch (e) {
       console.warn('revalidatePath warning:', e);
+    }
+
+    // Auto-submit URL to Google Indexing if published
+    if (post?.status === 'published' && post?.slug) {
+      autoSubmitPostIndexing(post.slug, 'post').catch((err) => {
+        console.warn('[Auto Indexing] Error triggering on post creation:', err);
+      });
     }
 
     return NextResponse.json(post, { status: 201 });

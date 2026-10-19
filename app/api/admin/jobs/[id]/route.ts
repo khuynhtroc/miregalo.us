@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { processContentJob } from '@/lib/ai/job-queue';
 import { generateMultiStageArticle } from '@/lib/ai/multi-stage-generator';
+import { autoSubmitPostIndexing } from '@/lib/indexing/google';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
@@ -76,6 +77,12 @@ export async function POST(_req: NextRequest, { params }: Context) {
         published_at: nowIso,
       },
     });
+
+    // Auto submit to Google Indexing
+    if (plannedPost.slug) {
+      autoSubmitPostIndexing(plannedPost.slug, 'post').catch(() => {});
+    }
+
     return NextResponse.json({
       success: true,
       job: {
@@ -121,6 +128,11 @@ export async function POST(_req: NextRequest, { params }: Context) {
           published_at: new Date().toISOString(),
         },
       });
+
+      // Auto submit to Google Indexing
+      if (res.post?.slug) {
+        autoSubmitPostIndexing(res.post.slug, 'post').catch(() => {});
+      }
 
       return NextResponse.json({
         success: true,
