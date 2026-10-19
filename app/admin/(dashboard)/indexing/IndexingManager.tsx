@@ -200,11 +200,11 @@ export function IndexingManager({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
               <span style={{ fontSize: '2rem' }}>🚀</span>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em' }}>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', color: '#ffffff' }}>
                 Google Auto Indexing &amp; Push API
               </h1>
             </div>
-            <p style={{ margin: 0, opacity: 0.85, fontSize: '0.95rem', maxWidth: '650px', lineHeight: 1.5 }}>
+            <p style={{ margin: 0, color: '#e0e7ff', fontSize: '0.95rem', maxWidth: '650px', lineHeight: 1.5 }}>
               Tự động gửi URL bài viết mới và cập nhật lên Google ngay lập tức khi xuất bản. Đảm bảo bot Google cào và lập chỉ mục trong vài phút thay vì chờ đợi nhiều ngày.
             </p>
           </div>
@@ -240,10 +240,11 @@ export function IndexingManager({
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              backgroundColor: 'rgba(0,0,0,0.25)',
+              backgroundColor: 'rgba(0,0,0,0.3)',
               padding: '6px 14px',
               borderRadius: '999px',
               fontSize: '0.85rem',
+              color: '#ffffff',
             }}
           >
             <span
@@ -267,10 +268,11 @@ export function IndexingManager({
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              backgroundColor: 'rgba(0,0,0,0.25)',
+              backgroundColor: 'rgba(0,0,0,0.3)',
               padding: '6px 14px',
               borderRadius: '999px',
               fontSize: '0.85rem',
+              color: '#ffffff',
             }}
           >
             <span
@@ -294,10 +296,11 @@ export function IndexingManager({
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              backgroundColor: 'rgba(0,0,0,0.25)',
+              backgroundColor: 'rgba(0,0,0,0.3)',
               padding: '6px 14px',
               borderRadius: '999px',
               fontSize: '0.85rem',
+              color: '#ffffff',
             }}
           >
             <span
