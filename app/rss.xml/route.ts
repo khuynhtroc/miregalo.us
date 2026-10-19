@@ -7,10 +7,19 @@ function cdata(str: string): string {
   return `<![CDATA[${(str || '').replace(/]]>/g, ']]]]><![CDATA[>')}]]>`;
 }
 
+function xmlAttr(str: string): string {
+  return (str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 export async function GET() {
   const [settings, { rows: posts }, authors, categories] = await Promise.all([
     getSettings(),
-    listPublishedPosts({ perPage: 80, full: true }),
+    listPublishedPosts({ perPage: 50, full: false }),
     getAuthors(),
     getCategories(),
   ]);
@@ -37,22 +46,17 @@ export async function GET() {
       const rawDesc = p.excerpt || p.seo_description || stripHtml(p.intro_html || p.content_html || '');
       const desc = rawDesc.length > 320 ? rawDesc.slice(0, 317) + '…' : rawDesc;
 
-      let richBody = p.content_html || p.intro_html || desc;
-      if (p.items?.length && (!p.content_html || p.content_html.length < 200)) {
-        const itemsList = p.items
-          .slice(0, 5)
-          .map((it) => `<li><strong>${it.heading}</strong>: ${stripHtml(it.description_html || '')}</li>`)
-          .join('');
-        richBody = `${p.intro_html || ''}<ul>${itemsList}</ul>${p.content_html || ''}`;
-      }
+      const richBody = p.intro_html || `<p>${desc}</p>`;
 
       let mediaTags = '';
       if (p.hero_image) {
         const heroUrl = p.hero_image.startsWith('http')
           ? p.hero_image
           : `${SITE_URL}${p.hero_image.startsWith('/') ? '' : '/'}${p.hero_image}`;
-        const mimeType = heroUrl.endsWith('.png') ? 'image/png' : heroUrl.endsWith('.webp') ? 'image/webp' : 'image/jpeg';
-        mediaTags = `\n      <media:content url="${heroUrl}" medium="image"/>\n      <enclosure url="${heroUrl}" length="0" type="${mimeType}"/>`;
+        const cleanPath = heroUrl.split('?')[0].toLowerCase();
+        const mimeType = cleanPath.endsWith('.png') ? 'image/png' : cleanPath.endsWith('.webp') ? 'image/webp' : 'image/jpeg';
+        const safeHeroUrl = xmlAttr(heroUrl);
+        mediaTags = `\n      <media:content url="${safeHeroUrl}" medium="image"/>\n      <enclosure url="${safeHeroUrl}" length="0" type="${mimeType}"/>`;
       }
 
       return `    <item>
