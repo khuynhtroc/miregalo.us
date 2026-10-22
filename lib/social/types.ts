@@ -1,6 +1,9 @@
 export interface SocialSettings {
   auto_share_enabled: boolean;
 
+  // Facebook historical-post backfill queue
+  facebook_backfill: FacebookBackfillState;
+
   // Facebook Fanpage
   facebook_enabled: boolean;
   facebook_page_id: string;
@@ -14,6 +17,13 @@ export interface SocialSettings {
   twitter_access_token: string;
   twitter_access_secret: string;
   twitter_template?: string;
+  // X OAuth 2.0 (confidential Web App)
+  twitter_oauth2_client_id?: string;
+  twitter_oauth2_client_secret?: string;
+  twitter_oauth2_access_token?: string;
+  twitter_oauth2_refresh_token?: string;
+  twitter_oauth2_expires_at?: number;
+  twitter_oauth2_username?: string;
 
   // Medium
   medium_enabled: boolean;
@@ -25,11 +35,32 @@ export interface SocialSettings {
   pinterest_enabled: boolean;
   pinterest_access_token: string;
   pinterest_board_name?: string;
+  pinterest_client_id?: string;
+  pinterest_client_secret?: string;
+  pinterest_refresh_token?: string;
+  pinterest_token_expires_at?: number;
 
   // Webhook (Make / Zapier / n8n)
   webhook_enabled: boolean;
   webhook_url: string;
   webhook_secret?: string;
+}
+
+export interface FacebookBackfillState {
+  status: 'idle' | 'scheduled' | 'paused' | 'error' | 'completed';
+  queue_id: string | null;
+  post_ids: string[];
+  cursor: number;
+  interval_minutes: number;
+  start_at: string | null;
+  next_post_at: string | null;
+  started_at: string | null;
+  last_posted_at: string | null;
+  last_post_title: string | null;
+  last_error: string | null;
+  skipped_count: number;
+  lock_id: string | null;
+  lock_until: string | null;
 }
 
 export interface ChannelShareResult {

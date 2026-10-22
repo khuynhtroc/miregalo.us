@@ -5,7 +5,8 @@ import {
   testTwitterConnection,
   testMediumConnection,
   testSocialWebhook,
-  listPinterestBoards,
+  getPinterestToken,
+  testPinterestConnection,
   sharePostToAllChannels,
 } from '@/lib/social';
 import { db } from '@/lib/db';
@@ -46,22 +47,11 @@ export async function POST(req: NextRequest) {
       }
 
       if (channel === 'pinterest') {
-        const { access_token } = credentials || {};
-        if (!access_token) {
+        const accessToken = credentials?.access_token || await getPinterestToken();
+        if (!accessToken) {
           return NextResponse.json({ success: false, error: 'Chưa điền Pinterest Access Token' });
         }
-        const boards = await listPinterestBoards(access_token);
-        if (boards && boards.length > 0) {
-          return NextResponse.json({
-            success: true,
-            boards_count: boards.length,
-            sample_boards: boards.slice(0, 5).map((b) => b.name),
-          });
-        }
-        return NextResponse.json({
-          success: false,
-          error: 'Không tìm thấy bảng (board) nào hoặc Token không hợp lệ',
-        });
+        return NextResponse.json(await testPinterestConnection(accessToken));
       }
 
       if (channel === 'webhook') {

@@ -137,10 +137,10 @@ export async function shareToFacebook(
           .replace(/{url}/g, postUrl)
       : `🎁 ${title}\n\n${excerpt}\n\n👉 Descubre todas las ideas y detalles aquí: ${postUrl}`;
 
-    const params = new URLSearchParams({
-      message,
-      link: postUrl,
-    });
+    // Keep the article URL in the message text so it remains visible in the
+    // post body. Sending the same URL again as the separate `link` parameter
+    // can make Facebook render it only as an attachment preview.
+    const params = new URLSearchParams({ message });
 
     const res = await fetch(`${FB_GRAPH_API}/${cleanId}/feed`, {
       method: 'POST',

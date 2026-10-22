@@ -2,11 +2,33 @@
 
 import { useState, useEffect } from 'react';
 import type { SocialSettings } from '@/lib/social/types';
+import { X_OAUTH_CALLBACK_URL } from '@/lib/social/twitter-oauth-config';
+import { PINTEREST_OAUTH_CALLBACK_URL } from '@/lib/social/pinterest-oauth-config';
+
+type SocialSettingsWithConnections = Omit<SocialSettings, 'pinterest_access_token'> & {
+  pinterest_access_token?: string;
+  twitter_oauth2_connected?: boolean;
+  twitter_oauth2_client_secret_configured?: boolean;
+  pinterest_oauth_connected?: boolean;
+  pinterest_client_secret_configured?: boolean;
+  pinterest_token_configured?: boolean;
+};
+
+function suggestedBackfillStart() {
+  const date = new Date(Date.now() + 60 * 60 * 1000);
+  date.setMinutes(0, 0, 0);
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000).toISOString().slice(0, 16);
+}
 
 export function SocialAutoShareManager() {
-  const [settings, setSettings] = useState<SocialSettings | null>(null);
+  const [settings, setSettings] = useState<SocialSettingsWithConnections | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [connectingX, setConnectingX] = useState(false);
+  const [connectingPinterest, setConnectingPinterest] = useState(false);
+  const [backfillStartAt, setBackfillStartAt] = useState(suggestedBackfillStart);
+  const [backfillInterval, setBackfillInterval] = useState(1440);
+  const [backfillBusy, setBackfillBusy] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [testingChannel, setTestingChannel] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<{
@@ -18,6 +40,44 @@ export function SocialAutoShareManager() {
 
   useEffect(() => {
     fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const connectionResult = url.searchParams.get('x_connection');
+    const pinterestConnectionResult = url.searchParams.get('pinterest_connection');
+
+    if (connectionResult) {
+      if (connectionResult === 'connected') {
+        setMsg({ type: 'success', text: '✅ Đã kết nối X thành công. Bạn có thể bật tự động chia sẻ và lưu cấu hình.' });
+      } else if (connectionResult === 'denied') {
+        setMsg({ type: 'error', text: 'Bạn đã hủy quyền kết nối với X.' });
+      } else if (connectionResult === 'missing_credentials') {
+        setMsg({ type: 'error', text: 'Hãy nhập Client ID và Client Secret của X, lưu cấu hình rồi kết nối lại.' });
+      } else {
+        setMsg({ type: 'error', text: 'Kết nối X chưa hoàn tất. Hãy thử lại và kiểm tra Callback URI trong X Developer Console.' });
+      }
+      url.searchParams.delete('x_connection');
+    }
+
+    if (pinterestConnectionResult) {
+      if (pinterestConnectionResult === 'connected') {
+        setMsg({ type: 'success', text: '✅ Pinterest đã kết nối với đủ quyền tạo boards và Pins. Token sẽ tự được làm mới.' });
+      } else if (pinterestConnectionResult === 'denied') {
+        setMsg({ type: 'error', text: 'Bạn đã hủy kết nối Pinterest.' });
+      } else if (pinterestConnectionResult === 'missing_credentials') {
+        setMsg({ type: 'error', text: 'Nhập Pinterest App ID và Client Secret, lưu cấu hình rồi kết nối lại.' });
+      } else if (pinterestConnectionResult === 'missing_scopes') {
+        setMsg({ type: 'error', text: 'Pinterest chưa cấp đủ quyền boards:read, boards:write, pins:read và pins:write cho ứng dụng.' });
+      } else {
+        setMsg({ type: 'error', text: 'Kết nối Pinterest chưa hoàn tất. Kiểm tra Callback URI trong Pinterest Developer Portal rồi thử lại.' });
+      }
+      url.searchParams.delete('pinterest_connection');
+    }
+
+    if (connectionResult || pinterestConnectionResult) {
+      window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+    }
   }, []);
 
   const fetchSettings = async () => {
@@ -60,6 +120,124 @@ export function SocialAutoShareManager() {
       setMsg({ type: 'error', text: '❌ Lỗi kết nối máy chủ khi lưu cấu hình' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleBackfillAction = async (action: 'start' | 'pause' | 'resume' | 'reset') => {
+    if (!settings) return;
+    if (action === 'reset' && !window.confirm('Xóa hàng đợi hiện tại? Các bài đã đăng sẽ không bị xóa khỏi Facebook.')) return;
+
+    setBackfillBusy(true);
+    setMsg(null);
+    try {
+      const payload: Record<string, unknown> = { action };
+      if (action === 'start') {
+        if (!backfillStartAt) {
+          setMsg({ type: 'error', text: 'Hãy chọn thời điểm bắt đầu.' });
+          setBackfillBusy(false);
+          return;
+        }
+        payload.start_at = new Date(backfillStartAt).toISOString();
+        payload.interval_minutes = backfillInterval;
+      }
+      const res = await fetch('/api/admin/social/backfill/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setMsg({ type: 'error', text: data.error || 'Không thể cập nhật hàng đợi Facebook.' });
+        return;
+      }
+
+      setSettings((current) => current ? { ...current, facebook_backfill: data.state } : current);
+      const successMessage = action === 'start'
+        ? `Đã tạo hàng đợi ${data.total_posts} bài, sắp từ cũ đến mới. Bài đầu tiên sẽ được đăng theo giờ đã chọn.`
+        : action === 'pause'
+          ? 'Đã tạm dừng hàng đợi Facebook.'
+          : action === 'resume'
+            ? 'Đã tiếp tục hàng đợi Facebook.'
+            : 'Đã xóa hàng đợi. Bài đã đăng vẫn còn trên Fanpage.';
+      setMsg({ type: 'success', text: successMessage });
+    } catch (error: any) {
+      setMsg({ type: 'error', text: error?.message || 'Lỗi kết nối khi cập nhật hàng đợi Facebook.' });
+    } finally {
+      setBackfillBusy(false);
+    }
+  };
+
+  const handleConnectX = async () => {
+    if (!settings) return;
+    if (!settings.twitter_oauth2_client_id?.trim() || (!settings.twitter_oauth2_client_secret?.trim() && !settings.twitter_oauth2_client_secret_configured)) {
+      setMsg({ type: 'error', text: 'Nhập Client ID và Client Secret trong X Developer Console trước khi kết nối.' });
+      return;
+    }
+
+    setConnectingX(true);
+    setMsg(null);
+    try {
+      const res = await fetch('/api/admin/social/settings/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setMsg({ type: 'error', text: `Không thể lưu thông tin X: ${data.error || 'lỗi máy chủ'}` });
+        setConnectingX(false);
+        return;
+      }
+      window.location.assign('/api/auth/x/connect/');
+    } catch {
+      setMsg({ type: 'error', text: 'Lỗi kết nối máy chủ khi lưu thông tin X.' });
+      setConnectingX(false);
+    }
+  };
+
+  const copyXCallbackUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(X_OAUTH_CALLBACK_URL);
+      setMsg({ type: 'success', text: 'Đã sao chép Callback URI của X.' });
+    } catch {
+      setMsg({ type: 'error', text: 'Không thể sao chép tự động. Hãy chọn và sao chép URL hiển thị bên dưới.' });
+    }
+  };
+
+  const handleConnectPinterest = async () => {
+    if (!settings) return;
+    if (!settings.pinterest_client_id?.trim() || (!settings.pinterest_client_secret?.trim() && !settings.pinterest_client_secret_configured)) {
+      setMsg({ type: 'error', text: 'Nhập Pinterest App ID và Client Secret trước khi kết nối.' });
+      return;
+    }
+
+    setConnectingPinterest(true);
+    setMsg(null);
+    try {
+      const res = await fetch('/api/admin/social/settings/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setMsg({ type: 'error', text: `Không thể lưu thông tin Pinterest: ${data.error || 'lỗi máy chủ'}` });
+        setConnectingPinterest(false);
+        return;
+      }
+      window.location.assign('/api/auth/pinterest/connect/');
+    } catch {
+      setMsg({ type: 'error', text: 'Lỗi kết nối máy chủ khi lưu thông tin Pinterest.' });
+      setConnectingPinterest(false);
+    }
+  };
+
+  const copyPinterestCallbackUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(PINTEREST_OAUTH_CALLBACK_URL);
+      setMsg({ type: 'success', text: 'Đã sao chép Callback URI của Pinterest.' });
+    } catch {
+      setMsg({ type: 'error', text: 'Không thể sao chép tự động. Hãy chọn và sao chép URL hiển thị bên dưới.' });
     }
   };
 
@@ -402,6 +580,115 @@ export function SocialAutoShareManager() {
         </div>
       </div>
 
+      {/* ── FACEBOOK HISTORICAL POST BACKFILL ────────── */}
+      <div className="admin-card" style={{ border: '1px solid #d6e4ff', background: '#f8fbff' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+          <div>
+            <h3 className="admin-card-title" style={{ fontSize: '1.05rem', marginBottom: '6px' }}>
+              📚 Đăng lại bài cũ lên Facebook theo lịch
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.84rem', color: '#53627c', lineHeight: 1.55 }}>
+              Tạo hàng đợi từ các bài hướng dẫn quà tặng và bài blog đã xuất bản, đăng bài cũ nhất trước rồi lần lượt đến bài mới hơn. Mỗi bài chỉ được gửi một lần trong hàng đợi này.
+            </p>
+          </div>
+          <span style={{ padding: '5px 10px', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 700, background: '#e7f0ff', color: '#175cd3' }}>
+            Chỉ đăng lên Facebook
+          </span>
+        </div>
+
+        <div className="form-row" style={{ marginTop: '18px' }}>
+          <div className="form-group">
+            <label className="form-label">Thời điểm đăng bài đầu tiên (giờ trên máy bạn)</label>
+            <input
+              className="form-input"
+              type="datetime-local"
+              value={backfillStartAt}
+              onChange={(e) => setBackfillStartAt(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Khoảng cách giữa các bài</label>
+            <select
+              className="form-input"
+              value={backfillInterval}
+              onChange={(e) => setBackfillInterval(Number(e.target.value))}
+            >
+              <option value={60}>Mỗi 1 giờ</option>
+              <option value={180}>Mỗi 3 giờ</option>
+              <option value={360}>Mỗi 6 giờ</option>
+              <option value={720}>Mỗi 12 giờ</option>
+              <option value={1440}>Mỗi 24 giờ</option>
+            </select>
+          </div>
+        </div>
+
+        {(() => {
+          const queue = settings.facebook_backfill;
+          const total = queue.post_ids?.length || 0;
+          const remaining = Math.max(0, total - queue.cursor);
+          const statusLabel = {
+            idle: 'Chưa tạo hàng đợi',
+            scheduled: 'Đang chạy theo lịch',
+            paused: 'Đã tạm dừng',
+            error: 'Đang dừng do lỗi',
+            completed: 'Đã đăng xong hàng đợi',
+          }[queue.status];
+          const statusColor = queue.status === 'error' ? '#b42318' : queue.status === 'scheduled' ? '#027a48' : '#344054';
+
+          return (
+            <div style={{ marginTop: '6px', padding: '14px 16px', borderRadius: '8px', background: '#ffffff', border: '1px solid #e4e7ec' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                <strong style={{ color: statusColor }}>{statusLabel}</strong>
+                {total > 0 && <span style={{ color: '#475467', fontSize: '0.84rem' }}>Đã xử lý {queue.cursor}/{total} · Còn {remaining} · Bỏ qua {queue.skipped_count}</span>}
+              </div>
+              {queue.next_post_at && queue.status === 'scheduled' && (
+                <p style={{ margin: '8px 0 0', fontSize: '0.83rem', color: '#475467' }}>
+                  Bài tiếp theo dự kiến: {new Date(queue.next_post_at).toLocaleString()}
+                </p>
+              )}
+              {queue.last_post_title && queue.last_posted_at && (
+                <p style={{ margin: '6px 0 0', fontSize: '0.83rem', color: '#475467' }}>
+                  Bài gần nhất: “{queue.last_post_title}” · {new Date(queue.last_posted_at).toLocaleString()}
+                </p>
+              )}
+              {queue.last_error && <p style={{ margin: '8px 0 0', fontSize: '0.84rem', color: '#b42318' }}>Lỗi: {queue.last_error}</p>}
+            </div>
+          );
+        })()}
+
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '14px' }}>
+          {(settings.facebook_backfill.status === 'idle' || settings.facebook_backfill.status === 'completed') && (
+            <button
+              type="button"
+              className="btn-primary"
+              disabled={backfillBusy || !settings.facebook_page_id || !settings.facebook_access_token}
+              onClick={() => handleBackfillAction('start')}
+              style={{ background: '#1877f2' }}
+            >
+              {backfillBusy ? 'Đang tạo hàng đợi...' : '▶ Tạo hàng đợi và bắt đầu theo lịch'}
+            </button>
+          )}
+          {settings.facebook_backfill.status === 'scheduled' && (
+            <button type="button" className="btn-secondary" disabled={backfillBusy} onClick={() => handleBackfillAction('pause')}>
+              ⏸ Tạm dừng
+            </button>
+          )}
+          {(settings.facebook_backfill.status === 'paused' || settings.facebook_backfill.status === 'error') && (
+            <button type="button" className="btn-primary" disabled={backfillBusy} onClick={() => handleBackfillAction('resume')} style={{ background: '#1877f2' }}>
+              {settings.facebook_backfill.status === 'error' ? '↻ Thử lại bài đang lỗi' : '▶ Tiếp tục hàng đợi'}
+            </button>
+          )}
+          {settings.facebook_backfill.status !== 'idle' && (
+            <button type="button" className="btn-secondary" disabled={backfillBusy} onClick={() => handleBackfillAction('reset')}>
+              Xóa hàng đợi
+            </button>
+          )}
+        </div>
+        <p className="form-hint" style={{ marginTop: '12px' }}>
+          Bài không được đăng ngay khi tạo hàng đợi. Cấu hình Cloudflare kiểm tra mỗi 5 phút; cấu hình Vercel hiện tại kiểm tra mỗi ngày. Máy chủ cần có bí mật CRON_SECRET để cho phép lịch chạy. Hãy lưu Page ID, token và mẫu bài đăng trước khi bắt đầu. Bài đã đăng thủ công trước đó không thể tự nhận diện và có thể bị đăng lại.
+        </p>
+      </div>
+
       {/* ── 2. X (TWITTER) ───────────────────────────── */}
       <div className="admin-card">
         <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
@@ -443,6 +730,65 @@ export function SocialAutoShareManager() {
           </label>
         </div>
 
+        <div style={{ border: '1px solid #e4e7ec', borderRadius: '10px', padding: '16px', marginBottom: '18px', background: '#fafafa' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <div>
+              <strong style={{ color: '#101828' }}>OAuth 2.0 (Web App)</strong>
+              <p style={{ margin: '4px 0 0', fontSize: '0.82rem', color: '#69707d' }}>
+                Dán Callback URI này vào X Developer Console, sau đó nhập Client ID và Client Secret.
+              </p>
+            </div>
+            <span style={{ padding: '5px 9px', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 600, background: settings.twitter_oauth2_connected ? '#e6f7ed' : '#fff7e6', color: settings.twitter_oauth2_connected ? '#027a48' : '#9a6700' }}>
+              {settings.twitter_oauth2_connected
+                ? `Đã kết nối${settings.twitter_oauth2_username ? ` · @${settings.twitter_oauth2_username}` : ''}`
+                : 'Chưa kết nối'}
+            </span>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Callback URI / Redirect URL</label>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <input className="form-input" type="url" value={X_OAUTH_CALLBACK_URL} readOnly style={{ flex: '1 1 320px', fontFamily: 'monospace' }} />
+              <button type="button" className="btn-secondary" onClick={copyXCallbackUrl}>Sao chép URL</button>
+            </div>
+            <p className="form-hint">Trong X Developer Console, thêm chính xác URL trên vào Callback URI / Redirect URL của OAuth 2.0.</p>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">X OAuth 2.0 Client ID</label>
+              <input
+                className="form-input"
+                type="text"
+                autoComplete="off"
+                value={settings.twitter_oauth2_client_id || ''}
+                onChange={(e) => setSettings({ ...settings, twitter_oauth2_client_id: e.target.value })}
+                style={{ fontFamily: 'monospace' }}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">X OAuth 2.0 Client Secret</label>
+              <input
+                className="form-input"
+                type="password"
+                autoComplete="new-password"
+                value={settings.twitter_oauth2_client_secret || ''}
+                placeholder={settings.twitter_oauth2_client_secret_configured ? 'Đã lưu; để trống nếu không đổi' : 'Nhập Client Secret'}
+                onChange={(e) => setSettings({ ...settings, twitter_oauth2_client_secret: e.target.value })}
+                style={{ fontFamily: 'monospace' }}
+              />
+            </div>
+          </div>
+
+          <button type="button" className="btn-primary" disabled={connectingX || saving} onClick={handleConnectX} style={{ background: '#000000' }}>
+            {connectingX ? 'Đang chuyển tới X...' : settings.twitter_oauth2_connected ? 'Kết nối lại tài khoản X' : 'Kết nối tài khoản X'}
+          </button>
+        </div>
+
+        <details style={{ marginBottom: '16px' }}>
+          <summary style={{ cursor: 'pointer', color: '#475467', fontSize: '0.88rem', fontWeight: 600 }}>
+            Cấu hình OAuth 1.0a cũ (chỉ mở nếu bạn đang dùng cách này)
+          </summary>
         <div className="form-row">
           <div className="form-group">
             <label className="form-label">API Key (Consumer Key)</label>
@@ -491,6 +837,8 @@ export function SocialAutoShareManager() {
           </div>
         </div>
 
+        </details>
+
         <div className="form-group">
           <label className="form-label">Mẫu Tweet (Template)</label>
           <input
@@ -524,7 +872,7 @@ export function SocialAutoShareManager() {
           <button
             type="button"
             className="btn-primary"
-            disabled={testingChannel !== null || !settings.twitter_api_key || !settings.twitter_access_token}
+            disabled={testingChannel !== null || !(settings.twitter_oauth2_connected || (settings.twitter_api_key && settings.twitter_access_token))}
             onClick={() => handleTestPost('twitter')}
             style={{ background: '#000000' }}
           >
@@ -676,18 +1024,60 @@ export function SocialAutoShareManager() {
           </label>
         </div>
 
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+          <strong style={{ color: settings.pinterest_oauth_connected ? '#027a48' : '#9a6700' }}>
+            {settings.pinterest_oauth_connected ? 'Đã có Pinterest Access Token' : 'Pinterest chưa kết nối'}
+          </strong>
+          {settings.pinterest_token_configured && !settings.pinterest_oauth_connected && (
+            <span style={{ color: '#69707d', fontSize: '0.82rem' }}>(đang dùng token nhập thủ công)</span>
+          )}
+        </div>
+
         <div className="form-row">
           <div className="form-group">
-            <label className="form-label">Pinterest Access Token</label>
+            <label className="form-label">Pinterest App ID</label>
+            <input
+              className="form-input"
+              type="text"
+              value={settings.pinterest_client_id || ''}
+              onChange={(e) => setSettings({ ...settings, pinterest_client_id: e.target.value })}
+            />
+            <p className="form-hint">Lấy trong Pinterest Developer Portal → My apps.</p>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Pinterest Client Secret</label>
             <input
               className="form-input"
               type="password"
-              placeholder="pina_..."
-              value={settings.pinterest_access_token}
+              value={settings.pinterest_client_secret || ''}
+              placeholder={settings.pinterest_client_secret_configured ? 'Đã lưu; để trống nếu không đổi' : 'Nhập Client Secret'}
+              onChange={(e) => setSettings({ ...settings, pinterest_client_secret: e.target.value })}
+            />
+            <p className="form-hint">Client Secret được lưu phía máy chủ và không hiển thị lại.</p>
+          </div>
+        </div>
+
+        <div className="form-group" style={{ marginBottom: '18px' }}>
+          <label className="form-label">Pinterest OAuth Callback URI</label>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <input className="form-input" type="url" value={PINTEREST_OAUTH_CALLBACK_URL} readOnly style={{ flex: '1 1 320px', fontFamily: 'monospace' }} />
+            <button type="button" className="btn-secondary" onClick={copyPinterestCallbackUrl}>Sao chép Callback URI</button>
+          </div>
+          <p className="form-hint">Thêm chính xác URL này vào Redirect URIs của ứng dụng Pinterest trước khi kết nối.</p>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Pinterest Access Token (nhập thủ công nếu không dùng OAuth)</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder={settings.pinterest_token_configured ? 'Đã lưu; để trống để giữ token hiện tại' : 'pina_...'}
+              value={settings.pinterest_access_token || ''}
               onChange={(e) => setSettings({ ...settings, pinterest_access_token: e.target.value })}
               style={{ fontFamily: 'monospace' }}
             />
-            <p className="form-hint">Token lấy tại Pinterest Developer Portal (scope: <code>boards:read</code>, <code>pins:write</code>)</p>
+            <p className="form-hint">Khuyến nghị kết nối OAuth bên dưới để cấp đủ quyền boards:read, boards:write, pins:read và pins:write.</p>
           </div>
 
           <div className="form-group">
@@ -707,6 +1097,14 @@ export function SocialAutoShareManager() {
           <button
             type="button"
             className="btn-secondary"
+            disabled={connectingPinterest || testingChannel !== null}
+            onClick={handleConnectPinterest}
+          >
+            {connectingPinterest ? 'Đang chuyển tới Pinterest...' : settings.pinterest_oauth_connected ? 'Kết nối lại Pinterest' : 'Kết nối Pinterest và cấp quyền'}
+          </button>
+          <button
+            type="button"
+            className="btn-secondary"
             disabled={testingChannel !== null}
             onClick={() =>
               handleTestConnection('pinterest', {
@@ -719,7 +1117,7 @@ export function SocialAutoShareManager() {
           <button
             type="button"
             className="btn-primary"
-            disabled={testingChannel !== null || !settings.pinterest_access_token}
+            disabled={testingChannel !== null || !(settings.pinterest_access_token || settings.pinterest_token_configured)}
             onClick={() => handleTestPost('pinterest')}
             style={{ background: '#e60023' }}
           >

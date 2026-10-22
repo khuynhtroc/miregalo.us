@@ -4,7 +4,7 @@ import type { SocialSettings, ChannelShareResult, MultiShareReport } from './typ
 import { shareToFacebook, testFacebookConnection } from './facebook';
 import { shareToTwitter, testTwitterConnection } from './twitter';
 import { shareToMedium, testMediumConnection } from './medium';
-import { publishPostToPinterest } from './pinterest';
+import { getValidPinterestAccessToken, publishPostToPinterest } from './pinterest';
 import { triggerSocialWebhook, testSocialWebhook } from './webhook';
 
 export * from './types';
@@ -17,6 +17,23 @@ export * from './webhook';
 export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
   auto_share_enabled: false,
 
+  facebook_backfill: {
+    status: 'idle',
+    queue_id: null,
+    post_ids: [],
+    cursor: 0,
+    interval_minutes: 1440,
+    start_at: null,
+    next_post_at: null,
+    started_at: null,
+    last_posted_at: null,
+    last_post_title: null,
+    last_error: null,
+    skipped_count: 0,
+    lock_id: null,
+    lock_until: null,
+  },
+
   facebook_enabled: false,
   facebook_page_id: '',
   facebook_access_token: '',
@@ -27,6 +44,12 @@ export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
   twitter_api_secret: '',
   twitter_access_token: '',
   twitter_access_secret: '',
+  twitter_oauth2_client_id: '',
+  twitter_oauth2_client_secret: '',
+  twitter_oauth2_access_token: '',
+  twitter_oauth2_refresh_token: '',
+  twitter_oauth2_expires_at: 0,
+  twitter_oauth2_username: '',
   twitter_template: '🎁 {title}\n\n👉 {url}\n\n#regalos #ideaspararegalar #miregalo',
 
   medium_enabled: false,
@@ -37,6 +60,10 @@ export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
   pinterest_enabled: false,
   pinterest_access_token: '',
   pinterest_board_name: 'Ideas de Regalos',
+  pinterest_client_id: '',
+  pinterest_client_secret: '',
+  pinterest_refresh_token: '',
+  pinterest_token_expires_at: 0,
 
   webhook_enabled: false,
   webhook_url: '',
@@ -50,7 +77,14 @@ export async function getSocialSettings(): Promise<SocialSettings> {
   try {
     const raw = await db.getSetting<Partial<SocialSettings>>('social_settings');
     if (!raw) return { ...DEFAULT_SOCIAL_SETTINGS };
-    return { ...DEFAULT_SOCIAL_SETTINGS, ...raw };
+    return {
+      ...DEFAULT_SOCIAL_SETTINGS,
+      ...raw,
+      facebook_backfill: {
+        ...DEFAULT_SOCIAL_SETTINGS.facebook_backfill,
+        ...(raw.facebook_backfill || {}),
+      },
+    };
   } catch (err) {
     console.warn('[Social] Failed to load social_settings from DB:', err);
     return { ...DEFAULT_SOCIAL_SETTINGS };
@@ -107,7 +141,12 @@ export async function sharePostToAllChannels(
   }
 
   // 2. X (Twitter)
-  const shouldShareTwitter = options?.forceChannels?.includes('twitter') || (settings.twitter_enabled && settings.twitter_api_key && settings.twitter_access_token);
+  const hasTwitterCredentials = Boolean(
+    (settings.twitter_oauth2_access_token || settings.twitter_oauth2_refresh_token) ||
+    settings.twitter_oauth2_client_id ||
+    (settings.twitter_api_key && settings.twitter_access_token)
+  );
+  const shouldShareTwitter = options?.forceChannels?.includes('twitter') || (settings.twitter_enabled && hasTwitterCredentials);
   if (shouldShareTwitter) {
     tasks.push(
       shareToTwitter(
@@ -142,7 +181,9 @@ export async function sharePostToAllChannels(
         const timestamp = new Date().toISOString();
         try {
           const boardName = settings.pinterest_board_name || 'Ideas de Regalos';
-          const pinRes = await publishPostToPinterest(settings.pinterest_access_token, post, boardName);
+          const token = await getValidPinterestAccessToken(settings.pinterest_access_token);
+          if (!token) throw new Error('Pinterest Access Token chưa được cấu hình.');
+          const pinRes = await publishPostToPinterest(token, post, boardName);
           if (pinRes) {
             return {
               channel: 'pinterest',

@@ -19,10 +19,96 @@ interface PinterestPinResult {
 
 const PINTEREST_API_BASE = 'https://api.pinterest.com/v5';
 
+type PinterestOAuthSettings = {
+  pinterest_access_token?: string;
+  pinterest_refresh_token?: string;
+  pinterest_token_expires_at?: number;
+  pinterest_client_id?: string;
+  pinterest_client_secret?: string;
+};
+
+function formatPinterestApiError(status: number, responseBody: unknown, fallback: string): string {
+  const raw = typeof responseBody === 'string' ? responseBody : JSON.stringify(responseBody || {});
+  let data: any = responseBody;
+  if (typeof responseBody === 'string') {
+    try { data = JSON.parse(responseBody); } catch { data = {}; }
+  }
+  const missing = raw.match(/Missing:\s*\[([^\]]+)\]/i)?.[1];
+  if (/insufficient permissions|missing.*(?:boards:write|pins:write)/i.test(raw) || missing) {
+    const scopes = missing || 'boards:write và pins:write';
+    return `Pinterest từ chối thao tác vì Access Token thiếu quyền ${scopes}. Hãy bấm “Kết nối lại Pinterest” để cấp boards:read, boards:write, pins:read và pins:write; token cũ không thể tự thêm quyền.`;
+  }
+  const message = data?.message || data?.detail || data?.error || raw || fallback;
+  return `Pinterest API (HTTP ${status}): ${String(message)}`;
+}
+
+async function requestPinterestBoards(token: string, pageSize = 100): Promise<PinterestBoard[]> {
+  const res = await fetch(`${PINTEREST_API_BASE}/boards?page_size=${pageSize}`, {
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    cache: 'no-store',
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(formatPinterestApiError(res.status, data, 'Không thể đọc danh sách Pinterest boards'));
+  return data.items || [];
+}
+
+async function refreshPinterestOAuthToken(settings: PinterestOAuthSettings): Promise<string> {
+  const clientId = settings.pinterest_client_id?.trim();
+  const clientSecret = settings.pinterest_client_secret;
+  const refreshToken = settings.pinterest_refresh_token;
+  if (!clientId || !clientSecret || !refreshToken) {
+    throw new Error('Pinterest Access Token đã hết hạn. Hãy kết nối lại Pinterest trong mục Social Auto-Share.');
+  }
+
+  const form = new URLSearchParams({ grant_type: 'refresh_token', refresh_token: refreshToken });
+  const response = await fetch(`${PINTEREST_API_BASE}/oauth/token`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: form,
+    cache: 'no-store',
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.access_token) {
+    throw new Error(formatPinterestApiError(response.status, data, 'Không thể làm mới Pinterest Access Token'));
+  }
+
+  const latest = await db.getSetting<PinterestOAuthSettings & Record<string, any>>('social_settings') || {};
+  await db.setSetting('social_settings', {
+    ...latest,
+    pinterest_access_token: data.access_token,
+    pinterest_refresh_token: data.refresh_token || refreshToken,
+    pinterest_token_expires_at: Date.now() + Number(data.expires_in || 2_592_000) * 1000,
+  });
+  return data.access_token as string;
+}
+
+/** Returns a current token, refreshing Pinterest OAuth tokens shortly before expiration. */
+export async function getValidPinterestAccessToken(token?: string): Promise<string | null> {
+  const settings = await db.getSetting<PinterestOAuthSettings>('social_settings') || {};
+  const storedToken = settings.pinterest_access_token?.trim();
+  const candidate = token?.trim() || storedToken;
+  if (!candidate) return null;
+
+  const expiresAt = Number(settings.pinterest_token_expires_at || 0);
+  if (storedToken && candidate === storedToken && expiresAt && expiresAt <= Date.now() + 60_000) {
+    return refreshPinterestOAuthToken(settings);
+  }
+  return candidate;
+}
+
 /**
- * Get active Pinterest Access Token from process.env or site settings
+ * Get the active Pinterest token from social settings, environment or legacy site settings.
  */
 export async function getPinterestToken(): Promise<string | null> {
+  try {
+    const socialSettings = await db.getSetting<PinterestOAuthSettings>('social_settings');
+    if (socialSettings?.pinterest_access_token) {
+      return await getValidPinterestAccessToken(socialSettings.pinterest_access_token);
+    }
+  } catch {}
   if (process.env.PINTEREST_ACCESS_TOKEN) {
     return process.env.PINTEREST_ACCESS_TOKEN.trim();
   }
@@ -40,22 +126,28 @@ export async function getPinterestToken(): Promise<string | null> {
  */
 export async function listPinterestBoards(token: string): Promise<PinterestBoard[]> {
   try {
-    const res = await fetch(`${PINTEREST_API_BASE}/boards?page_size=100`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    if (!res.ok) {
-      const err = await res.text();
-      console.warn('[Pinterest] Error listing boards:', err);
-      return [];
-    }
-    const data = await res.json();
-    return data.items || [];
+    return await requestPinterestBoards(token);
   } catch (err) {
     console.error('[Pinterest] Exception listing boards:', err);
     return [];
+  }
+}
+
+export async function testPinterestConnection(token: string): Promise<{
+  success: boolean;
+  boards_count?: number;
+  sample_boards?: string[];
+  error?: string;
+}> {
+  try {
+    const boards = await requestPinterestBoards(token, 100);
+    return {
+      success: true,
+      boards_count: boards.length,
+      sample_boards: boards.slice(0, 5).map((board) => board.name),
+    };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Không thể kiểm tra Pinterest Access Token' };
   }
 }
 
@@ -68,7 +160,7 @@ export async function getOrCreatePinterestBoard(
   description?: string
 ): Promise<string | null> {
   const cleanName = boardName.trim().slice(0, 50);
-  const existingBoards = await listPinterestBoards(token);
+  const existingBoards = await requestPinterestBoards(token);
   const found = existingBoards.find(
     (b) => b.name.toLowerCase().trim() === cleanName.toLowerCase().trim()
   );
@@ -93,9 +185,9 @@ export async function getOrCreatePinterestBoard(
     });
 
     if (!res.ok) {
-      const errText = await res.text();
+      const errText = await res.json().catch(() => ({}));
       console.warn(`[Pinterest] Error creating board "${cleanName}":`, errText);
-      return null;
+      throw new Error(formatPinterestApiError(res.status, errText, `Không thể tạo Pinterest board "${cleanName}"`));
     }
 
     const created = await res.json();
@@ -103,7 +195,7 @@ export async function getOrCreatePinterestBoard(
     return created.id;
   } catch (err) {
     console.error(`[Pinterest] Exception creating board "${cleanName}":`, err);
-    return null;
+    throw err;
   }
 }
 
@@ -158,8 +250,8 @@ export async function publishPostToPinterest(
   });
 
   if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Pinterest API Pin creation failed: ${errText}`);
+    const errBody = await res.json().catch(() => ({}));
+    throw new Error(formatPinterestApiError(res.status, errBody, 'Không thể tạo Pin trên Pinterest'));
   }
 
   const result = await res.json();
