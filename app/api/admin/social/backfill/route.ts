@@ -1,84 +1,101 @@
-import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { db } from '@/lib/db';
-import { getSocialSettings, saveSocialSettings } from '@/lib/social';
-import type { FacebookBackfillState } from '@/lib/social/types';
+import {
+  getSocialSettings,
+  saveSocialSettings,
+  buildFacebookBackfillQueue,
+  executeFacebookBackfillStep,
+} from '@/lib/social';
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_INTERVALS = new Set([60, 180, 240, 360, 720, 1440]);
+const ALLOWED_INTERVALS = new Set([30, 60, 120, 180, 240, 360, 480, 720, 1440]);
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const { action, interval_minutes, start_at } = await req.json();
+    const { action, interval_minutes, start_at, post_immediately } = await req.json();
     const settings = await getSocialSettings();
     const current = settings.facebook_backfill;
     const now = new Date();
 
     if (action === 'start') {
-      if (!process.env.CRON_SECRET) {
-        return NextResponse.json({ error: 'Máy chủ chưa cấu hình CRON_SECRET nên chưa thể chạy lịch tự động. Hãy cấu hình CRON_SECRET và deploy Cloudflare Worker hoặc cron-job.org trước.' }, { status: 503 });
-      }
-      if (current.status === 'scheduled' || (current.lock_until && new Date(current.lock_until) > now)) {
-        return NextResponse.json({ error: 'Hàng đợi đang chạy hoặc đang xử lý một bài. Hãy tạm dừng trước khi tạo hàng đợi mới.' }, { status: 409 });
-      }
-      if (current.status === 'paused' || current.status === 'error') {
-        return NextResponse.json({ error: 'Hàng đợi đang tạm dừng hoặc bị lỗi. Hãy tiếp tục hàng đợi hiện tại hoặc xóa nó trước.' }, { status: 409 });
+      if (current.lock_until && new Date(current.lock_until) > now) {
+        return NextResponse.json(
+          { error: 'Hàng đợi đang xử lý một bài. Hãy đợi giây lát rồi thử lại.' },
+          { status: 409 }
+        );
       }
       if (!settings.facebook_page_id || !settings.facebook_access_token) {
-        return NextResponse.json({ error: 'Nhập Page ID và Page Access Token rồi lưu cấu hình trước khi tạo hàng đợi bài cũ.' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Nhập Page ID và Page Access Token rồi lưu cấu hình trước khi tạo hàng đợi bài cũ.' },
+          { status: 400 }
+        );
       }
-      const interval = Number(interval_minutes);
-      if (!ALLOWED_INTERVALS.has(interval)) {
-        return NextResponse.json({ error: 'Khoảng cách đăng không hợp lệ.' }, { status: 400 });
-      }
-      const firstPostAt = new Date(start_at);
-      if (!start_at || Number.isNaN(firstPostAt.getTime())) {
-        return NextResponse.json({ error: 'Chọn thời điểm bắt đầu hợp lệ.' }, { status: 400 });
-      }
-      if (firstPostAt.getTime() < now.getTime()) {
-        return NextResponse.json({ error: 'Thời điểm bắt đầu cần ở hiện tại hoặc trong tương lai.' }, { status: 400 });
-      }
+      const interval = ALLOWED_INTERVALS.has(Number(interval_minutes)) ? Number(interval_minutes) : 240;
+      const parsedStart = start_at ? new Date(start_at) : now;
+      const startAtDate = !Number.isNaN(parsedStart.getTime()) ? parsedStart : now;
+      const shouldPostImmediately =
+        Boolean(post_immediately) || startAtDate.getTime() <= now.getTime() + 60 * 1000;
 
-      const { rows } = await db.find('posts', {
-        eq: { status: 'published' },
-        order: [
-          { field: 'published_at', asc: true },
-          { field: 'created_at', asc: true },
-        ],
-        select: 'id,type,published_at,created_at',
-      });
-      const postIds = rows
-        .filter((post) => post.type === 'gift' || post.type === 'blog')
-        .map((post) => post.id);
-
-      if (!postIds.length) {
-        return NextResponse.json({ error: 'Không tìm thấy bài viết đã xuất bản để đưa vào hàng đợi.' }, { status: 400 });
+      const { state: nextState, totalPosts } = await buildFacebookBackfillQueue(interval, startAtDate);
+      if (!totalPosts) {
+        return NextResponse.json(
+          { error: 'Không tìm thấy bài viết đã xuất bản để đưa vào hàng đợi.' },
+          { status: 400 }
+        );
       }
-
-      const nextState: FacebookBackfillState = {
-        status: 'scheduled',
-        queue_id: randomUUID(),
-        post_ids: postIds,
-        cursor: 0,
-        interval_minutes: interval,
-        start_at: firstPostAt.toISOString(),
-        next_post_at: firstPostAt.toISOString(),
-        started_at: now.toISOString(),
-        last_posted_at: null,
-        last_post_title: null,
-        last_error: null,
-        skipped_count: 0,
-        lock_id: null,
-        lock_until: null,
-      };
 
       const updated = await saveSocialSettings({ facebook_backfill: nextState });
-      return NextResponse.json({ success: true, state: updated.facebook_backfill, total_posts: postIds.length });
+
+      if (shouldPostImmediately) {
+        const step = await executeFacebookBackfillStep({ forceNow: true });
+        const latest = await getSocialSettings();
+        return NextResponse.json({
+          success: true,
+          state: latest.facebook_backfill,
+          total_posts: totalPosts,
+          posted_first: step.body.posted === true,
+          first_post_title: step.body.post_title || null,
+          facebook_url: step.body.facebook_url || null,
+          step_error: step.body.error || null,
+        });
+      }
+
+      return NextResponse.json({
+        success: true,
+        state: updated.facebook_backfill,
+        total_posts: totalPosts,
+      });
+    }
+
+    if (action === 'post_now') {
+      if (!settings.facebook_page_id || !settings.facebook_access_token) {
+        return NextResponse.json(
+          { error: 'Nhập Page ID và Page Access Token hợp lệ trước khi đăng bài.' },
+          { status: 400 }
+        );
+      }
+      const step = await executeFacebookBackfillStep({ forceNow: true });
+      const latest = await getSocialSettings();
+      if (step.httpStatus >= 400 || !step.body.posted) {
+        return NextResponse.json(
+          {
+            error: step.body.error || step.body.message || 'Không thể đăng bài tiếp theo lên Fanpage.',
+            state: latest.facebook_backfill,
+          },
+          { status: step.httpStatus >= 400 ? step.httpStatus : 400 }
+        );
+      }
+      return NextResponse.json({
+        success: true,
+        posted: true,
+        post_title: step.body.post_title,
+        facebook_url: step.body.facebook_url,
+        state: latest.facebook_backfill,
+      });
     }
 
     if (action === 'pause') {
@@ -95,9 +112,10 @@ export async function POST(req: NextRequest) {
       if (current.status !== 'paused' && current.status !== 'error') {
         return NextResponse.json({ error: 'Hàng đợi hiện không ở trạng thái tạm dừng hoặc lỗi.' }, { status: 400 });
       }
-      const retryAt = current.next_post_at && new Date(current.next_post_at) > now
-        ? current.next_post_at
-        : now.toISOString();
+      const retryAt =
+        current.next_post_at && new Date(current.next_post_at) > now
+          ? current.next_post_at
+          : now.toISOString();
       const updated = await saveSocialSettings({
         facebook_backfill: {
           ...current,
@@ -113,10 +131,28 @@ export async function POST(req: NextRequest) {
 
     if (action === 'reset') {
       if (current.lock_until && new Date(current.lock_until) > now) {
-        return NextResponse.json({ error: 'Đang gửi một bài lên Facebook. Hãy đợi thao tác này hoàn tất rồi thử lại.' }, { status: 409 });
+        return NextResponse.json(
+          { error: 'Đang gửi một bài lên Facebook. Hãy đợi thao tác này hoàn tất rồi thử lại.' },
+          { status: 409 }
+        );
       }
       const updated = await saveSocialSettings({
-        facebook_backfill: { ...settings.facebook_backfill, status: 'idle', queue_id: null, post_ids: [], cursor: 0, start_at: null, next_post_at: null, started_at: null, last_posted_at: null, last_post_title: null, last_error: null, skipped_count: 0, lock_id: null, lock_until: null },
+        facebook_backfill: {
+          ...settings.facebook_backfill,
+          status: 'idle',
+          queue_id: null,
+          post_ids: [],
+          cursor: 0,
+          start_at: null,
+          next_post_at: null,
+          started_at: null,
+          last_posted_at: null,
+          last_post_title: null,
+          last_error: null,
+          skipped_count: 0,
+          lock_id: null,
+          lock_until: null,
+        },
       });
       return NextResponse.json({ success: true, state: updated.facebook_backfill });
     }

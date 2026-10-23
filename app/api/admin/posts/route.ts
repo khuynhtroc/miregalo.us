@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
       autoSubmitPostIndexing(post.slug, 'post').catch((err) => {
         console.warn('[Auto Indexing] Error triggering on post creation:', err);
       });
-      schedulePublishedPostAutoShare(post, 'admin post creation');
+      await schedulePublishedPostAutoShare(post, 'admin post creation');
     }
 
     return NextResponse.json(post, { status: 201 });

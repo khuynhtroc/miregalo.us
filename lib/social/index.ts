@@ -9,6 +9,7 @@ import { triggerSocialWebhook, testSocialWebhook } from './webhook';
 
 export * from './types';
 export * from './facebook';
+export * from './facebook-backfill';
 export * from './twitter';
 export * from './medium';
 export * from './pinterest';

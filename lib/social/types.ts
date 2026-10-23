@@ -8,6 +8,8 @@ export interface SocialSettings {
   facebook_enabled: boolean;
   facebook_page_id: string;
   facebook_access_token: string;
+  facebook_app_id?: string;
+  facebook_app_secret?: string;
   facebook_template?: string;
 
   // X (Twitter)

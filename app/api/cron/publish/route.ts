@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, after } from 'next/server';
 import { db } from '@/lib/db';
 import { generateMultiStageArticle } from '@/lib/ai/multi-stage-generator';
+import { executeFacebookBackfillStep, sharePostToAllChannels } from '@/lib/social';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -36,6 +37,15 @@ async function handleCronPublish(req: NextRequest) {
   }
 
   try {
+    // 0. Also check & process due Facebook historical backfill post (every 4 hours / configured interval)
+    let backfillResult: Record<string, any> | null = null;
+    try {
+      const bfStep = await executeFacebookBackfillStep();
+      backfillResult = bfStep.body;
+    } catch (bfErr: any) {
+      console.warn('[Cron] Facebook backfill check warning:', bfErr?.message || bfErr);
+    }
+
     // 1. Fetch scheduled jobs from Supabase (up to 1000 to cover full queue)
     const { rows: allJobs } = await db.find('content_jobs', {
       order: [{ field: 'created_at', asc: true }],
@@ -52,8 +62,16 @@ async function handleCronPublish(req: NextRequest) {
       if (payload.status === 'processing') {
         const updatedAt = j.updated_at ? new Date(j.updated_at).getTime() : 0;
         if (now.getTime() - updatedAt > STALE_ZOMBIE_MS) {
-          console.warn(`[Cron] Auto-healing stale zombie job ${j.id} (stuck for ${Math.round((now.getTime() - updatedAt) / 60000)}m)`);
+          const retries = (payload.retry_count || 0) + 1;
+          console.warn(
+            `[Cron] Auto-healing stale zombie job ${j.id} (stuck for ${Math.round((now.getTime() - updatedAt) / 60000)}m, retry #${retries})`
+          );
+          // Reschedule repeatedly timing-out AI jobs slightly ahead so they don't starve the queue
           payload.status = 'scheduled';
+          payload.retry_count = retries;
+          if (retries >= 2 && !j.result?.post_id && !j.result?.slug && !payload.target_path) {
+            payload.scheduled_for = new Date(now.getTime() + 6 * 60 * 60 * 1000).toISOString();
+          }
           await db.update('content_jobs', j.id, {
             stage: 'research',
             updated_at: now.toISOString(),
@@ -66,7 +84,8 @@ async function handleCronPublish(req: NextRequest) {
       }
     }
 
-    // 3. Filter and sort pending/scheduled jobs by scheduled_for ascending
+    // 3. Filter and sort pending/scheduled jobs:
+    // Prioritize jobs with pre-authored posts (fast_activation) first so they NEVER get delayed by heavy AI jobs
     const pendingJobs = allJobs
       .filter((j: any) => {
         if (targetJobId) return j.id === targetJobId;
@@ -80,6 +99,10 @@ async function handleCronPublish(req: NextRequest) {
         return scheduledTime <= now;
       })
       .sort((a: any, b: any) => {
+        const aFast = Boolean(a.result?.post_id || a.result?.slug || a.payload?.target_path);
+        const bFast = Boolean(b.result?.post_id || b.result?.slug || b.payload?.target_path);
+        if (aFast !== bFast) return aFast ? -1 : 1;
+
         const timeA = a.payload?.scheduled_for ? new Date(a.payload.scheduled_for).getTime() : 0;
         const timeB = b.payload?.scheduled_for ? new Date(b.payload.scheduled_for).getTime() : 0;
         return timeA - timeB;
@@ -91,6 +114,7 @@ async function handleCronPublish(req: NextRequest) {
         time: now.toISOString(),
         healed_zombies: healedCount,
         total_queued: allJobs.filter((j: any) => j.payload?.status === 'scheduled').length,
+        facebook_backfill: backfillResult,
       });
     }
 
@@ -123,7 +147,7 @@ async function handleCronPublish(req: NextRequest) {
         console.log(`[Cron] Fast-activating pre-authored post "${plannedPost.title}" for job ${job.id}`);
         const nowIso = new Date().toISOString();
 
-        await db.update('posts', plannedPost.id, {
+        const updatedPost = await db.update('posts', plannedPost.id, {
           status: 'published',
           published_at: nowIso,
           updated_at: nowIso,
@@ -144,6 +168,19 @@ async function handleCronPublish(req: NextRequest) {
           },
         });
 
+        // Directly share to Facebook Fanpage, Pinterest, X, Medium, Webhook right here so it never gets skipped!
+        let socialShareSummary: any = null;
+        try {
+          const socialReport = await sharePostToAllChannels(updatedPost || { ...plannedPost, status: 'published', published_at: nowIso });
+          socialShareSummary = {
+            attempted: socialReport.total_attempted,
+            succeeded: socialReport.total_success,
+            results: socialReport.results,
+          };
+        } catch (socialErr: any) {
+          console.warn('[Cron Fast-Activation] Social auto-share error:', socialErr?.message || socialErr);
+        }
+
         // Auto-Index on Google
         try {
           const { autoSubmitPostIndexing } = await import('@/lib/indexing/google');
@@ -156,8 +193,33 @@ async function handleCronPublish(req: NextRequest) {
           slug: plannedPost.slug,
           mode: 'fast_activation',
           status: 'success',
+          social_share: socialShareSummary,
         });
         fastActivationCount++;
+        continue;
+      }
+
+      // If pre-authored post was already published previously, mark job done
+      if (plannedPost && plannedPost.status === 'published') {
+        const nowIso = new Date().toISOString();
+        await db.update('content_jobs', job.id, {
+          stage: 'done',
+          updated_at: nowIso,
+          payload: { ...payload, status: 'published' },
+          result: {
+            ...job.result,
+            post_id: plannedPost.id,
+            slug: plannedPost.slug,
+            published_at: plannedPost.published_at || nowIso,
+          },
+        });
+        results.push({
+          job_id: job.id,
+          topic: payload.topic || plannedPost.title,
+          slug: plannedPost.slug,
+          mode: 'already_published',
+          status: 'success',
+        });
         continue;
       }
 
@@ -204,7 +266,6 @@ async function handleCronPublish(req: NextRequest) {
 
           // Social Auto-Sharing across enabled channels
           try {
-            const { sharePostToAllChannels } = await import('@/lib/social');
             await sharePostToAllChannels(genResult.post);
           } catch (socialErr: any) {
             console.warn('[Cron Sync] Social auto-share error:', socialErr?.message || socialErr);
@@ -247,7 +308,6 @@ async function handleCronPublish(req: NextRequest) {
         }
       } else {
         // ── ASYNCHRONOUS BACKGROUND WORKER (after) ──
-        // Immediately lock job in Supabase so subsequent cron ticks won't re-pick it
         const startIso = new Date().toISOString();
         await db.update('content_jobs', job.id, {
           stage: 'draft',
@@ -264,7 +324,6 @@ async function handleCronPublish(req: NextRequest) {
         });
         aiGenerationCount++;
 
-        // Schedule background worker to execute after HTTP response is returned
         after(async () => {
           console.log(`[Cron Background] Starting multi-stage AI generation for job ${job.id}: "${payload.topic}"`);
           try {
@@ -296,15 +355,12 @@ async function handleCronPublish(req: NextRequest) {
 
             console.log(`[Cron Background] Finished job ${job.id} -> /${genResult.post.slug}/ (${genResult.wordCount} words)`);
 
-            // Automated Multi-Channel Social Auto-Sharing (Facebook, X, Medium, Pinterest, Webhook)
             try {
-              const { sharePostToAllChannels } = await import('@/lib/social');
               await sharePostToAllChannels(genResult.post);
             } catch (socialErr: any) {
               console.warn('[Cron Background] Social auto-share error:', socialErr?.message || socialErr);
             }
 
-            // Auto-Index on Google
             try {
               const { autoSubmitPostIndexing } = await import('@/lib/indexing/google');
               autoSubmitPostIndexing(genResult.post.slug).catch(() => {});
@@ -323,30 +379,12 @@ async function handleCronPublish(req: NextRequest) {
       }
     }
 
-    // Schedule background Social Auto-Sharing for fast-activated posts if no AI background job was dispatched
-    if (!syncMode && aiGenerationCount === 0 && results.some((r) => r.mode === 'fast_activation')) {
-      after(async () => {
-        try {
-          const { sharePostToAllChannels } = await import('@/lib/social');
-          // Find the most recently published fast-activated post to share
-          const latestFastResult = results.find((r) => r.mode === 'fast_activation');
-          if (latestFastResult?.slug) {
-            const post = await db.findOne('posts', { slug: latestFastResult.slug });
-            if (post) {
-              await sharePostToAllChannels(post);
-            }
-          }
-        } catch (socialErr: any) {
-          console.warn('[Cron Fast-Path] Social auto-share error:', socialErr?.message || socialErr);
-        }
-      });
-    }
-
     return NextResponse.json({
       success: true,
       processed: results.length,
       healed_zombies: healedCount,
       results,
+      facebook_backfill: backfillResult,
       sync_mode: syncMode,
       remaining_queued: pendingJobs.length - results.length,
     });

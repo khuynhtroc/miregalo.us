@@ -15,8 +15,7 @@ type SocialSettingsWithConnections = Omit<SocialSettings, 'pinterest_access_toke
 };
 
 function suggestedBackfillStart() {
-  const date = new Date(Date.now() + 60 * 60 * 1000);
-  date.setMinutes(0, 0, 0);
+  const date = new Date();
   return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000).toISOString().slice(0, 16);
 }
 
@@ -123,7 +122,7 @@ export function SocialAutoShareManager() {
     }
   };
 
-  const handleBackfillAction = async (action: 'start' | 'pause' | 'resume' | 'reset') => {
+  const handleBackfillAction = async (action: 'start' | 'post_now' | 'pause' | 'resume' | 'reset') => {
     if (!settings) return;
     if (action === 'reset' && !window.confirm('Xóa hàng đợi hiện tại? Các bài đã đăng sẽ không bị xóa khỏi Facebook.')) return;
 
@@ -132,12 +131,7 @@ export function SocialAutoShareManager() {
     try {
       const payload: Record<string, unknown> = { action };
       if (action === 'start') {
-        if (!backfillStartAt) {
-          setMsg({ type: 'error', text: 'Hãy chọn thời điểm bắt đầu.' });
-          setBackfillBusy(false);
-          return;
-        }
-        payload.start_at = new Date(backfillStartAt).toISOString();
+        payload.start_at = backfillStartAt ? new Date(backfillStartAt).toISOString() : new Date().toISOString();
         payload.interval_minutes = backfillInterval;
       }
       const res = await fetch('/api/admin/social/backfill/', {
@@ -147,18 +141,26 @@ export function SocialAutoShareManager() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
+        if (data.state) {
+          setSettings((current) => (current ? { ...current, facebook_backfill: data.state } : current));
+        }
         setMsg({ type: 'error', text: data.error || 'Không thể cập nhật hàng đợi Facebook.' });
         return;
       }
 
-      setSettings((current) => current ? { ...current, facebook_backfill: data.state } : current);
-      const successMessage = action === 'start'
-        ? `Đã tạo hàng đợi ${data.total_posts} bài, sắp từ cũ đến mới. Bài đầu tiên sẽ được đăng theo giờ đã chọn.`
-        : action === 'pause'
-          ? 'Đã tạm dừng hàng đợi Facebook.'
-          : action === 'resume'
-            ? 'Đã tiếp tục hàng đợi Facebook.'
-            : 'Đã xóa hàng đợi. Bài đã đăng vẫn còn trên Fanpage.';
+      setSettings((current) => (current ? { ...current, facebook_backfill: data.state } : current));
+      const successMessage =
+        action === 'start'
+          ? data.posted_first
+            ? `✅ Đã tạo hàng đợi ${data.total_posts} bài (cũ nhất ➔ mới nhất) và đăng ngay bài đầu tiên: “${data.first_post_title}”!`
+            : `✅ Đã tạo hàng đợi ${data.total_posts} bài, sắp từ cũ đến mới. Bài đầu tiên sẽ được đăng theo giờ đã chọn.`
+          : action === 'post_now'
+            ? `🚀 Đã đăng thành công bài tiếp theo lên Fanpage: “${data.post_title}”!`
+            : action === 'pause'
+              ? '⏸ Đã tạm dừng hàng đợi Facebook.'
+              : action === 'resume'
+                ? '▶ Đã tiếp tục hàng đợi Facebook.'
+                : '🗑 Đã xóa hàng đợi. Bài đã đăng vẫn còn trên Fanpage.';
       setMsg({ type: 'success', text: successMessage });
     } catch (error: any) {
       setMsg({ type: 'error', text: error?.message || 'Lỗi kết nối khi cập nhật hàng đợi Facebook.' });
@@ -582,7 +584,35 @@ export function SocialAutoShareManager() {
               onChange={(e) => setSettings({ ...settings, facebook_access_token: e.target.value })}
               style={{ fontFamily: 'monospace' }}
             />
-            <p className="form-hint">Token có quyền <code>pages_manage_posts</code> và <code>pages_read_engagement</code></p>
+            <p className="form-hint">
+              Token có quyền <code>pages_manage_posts</code> và <code>pages_read_engagement</code>. Nếu lấy từ Graph API Explorer, hãy điền thêm App Secret bên dưới rồi bấm Lưu Cấu Hình để hệ thống <strong>tự động đổi sang Token Vĩnh Viễn (Không bao giờ hết hạn)</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Facebook App ID (Tùy chọn - Dùng để đổi Token Vĩnh Viễn)</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="1132334105813486"
+              value={settings.facebook_app_id || '1132334105813486'}
+              onChange={(e) => setSettings({ ...settings, facebook_app_id: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Facebook App Secret (Tùy chọn - Tự động gia hạn Token Vĩnh Viễn)</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder="Nhập App Secret từ Meta App Settings > Basic..."
+              value={settings.facebook_app_secret || ''}
+              onChange={(e) => setSettings({ ...settings, facebook_app_secret: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
           </div>
         </div>
 
@@ -658,10 +688,13 @@ export function SocialAutoShareManager() {
               value={backfillInterval}
               onChange={(e) => setBackfillInterval(Number(e.target.value))}
             >
+              <option value={30}>Mỗi 30 phút</option>
               <option value={60}>Mỗi 1 giờ</option>
+              <option value={120}>Mỗi 2 giờ</option>
               <option value={180}>Mỗi 3 giờ</option>
-              <option value={240}>Mỗi 4 giờ</option>
+              <option value={240}>Mỗi 4 giờ (Khuyên dùng)</option>
               <option value={360}>Mỗi 6 giờ</option>
+              <option value={480}>Mỗi 8 giờ</option>
               <option value={720}>Mỗi 12 giờ</option>
               <option value={1440}>Mỗi 24 giờ</option>
             </select>
@@ -714,6 +747,17 @@ export function SocialAutoShareManager() {
               {backfillBusy ? 'Đang tạo hàng đợi...' : '▶ Tạo hàng đợi và bắt đầu theo lịch'}
             </button>
           )}
+          {settings.facebook_backfill.status !== 'completed' && (
+            <button
+              type="button"
+              className="btn-primary"
+              disabled={backfillBusy || !settings.facebook_page_id || !settings.facebook_access_token}
+              onClick={() => handleBackfillAction('post_now')}
+              style={{ background: '#027a48' }}
+            >
+              {backfillBusy ? 'Đang đăng...' : '⚡ Đăng ngay 1 bài tiếp theo (Cũ ➔ Mới)'}
+            </button>
+          )}
           {settings.facebook_backfill.status === 'scheduled' && (
             <button type="button" className="btn-secondary" disabled={backfillBusy} onClick={() => handleBackfillAction('pause')}>
               ⏸ Tạm dừng
@@ -731,7 +775,7 @@ export function SocialAutoShareManager() {
           )}
         </div>
         <p className="form-hint" style={{ marginTop: '12px' }}>
-          Bài không được đăng ngay khi tạo hàng đợi. Lịch bài cũ không phụ thuộc công tắc “Tự động chia sẻ bài mới”, nhưng cần Page ID và Page Access Token hợp lệ. Cloudflare Worker đã deploy sẽ kiểm tra mỗi 5 phút. Nếu không dùng Worker, Vercel hiện chỉ kiểm tra mỗi ngày; có thể dùng cron-job.org gọi GET https://www.miregalo.us/api/cron/social-backfill/ mỗi 5 phút với header Authorization: Bearer CRON_SECRET. Máy chủ phải có CRON_SECRET. Bài đã đăng thủ công trước đó không thể tự nhận diện và có thể bị đăng lại.
+          Hệ thống tự động xếp toàn bộ bài viết đã xuất bản theo thứ tự từ cũ nhất đến mới nhất và đăng lên Fanpage theo chu kỳ đã chọn (mặc định 4 tiếng/bài). Lịch này hoạt động độc lập với công tắc “Tự động chia sẻ bài mới”.
         </p>
       </div>
 

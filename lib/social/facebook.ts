@@ -5,20 +5,92 @@ import type { ChannelShareResult } from './types';
 const FB_GRAPH_API = 'https://graph.facebook.com/v19.0';
 
 /**
- * Verifies Facebook Page Access Token and retrieves Page Name.
- * Performs deep diagnostics: checks whether token is Page Token or User Token,
- * and extracts full Facebook error codes and actionable hints.
+ * Automatically exchanges a short-lived User/Page token or long-lived User token
+ * into a NEVER-EXPIRING (Permanent) Facebook Page Access Token whenever possible.
+ */
+export async function resolvePermanentFacebookPageToken(
+  pageId: string,
+  inputToken: string,
+  appId?: string,
+  appSecret?: string
+): Promise<{ token: string; exchanged: boolean; isPermanent?: boolean }> {
+  const cleanPageId = (pageId || '').trim().replace(/['"]/g, '');
+  let currentToken = (inputToken || '').trim().replace(/['"]/g, '');
+  if (!cleanPageId || !currentToken) {
+    return { token: currentToken, exchanged: false };
+  }
+
+  let exchanged = false;
+  const cleanAppId = (appId || '').trim();
+  const cleanAppSecret = (appSecret || '').trim();
+
+  // Step 1: If App ID + App Secret are provided, exchange 1-hour token for 60-day token first
+  if (cleanAppId && cleanAppSecret) {
+    try {
+      const exchangeUrl = new URL(`${FB_GRAPH_API}/oauth/access_token`);
+      exchangeUrl.searchParams.set('grant_type', 'fb_exchange_token');
+      exchangeUrl.searchParams.set('client_id', cleanAppId);
+      exchangeUrl.searchParams.set('client_secret', cleanAppSecret);
+      exchangeUrl.searchParams.set('fb_exchange_token', currentToken);
+      const exRes = await fetch(exchangeUrl.toString());
+      const exData = await exRes.json();
+      if (exRes.ok && exData?.access_token) {
+        currentToken = exData.access_token;
+        exchanged = true;
+      }
+    } catch {}
+  }
+
+  // Step 2: Check if currentToken can retrieve a Page Access Token from /me/accounts or /{pageId}?fields=access_token
+  try {
+    const pageRes = await fetch(`${FB_GRAPH_API}/${cleanPageId}?fields=id,name,access_token`, {
+      headers: { Authorization: `Bearer ${currentToken}` },
+    });
+    const pageData = await pageRes.json();
+    if (pageRes.ok && pageData?.access_token) {
+      currentToken = pageData.access_token;
+      exchanged = true;
+    } else {
+      const accRes = await fetch(`${FB_GRAPH_API}/me/accounts?fields=id,name,access_token`, {
+        headers: { Authorization: `Bearer ${currentToken}` },
+      });
+      const accData = await accRes.json();
+      const found = (accData?.data || []).find((p: any) => String(p.id) === cleanPageId);
+      if (found?.access_token) {
+        currentToken = found.access_token;
+        exchanged = true;
+      }
+    }
+  } catch {}
+
+  return { token: currentToken, exchanged };
+}
+
+/**
+ * Verifies Facebook Page Access Token and retrieves Page Name + Expiration status.
  */
 export async function testFacebookConnection(
   pageId: string,
   accessToken: string
-): Promise<{ success: boolean; page_name?: string; error?: string }> {
+): Promise<{ success: boolean; page_name?: string; is_permanent?: boolean; expires_at?: number; error?: string }> {
   try {
     const cleanId = (pageId || '').trim().replace(/['"]/g, '');
     const cleanToken = (accessToken || '').trim().replace(/['"]/g, '');
     if (!cleanId || !cleanToken) {
       return { success: false, error: 'Page ID hoặc Access Token chưa được điền đầy đủ' };
     }
+
+    // Check token expiration metadata via /debug_token
+    let expiresAt: number | undefined;
+    try {
+      const dbgRes = await fetch(
+        `${FB_GRAPH_API}/debug_token?input_token=${encodeURIComponent(cleanToken)}&access_token=${encodeURIComponent(cleanToken)}`
+      );
+      const dbgData = await dbgRes.json();
+      if (dbgData?.data && typeof dbgData.data.expires_at === 'number') {
+        expiresAt = dbgData.data.expires_at;
+      }
+    } catch {}
 
     // 1. Inspect what this token represents via /me
     let meData: any = null;
@@ -29,15 +101,26 @@ export async function testFacebookConnection(
       meData = await meRes.json();
     } catch {}
 
+    const formatExpiryNotice = (baseName: string) => {
+      if (expiresAt === 0) return `${baseName} · Token Vĩnh Viễn (Không bao giờ hết hạn)`;
+      if (expiresAt && expiresAt > 0) {
+        const expDate = new Date(expiresAt * 1000).toLocaleString();
+        return `${baseName} · ⚠️ Token ngắn hạn (Hết hạn lúc ${expDate} - Hãy nhập App Secret bên dưới rồi bấm Lưu để tự động đổi sang Token Vĩnh Viễn!)`;
+      }
+      return baseName;
+    };
+
     // Case A: The token is directly a Page Access Token for this Page
     if (meData?.id && String(meData.id) === cleanId) {
       return {
         success: true,
-        page_name: meData.name || cleanId,
+        page_name: formatExpiryNotice(meData.name || cleanId),
+        is_permanent: expiresAt === 0,
+        expires_at: expiresAt,
       };
     }
 
-    // Case B: Token belongs to a personal User profile, NOT a Page!
+    // Case B: Token belongs to a personal User profile
     if (meData?.id && String(meData.id) !== cleanId && !meData?.error) {
       try {
         const accountsRes = await fetch(`${FB_GRAPH_API}/me/accounts?fields=id,name`, {
@@ -49,7 +132,7 @@ export async function testFacebookConnection(
         if (found) {
           return {
             success: false,
-            error: `Token bạn nhập là User Token cá nhân ("${meData.name}"), KHÔNG PHẢI Page Access Token của Fanpage "${found.name}". Vui lòng chọn Page "${found.name}" khi tạo Token trong Graph API Explorer để lấy Page Access Token vĩnh viễn.`,
+            error: `Token bạn nhập là User Token cá nhân ("${meData.name}"). Hãy bấm nút "💾 Lưu Cấu Hình" để hệ thống tự động trích xuất Page Access Token của Fanpage "${found.name}"!`,
           };
         } else {
           const list = pages.map((p: any) => `"${p.name}" (${p.id})`).join(', ');
@@ -61,7 +144,7 @@ export async function testFacebookConnection(
       } catch {}
     }
 
-    // 2. Query Page directly by ID with clean fields (NEVER request 'link' as it requires App Review)
+    // 2. Query Page directly by ID
     const res = await fetch(`${FB_GRAPH_API}/${cleanId}?fields=id,name`, {
       headers: { Authorization: `Bearer ${cleanToken}` },
     });
@@ -70,11 +153,12 @@ export async function testFacebookConnection(
     if (res.ok && data?.id) {
       return {
         success: true,
-        page_name: data.name || cleanId,
+        page_name: formatExpiryNotice(data.name || cleanId),
+        is_permanent: expiresAt === 0,
+        expires_at: expiresAt,
       };
     }
 
-    // 3. Fallback: query with access_token query param
     if (!res.ok) {
       const fbErr = data?.error || meData?.error;
       const msg = fbErr?.message || 'Không thể xác thực Facebook Page';
@@ -87,9 +171,8 @@ export async function testFacebookConnection(
       if (userMsg) detail += ` - ${userMsg}`;
 
       if (code === 190) {
-        detail += '. Gợi ý: Token đã hết hạn hoặc định dạng không đúng. Vui lòng tạo lại Page Access Token.';
-      } else if (msg.toLowerCase().includes('invalid request')) {
-        detail += '. Gợi ý: Kiểm tra xem Token có quyền pages_manage_posts / pages_read_engagement và được cấp cho đúng Fanpage chưa.';
+        detail +=
+          '. Nguyên nhân: Token ngắn hạn (1 giờ) từ Graph API Explorer đã hết hạn. Hãy lấy lại Token mới trong Graph API Explorer và điền thêm App Secret bên dưới rồi bấm Lưu Cấu Hình để hệ thống tự động đổi sang Token Vĩnh Viễn không bao giờ hết hạn!';
       }
 
       return { success: false, error: detail };
@@ -97,7 +180,9 @@ export async function testFacebookConnection(
 
     return {
       success: true,
-      page_name: data.name || cleanId,
+      page_name: formatExpiryNotice(data.name || cleanId),
+      is_permanent: expiresAt === 0,
+      expires_at: expiresAt,
     };
   } catch (err: any) {
     return { success: false, error: err?.message || String(err) };
@@ -130,16 +215,13 @@ export async function shareToFacebook(
     const title = post.title || 'Guía de Regalos';
     const excerpt = post.seo_description || post.excerpt || '';
 
-    let message = template
+    const message = template
       ? template
           .replace(/{title}/g, title)
           .replace(/{excerpt}/g, excerpt)
           .replace(/{url}/g, postUrl)
       : `🎁 ${title}\n\n${excerpt}\n\n👉 Descubre todas las ideas y detalles aquí: ${postUrl}`;
 
-    // Keep the article URL in the message text so it remains visible in the
-    // post body. Sending the same URL again as the separate `link` parameter
-    // can make Facebook render it only as an attachment preview.
     const params = new URLSearchParams({ message });
 
     const res = await fetch(`${FB_GRAPH_API}/${cleanId}/feed`, {

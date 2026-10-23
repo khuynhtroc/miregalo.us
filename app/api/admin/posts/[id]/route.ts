@@ -55,7 +55,7 @@ export async function PUT(
         console.warn('[Auto Indexing] Error triggering on post update:', err);
       });
       if (existing?.status !== 'published') {
-        schedulePublishedPostAutoShare(updated, 'admin post publication');
+        await schedulePublishedPostAutoShare(updated, 'admin post publication');
       }
     }
 

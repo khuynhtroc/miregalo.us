@@ -12,6 +12,9 @@
     "NEXT_PUBLIC_SITE_URL": "https://www.miregalo.us",
     "DB_DRIVER": "supabase"
   },
+  "triggers": {
+    "crons": ["*/15 * * * *"]
+  },
   "routes": [
     { "pattern": "miregalo.us/*", "zone_name": "miregalo.us" },
     { "pattern": "www.miregalo.us/*", "zone_name": "miregalo.us" }
