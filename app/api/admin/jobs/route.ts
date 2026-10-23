@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { enqueueContentJob, processContentJob } from '@/lib/ai/job-queue';
 import { generateMultiStageArticle } from '@/lib/ai/multi-stage-generator';
+import { schedulePublishedPostAutoShare } from '@/lib/social/schedule-auto-share';
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -63,6 +64,9 @@ export async function POST(req: NextRequest) {
         affiliate_tag: body.affiliate_tag || 'miregalo26-20',
         publish: body.publish ?? true,
       });
+      if (result.post?.status === 'published') {
+        schedulePublishedPostAutoShare(result.post, 'admin multi-stage generation');
+      }
       return NextResponse.json({ success: true, result }, { status: 201 });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -85,6 +89,9 @@ export async function POST(req: NextRequest) {
 
   if (body.autoProcess !== false) {
     const result = await processContentJob(job.id);
+    if (result.success && result.generatedPost?.status === 'published') {
+      schedulePublishedPostAutoShare(result.generatedPost, 'admin content job');
+    }
     return NextResponse.json(
       {
         job: result.job,

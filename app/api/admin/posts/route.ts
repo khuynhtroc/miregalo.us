@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import type { Post } from '@/lib/types';
 import { autoSubmitPostIndexing } from '@/lib/indexing/google';
+import { schedulePublishedPostAutoShare } from '@/lib/social/schedule-auto-share';
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
       autoSubmitPostIndexing(post.slug, 'post').catch((err) => {
         console.warn('[Auto Indexing] Error triggering on post creation:', err);
       });
+      schedulePublishedPostAutoShare(post, 'admin post creation');
     }
 
     return NextResponse.json(post, { status: 201 });

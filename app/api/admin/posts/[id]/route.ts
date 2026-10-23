@@ -5,6 +5,7 @@ import { getSession } from '@/lib/auth';
 import type { Post } from '@/lib/types';
 import { autoSubmitPostIndexing, submitUrlToGoogle } from '@/lib/indexing/google';
 import { SITE_URL } from '@/lib/urls';
+import { schedulePublishedPostAutoShare } from '@/lib/social/schedule-auto-share';
 
 export async function GET(
   _req: NextRequest,
@@ -30,6 +31,7 @@ export async function PUT(
   const { id } = await params;
   try {
     const patch = (await req.json()) as Partial<Post>;
+    const existing = await db.findOne('posts', { id });
 
     if (patch.status === 'published' && !patch.published_at) {
       patch.published_at = new Date().toISOString();
@@ -52,6 +54,9 @@ export async function PUT(
       autoSubmitPostIndexing(updated.slug, 'post').catch((err) => {
         console.warn('[Auto Indexing] Error triggering on post update:', err);
       });
+      if (existing?.status !== 'published') {
+        schedulePublishedPostAutoShare(updated, 'admin post publication');
+      }
     }
 
     return NextResponse.json(updated);

@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth';
 import { processContentJob } from '@/lib/ai/job-queue';
 import { generateMultiStageArticle } from '@/lib/ai/multi-stage-generator';
 import { autoSubmitPostIndexing } from '@/lib/indexing/google';
+import { schedulePublishedPostAutoShare } from '@/lib/social/schedule-auto-share';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
@@ -82,6 +83,7 @@ export async function POST(_req: NextRequest, { params }: Context) {
     if (plannedPost.slug) {
       autoSubmitPostIndexing(plannedPost.slug, 'post').catch(() => {});
     }
+    schedulePublishedPostAutoShare({ ...plannedPost, status: 'published', published_at: nowIso }, 'admin scheduled post');
 
     return NextResponse.json({
       success: true,
@@ -133,6 +135,9 @@ export async function POST(_req: NextRequest, { params }: Context) {
       if (res.post?.slug) {
         autoSubmitPostIndexing(res.post.slug, 'post').catch(() => {});
       }
+      if (res.post?.status === 'published') {
+        schedulePublishedPostAutoShare(res.post, 'admin job generation');
+      }
 
       return NextResponse.json({
         success: true,
@@ -158,5 +163,8 @@ export async function POST(_req: NextRequest, { params }: Context) {
 
   // Fallback to legacy processContentJob
   const result = await processContentJob(id);
+  if (result.success && result.generatedPost?.status === 'published') {
+    schedulePublishedPostAutoShare(result.generatedPost, 'admin legacy content job');
+  }
   return NextResponse.json(result);
 }
