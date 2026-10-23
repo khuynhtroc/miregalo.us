@@ -27,7 +27,7 @@ export function SocialAutoShareManager() {
   const [connectingX, setConnectingX] = useState(false);
   const [connectingPinterest, setConnectingPinterest] = useState(false);
   const [backfillStartAt, setBackfillStartAt] = useState(suggestedBackfillStart);
-  const [backfillInterval, setBackfillInterval] = useState(1440);
+  const [backfillInterval, setBackfillInterval] = useState(240);
   const [backfillBusy, setBackfillBusy] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [testingChannel, setTestingChannel] = useState<string | null>(null);
@@ -615,6 +615,7 @@ export function SocialAutoShareManager() {
             >
               <option value={60}>Mỗi 1 giờ</option>
               <option value={180}>Mỗi 3 giờ</option>
+              <option value={240}>Mỗi 4 giờ</option>
               <option value={360}>Mỗi 6 giờ</option>
               <option value={720}>Mỗi 12 giờ</option>
               <option value={1440}>Mỗi 24 giờ</option>
@@ -685,7 +686,7 @@ export function SocialAutoShareManager() {
           )}
         </div>
         <p className="form-hint" style={{ marginTop: '12px' }}>
-          Bài không được đăng ngay khi tạo hàng đợi. Lịch bài cũ không phụ thuộc công tắc “Tự động chia sẻ bài mới”, nhưng cần Page ID và Page Access Token hợp lệ. Cấu hình Cloudflare kiểm tra mỗi 5 phút; cấu hình Vercel hiện tại kiểm tra mỗi ngày. Máy chủ cần có bí mật CRON_SECRET để cho phép lịch chạy. Bài đã đăng thủ công trước đó không thể tự nhận diện và có thể bị đăng lại.
+          Bài không được đăng ngay khi tạo hàng đợi. Lịch bài cũ không phụ thuộc công tắc “Tự động chia sẻ bài mới”, nhưng cần Page ID và Page Access Token hợp lệ. Cloudflare Worker đã deploy sẽ kiểm tra mỗi 5 phút. Nếu không dùng Worker, Vercel hiện chỉ kiểm tra mỗi ngày; có thể dùng cron-job.org gọi GET https://www.miregalo.us/api/cron/social-backfill/ mỗi 5 phút với header Authorization: Bearer CRON_SECRET. Máy chủ phải có CRON_SECRET. Bài đã đăng thủ công trước đó không thể tự nhận diện và có thể bị đăng lại.
         </p>
       </div>
 

@@ -22,7 +22,7 @@ export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
     queue_id: null,
     post_ids: [],
     cursor: 0,
-    interval_minutes: 1440,
+    interval_minutes: 240,
     start_at: null,
     next_post_at: null,
     started_at: null,

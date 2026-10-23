@@ -7,7 +7,7 @@ import type { FacebookBackfillState } from '@/lib/social/types';
 
 export const dynamic = 'force-dynamic';
 
-const ALLOWED_INTERVALS = new Set([60, 180, 360, 720, 1440]);
+const ALLOWED_INTERVALS = new Set([60, 180, 240, 360, 720, 1440]);
 
 export async function POST(req: NextRequest) {
   const session = await getSession();
@@ -20,6 +20,9 @@ export async function POST(req: NextRequest) {
     const now = new Date();
 
     if (action === 'start') {
+      if (!process.env.CRON_SECRET) {
+        return NextResponse.json({ error: 'Máy chủ chưa cấu hình CRON_SECRET nên chưa thể chạy lịch tự động. Hãy cấu hình CRON_SECRET và deploy Cloudflare Worker hoặc cron-job.org trước.' }, { status: 503 });
+      }
       if (current.status === 'scheduled' || (current.lock_until && new Date(current.lock_until) > now)) {
         return NextResponse.json({ error: 'Hàng đợi đang chạy hoặc đang xử lý một bài. Hãy tạm dừng trước khi tạo hàng đợi mới.' }, { status: 409 });
       }
