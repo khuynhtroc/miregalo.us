@@ -394,7 +394,7 @@ export function SocialAutoShareManager() {
                 onChange={(e) => setSettings({ ...settings, auto_share_enabled: e.target.checked })}
                 style={{ width: '18px', height: '18px', cursor: 'pointer' }}
               />
-              <span>Bật Tự Động Chia Sẻ</span>
+              <span>Tự động chia sẻ bài mới</span>
             </label>
 
             <button
@@ -498,7 +498,7 @@ export function SocialAutoShareManager() {
                 Facebook Fanpage
               </h3>
               <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
-                Tự động đăng link bài viết kèm ảnh đại diện lên trang Fanpage
+                Tự động chia sẻ bài mới lên Fanpage khi bài được xuất bản
               </p>
             </div>
           </div>
@@ -510,7 +510,7 @@ export function SocialAutoShareManager() {
               onChange={(e) => setSettings({ ...settings, facebook_enabled: e.target.checked })}
               style={{ width: '18px', height: '18px' }}
             />
-            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Chia sẻ bài mới</span>
           </label>
         </div>
 
@@ -588,7 +588,7 @@ export function SocialAutoShareManager() {
               📚 Đăng lại bài cũ lên Facebook theo lịch
             </h3>
             <p style={{ margin: 0, fontSize: '0.84rem', color: '#53627c', lineHeight: 1.55 }}>
-              Tạo hàng đợi từ các bài hướng dẫn quà tặng và bài blog đã xuất bản, đăng bài cũ nhất trước rồi lần lượt đến bài mới hơn. Mỗi bài chỉ được gửi một lần trong hàng đợi này.
+              Tạo hàng đợi riêng từ các bài hướng dẫn quà tặng và bài blog đã xuất bản, đăng bài cũ nhất trước rồi lần lượt đến bài mới hơn. Lịch này hoạt động độc lập với công tắc chia sẻ bài mới.
             </p>
           </div>
           <span style={{ padding: '5px 10px', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 700, background: '#e7f0ff', color: '#175cd3' }}>
@@ -685,7 +685,7 @@ export function SocialAutoShareManager() {
           )}
         </div>
         <p className="form-hint" style={{ marginTop: '12px' }}>
-          Bài không được đăng ngay khi tạo hàng đợi. Cấu hình Cloudflare kiểm tra mỗi 5 phút; cấu hình Vercel hiện tại kiểm tra mỗi ngày. Máy chủ cần có bí mật CRON_SECRET để cho phép lịch chạy. Hãy lưu Page ID, token và mẫu bài đăng trước khi bắt đầu. Bài đã đăng thủ công trước đó không thể tự nhận diện và có thể bị đăng lại.
+          Bài không được đăng ngay khi tạo hàng đợi. Lịch bài cũ không phụ thuộc công tắc “Tự động chia sẻ bài mới”, nhưng cần Page ID và Page Access Token hợp lệ. Cấu hình Cloudflare kiểm tra mỗi 5 phút; cấu hình Vercel hiện tại kiểm tra mỗi ngày. Máy chủ cần có bí mật CRON_SECRET để cho phép lịch chạy. Bài đã đăng thủ công trước đó không thể tự nhận diện và có thể bị đăng lại.
         </p>
       </div>
 

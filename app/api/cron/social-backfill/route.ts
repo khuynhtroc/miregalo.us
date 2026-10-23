@@ -41,11 +41,11 @@ async function runBackfill(req: NextRequest) {
     if (state.lock_until && new Date(state.lock_until) > now) {
       return NextResponse.json({ status: state.status, message: 'A backfill post is already being processed.' });
     }
-    if (!settings.facebook_enabled || !settings.facebook_page_id || !settings.facebook_access_token) {
+    if (!settings.facebook_page_id || !settings.facebook_access_token) {
       const failedState: FacebookBackfillState = {
         ...state,
         status: 'error',
-        last_error: 'Facebook is disabled or the Page ID / Page Access Token is missing. Save valid Facebook settings, then resume the queue.',
+        last_error: 'Facebook Page ID or Page Access Token is missing. Save valid credentials, then resume the queue.',
         lock_id: null,
         lock_until: null,
       };

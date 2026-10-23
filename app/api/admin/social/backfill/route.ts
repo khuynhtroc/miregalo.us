@@ -26,8 +26,8 @@ export async function POST(req: NextRequest) {
       if (current.status === 'paused' || current.status === 'error') {
         return NextResponse.json({ error: 'Hàng đợi đang tạm dừng hoặc bị lỗi. Hãy tiếp tục hàng đợi hiện tại hoặc xóa nó trước.' }, { status: 409 });
       }
-      if (!settings.facebook_enabled || !settings.facebook_page_id || !settings.facebook_access_token) {
-        return NextResponse.json({ error: 'Hãy bật Facebook, nhập Page ID và Page Access Token rồi lưu cấu hình trước.' }, { status: 400 });
+      if (!settings.facebook_page_id || !settings.facebook_access_token) {
+        return NextResponse.json({ error: 'Nhập Page ID và Page Access Token rồi lưu cấu hình trước khi tạo hàng đợi bài cũ.' }, { status: 400 });
       }
       const interval = Number(interval_minutes);
       if (!ALLOWED_INTERVALS.has(interval)) {
