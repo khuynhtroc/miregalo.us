@@ -30,6 +30,7 @@ export function buildMetadata(s: SiteSettings, m: MetaInput): Metadata {
   const url = absUrl(m.path);
   const canonical = m.canonical ? absUrl(m.canonical) : url;
   const image = m.image || s.default_og_image || undefined;
+  const ogLocale = s.locale && s.locale.includes('_') ? s.locale : 'es_ES';
   return {
     title: { absolute: m.title },
     description: m.description,
@@ -44,7 +45,7 @@ export function buildMetadata(s: SiteSettings, m: MetaInput): Metadata {
       description: m.description,
       url: canonical,
       siteName: s.site_name,
-      locale: s.locale,
+      locale: ogLocale,
       ...(image ? { images: [{ url: absUrl(image) }] } : {}),
       ...(m.type === 'article'
         ? { publishedTime: m.publishedTime ?? undefined, modifiedTime: m.modifiedTime ?? undefined }
@@ -60,12 +61,17 @@ export function buildMetadata(s: SiteSettings, m: MetaInput): Metadata {
 }
 
 export function postMetadata(s: SiteSettings, p: Post): Metadata {
+  const fallbackImg =
+    p.og_image ||
+    p.hero_image ||
+    p.items?.find((it) => it?.image)?.image ||
+    p.content_html?.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1];
   return buildMetadata(s, {
     title: p.seo_title || pageTitle(p.title, s),
     description: p.seo_description || p.excerpt || stripHtml(p.intro_html || p.content_html).slice(0, 160),
     path: postPath(p),
     type: p.type === 'page' ? 'website' : 'article',
-    image: p.og_image || p.hero_image,
+    image: fallbackImg,
     robots: p.robots,
     canonical: p.canonical_url,
     publishedTime: p.published_at,

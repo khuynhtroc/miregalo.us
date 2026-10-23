@@ -222,7 +222,18 @@ export async function shareToFacebook(
           .replace(/{url}/g, postUrl)
       : `🎁 ${title}\n\n${excerpt}\n\n👉 Descubre todas las ideas y detalles aquí: ${postUrl}`;
 
-    const params = new URLSearchParams({ message });
+    // Warm Facebook's OpenGraph cache so the first share of an older URL always renders its og:image
+    try {
+      await fetch(`${FB_GRAPH_API}/?id=${encodeURIComponent(postUrl)}&scrape=true`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${cleanToken}` },
+      });
+    } catch {}
+
+    const params = new URLSearchParams({
+      message,
+      link: postUrl,
+    });
 
     const res = await fetch(`${FB_GRAPH_API}/${cleanId}/feed`, {
       method: 'POST',

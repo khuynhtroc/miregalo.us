@@ -147,7 +147,19 @@ export async function executeFacebookBackfillStep(options?: {
   let post: Post | null = null;
   while (cursor < lockedState.post_ids.length) {
     const candidate = await db.findOne('posts', { id: lockedState.post_ids[cursor] });
-    if (candidate && candidate.status === 'published' && (candidate.type === 'gift' || candidate.type === 'blog')) {
+    const hasImage = Boolean(
+      candidate &&
+        (candidate.hero_image ||
+          candidate.og_image ||
+          candidate.items?.some((it: any) => it?.image) ||
+          /<img[^>]+src=/i.test(candidate.content_html || ''))
+    );
+    if (
+      candidate &&
+      candidate.status === 'published' &&
+      (candidate.type === 'gift' || candidate.type === 'blog') &&
+      hasImage
+    ) {
       post = candidate;
       break;
     }
