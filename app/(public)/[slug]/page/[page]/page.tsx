@@ -87,7 +87,7 @@ export default async function CategoryPaginationPage({ params }: PageProps) {
       ? [{ name: category.group.charAt(0).toUpperCase() + category.group.slice(1), path: `/${category.group}/` }]
       : []),
     { name: category.name, path: `/${category.slug}/` },
-    { name: `Página ${page}` },
+    { name: `Página ${page}`, path: `/${category.slug}/page/${page}/` },
   ];
 
   return (

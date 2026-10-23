@@ -2,14 +2,14 @@ import { db } from '@/lib/db';
 import { SITE_URL, postPath } from '@/lib/urls';
 import type { Post } from '@/lib/types';
 
-interface PinterestBoard {
+export interface PinterestBoard {
   id: string;
   name: string;
   description?: string;
   privacy?: string;
 }
 
-interface PinterestPinResult {
+export interface PinterestPinResult {
   id: string;
   title: string;
   link: string;
@@ -17,7 +17,22 @@ interface PinterestPinResult {
   created_at: string;
 }
 
+export interface PinterestSyncState {
+  pinned_post_ids: string[];
+  history: Array<{
+    post_id: string;
+    slug: string;
+    pin_id: string;
+    board: string;
+    pinned_at: string;
+  }>;
+  last_sync_at?: string;
+  total_synced?: number;
+}
+
 const PINTEREST_API_BASE = 'https://api.pinterest.com/v5';
+const DEFAULT_BOARD = 'Ideas de Regalos';
+const SYNC_STATE_KEY = 'pinterest_sync_state';
 
 type PinterestOAuthSettings = {
   pinterest_access_token?: string;
@@ -105,19 +120,22 @@ export async function getValidPinterestAccessToken(token?: string): Promise<stri
 export async function getPinterestToken(): Promise<string | null> {
   try {
     const socialSettings = await db.getSetting<PinterestOAuthSettings>('social_settings');
-    if (socialSettings?.pinterest_access_token) {
+    if (socialSettings?.pinterest_access_token?.trim()) {
       return await getValidPinterestAccessToken(socialSettings.pinterest_access_token);
     }
   } catch {}
-  if (process.env.PINTEREST_ACCESS_TOKEN) {
+
+  if (process.env.PINTEREST_ACCESS_TOKEN?.trim()) {
     return process.env.PINTEREST_ACCESS_TOKEN.trim();
   }
+
   try {
     const siteSettings = await db.getSetting<any>('site');
-    if (siteSettings?.pinterest_access_token) {
+    if (siteSettings?.pinterest_access_token?.trim()) {
       return siteSettings.pinterest_access_token.trim();
     }
   } catch {}
+
   return null;
 }
 
@@ -133,21 +151,61 @@ export async function listPinterestBoards(token: string): Promise<PinterestBoard
   }
 }
 
+/**
+ * Test Pinterest API Connection via /user_account and list boards
+ */
 export async function testPinterestConnection(token: string): Promise<{
   success: boolean;
+  username?: string;
+  account_type?: string;
+  profile_image?: string;
   boards_count?: number;
   sample_boards?: string[];
   error?: string;
 }> {
+  if (!token?.trim()) {
+    return { success: false, boards_count: 0, sample_boards: [], error: 'Token không được để trống' };
+  }
+
   try {
-    const boards = await requestPinterestBoards(token, 100);
+    const validToken = (await getValidPinterestAccessToken(token)) || token.trim();
+    const [boards, userRes] = await Promise.all([
+      requestPinterestBoards(validToken, 100),
+      fetch(`${PINTEREST_API_BASE}/user_account`, {
+        headers: {
+          Authorization: `Bearer ${validToken}`,
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+      }).catch(() => null),
+    ]);
+
+    let username: string | undefined;
+    let accountType: string | undefined;
+    let profileImage: string | undefined;
+
+    if (userRes && userRes.ok) {
+      const userData = await userRes.json().catch(() => ({}));
+      username = userData.username || userData.business_name;
+      accountType = userData.account_type;
+      profileImage = userData.profile_image;
+    }
+
     return {
       success: true,
+      username,
+      account_type: accountType,
+      profile_image: profileImage,
       boards_count: boards.length,
       sample_boards: boards.slice(0, 5).map((board) => board.name),
     };
   } catch (err: any) {
-    return { success: false, error: err?.message || 'Không thể kiểm tra Pinterest Access Token' };
+    return {
+      success: false,
+      boards_count: 0,
+      sample_boards: [],
+      error: err?.message || 'Không thể kiểm tra Pinterest Access Token',
+    };
   }
 }
 
@@ -174,7 +232,7 @@ export async function getOrCreatePinterestBoard(
     const res = await fetch(`${PINTEREST_API_BASE}/boards`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token.trim()}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -187,6 +245,9 @@ export async function getOrCreatePinterestBoard(
     if (!res.ok) {
       const errText = await res.json().catch(() => ({}));
       console.warn(`[Pinterest] Error creating board "${cleanName}":`, errText);
+      if (existingBoards[0]?.id) {
+        return existingBoards[0].id;
+      }
       throw new Error(formatPinterestApiError(res.status, errText, `Không thể tạo Pinterest board "${cleanName}"`));
     }
 
@@ -200,40 +261,85 @@ export async function getOrCreatePinterestBoard(
 }
 
 /**
+ * Smart board resolver based on post taxonomy, type and focus keywords
+ */
+export function resolveBoardForPost(post: Partial<Post>, fallbackBoard = DEFAULT_BOARD): string {
+  const title = (post.title || '').toLowerCase();
+  const slug = (post.slug || '').toLowerCase();
+  const focus = (post.focus_keyword || '').toLowerCase();
+
+  if (title.includes('halloween') || slug.includes('halloween') || focus.includes('halloween')) {
+    return 'Regalos Halloween 2026';
+  }
+
+  if (post.type === 'blog') {
+    if (title.includes('tendencia') || title.includes('noticia') || title.includes('2026')) {
+      return 'Tendencias y Novedades de Regalos';
+    }
+    return 'Blog e Inspiración Miregalo';
+  }
+
+  if (title.includes('novio') || title.includes('pareja') || title.includes('aniversario') || title.includes('esposo')) {
+    return 'Regalos para Parejas y Novios';
+  }
+  if (title.includes('mama') || title.includes('madre') || title.includes('mujer') || title.includes('chica')) {
+    return 'Regalos para Mujeres y Mamá';
+  }
+  if (title.includes('papa') || title.includes('padre') || title.includes('hombre')) {
+    return 'Regalos para Hombres y Papá';
+  }
+  if (title.includes('navidad') || title.includes('reyes')) {
+    return 'Regalos de Navidad';
+  }
+  if (title.includes('cumpleaños')) {
+    return 'Regalos de Cumpleaños';
+  }
+
+  return fallbackBoard;
+}
+
+/**
  * Publish a single Pin to Pinterest
  */
 export async function publishPostToPinterest(
   token: string,
   post: Post,
-  boardName: string
+  boardName?: string
 ): Promise<PinterestPinResult | null> {
+  const targetBoardName = boardName || resolveBoardForPost(post);
   const boardId = await getOrCreatePinterestBoard(
     token,
-    boardName,
-    `Las mejores recomendaciones y guías de compra para ${boardName} en Miregalo.us.`
+    targetBoardName,
+    `Las mejores recomendaciones y guías de compra para ${targetBoardName} en Miregalo.us.`
   );
 
   if (!boardId) {
-    throw new Error(`Could not find or create Pinterest board for "${boardName}"`);
+    throw new Error(`Could not find or create Pinterest board for "${targetBoardName}"`);
   }
 
   const postUrl = `${SITE_URL}${postPath(post)}`;
   const title = (post.title || 'Guía de Regalos').slice(0, 100);
-  const description = (
-    post.seo_description ||
-    post.excerpt ||
-    'Descubre las mejores recomendaciones y ofertas seleccionadas por Miregalo.us.'
-  ).slice(0, 500);
 
-  const heroImage = post.hero_image?.startsWith('http')
-    ? post.hero_image
-    : `${SITE_URL}${post.hero_image?.startsWith('/') ? '' : '/'}${post.hero_image || 'images/miregalo-logo.png'}`;
+  // Format description with hashtags (max 500 chars)
+  const baseDesc = post.seo_description || post.excerpt || 'Descubre las mejores recomendaciones e ideas de regalos seleccionadas por Miregalo.us.';
+  const hashtags = '\n\n#regalos #ideaspararegalar #miregalo #guíaderegalos';
+  const maxDescLen = 500 - hashtags.length;
+  const description = `${baseDesc.slice(0, maxDescLen).trim()}${hashtags}`;
 
-  const payload = {
+  // Ensure absolute HTTPS Hero Image URL
+  let heroImage = post.hero_image?.trim() || '';
+  if (!heroImage) {
+    heroImage = `${SITE_URL}/images/miregalo-logo-fullsize.png`;
+  } else if (!heroImage.startsWith('http://') && !heroImage.startsWith('https://')) {
+    heroImage = `${SITE_URL}${heroImage.startsWith('/') ? '' : '/'}${heroImage}`;
+  }
+
+  const payload: Record<string, any> = {
     board_id: boardId,
     title,
     description,
     link: postUrl,
+    alt_text: (post.hero_alt || post.title || 'Miregalo').slice(0, 500),
     media_source: {
       source_type: 'image_url',
       url: heroImage,
@@ -243,7 +349,7 @@ export async function publishPostToPinterest(
   const res = await fetch(`${PINTEREST_API_BASE}/pins`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token.trim()}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),
@@ -254,102 +360,176 @@ export async function publishPostToPinterest(
     throw new Error(formatPinterestApiError(res.status, errBody, 'Không thể tạo Pin trên Pinterest'));
   }
 
-  const result = await res.json();
-  console.log(`[Pinterest] Successfully pinned post "${post.title}" to board "${boardName}" (Pin ID: ${result.id})`);
+  const result: PinterestPinResult = await res.json();
+  console.log(`[Pinterest] Successfully pinned post "${post.title}" to board "${targetBoardName}" (Pin ID: ${result.id})`);
+
+  // Record into persistent sync state
+  await recordPinnedPost(post.id, post.slug, result.id, targetBoardName);
+
   return result;
 }
 
 /**
- * Worker: Find the oldest unpinned article and pin it to its corresponding URL Map board
+ * Retrieve persistent Pinterest sync state from DB settings
  */
-export async function pinNextOldestPost(): Promise<{
+export async function getPinterestSyncState(): Promise<PinterestSyncState> {
+  try {
+    const state = await db.getSetting<PinterestSyncState>(SYNC_STATE_KEY);
+    if (state && Array.isArray(state.pinned_post_ids)) {
+      return state;
+    }
+  } catch {}
+
+  return {
+    pinned_post_ids: [],
+    history: [],
+    total_synced: 0,
+  };
+}
+
+/**
+ * Record a newly pinned post in persistent settings
+ */
+export async function recordPinnedPost(
+  postId: string,
+  slug: string,
+  pinId: string,
+  board: string
+): Promise<void> {
+  try {
+    const current = await getPinterestSyncState();
+    if (!current.pinned_post_ids.includes(postId)) {
+      current.pinned_post_ids.push(postId);
+      current.history.unshift({
+        post_id: postId,
+        slug,
+        pin_id: pinId,
+        board,
+        pinned_at: new Date().toISOString(),
+      });
+      if (current.history.length > 500) {
+        current.history = current.history.slice(0, 500);
+      }
+      current.last_sync_at = new Date().toISOString();
+      current.total_synced = current.pinned_post_ids.length;
+      await db.setSetting(SYNC_STATE_KEY, current);
+    }
+  } catch (err) {
+    console.warn('[Pinterest] Failed to update sync state in DB:', err);
+  }
+}
+
+/**
+ * Batch Worker: Pin up to `limit` unpinned published posts to Pinterest
+ */
+export async function syncUnpinnedPostsToPinterest(limit = 5): Promise<{
   success: boolean;
   message: string;
-  post_id?: string;
-  pin_id?: string;
-  board?: string;
+  total_published: number;
+  total_pinned: number;
+  remaining: number;
+  pinned_this_run: number;
+  details: Array<{
+    post_id: string;
+    slug: string;
+    title: string;
+    board: string;
+    pin_id?: string;
+    error?: string;
+  }>;
 }> {
   const token = await getPinterestToken();
   if (!token) {
     return {
       success: false,
-      message: 'Pinterest Access Token not configured (PINTEREST_ACCESS_TOKEN)',
+      message: 'Pinterest Access Token chưa được cấu hình (PINTEREST_ACCESS_TOKEN)',
+      total_published: 0,
+      total_pinned: 0,
+      remaining: 0,
+      pinned_this_run: 0,
+      details: [],
     };
   }
 
-  // 1. Load catalog URLs to map clusters/categories to board names
-  const [postsRes, catalogUrlsRes, categoriesRes] = await Promise.all([
-    db.find('posts', { limit: 2000, order: [{ field: 'published_at', asc: true }] }),
-    db.find('catalog_urls', { limit: 200 }),
-    db.find('categories', { limit: 100 }),
+  const [{ rows: allPosts }, syncState] = await Promise.all([
+    db.find('posts', {
+      eq: { status: 'published' },
+      order: [{ field: 'published_at', asc: true }],
+      limit: 1000,
+    }),
+    getPinterestSyncState(),
   ]);
 
-  const catMap = new Map(categoriesRes.rows.map((c: any) => [c.id, c.name]));
-  const catalogMap = new Map(catalogUrlsRes.rows.map((u: any) => [u.id, u.page_title]));
+  const pinnedSet = new Set(syncState.pinned_post_ids);
+  const unpinned = allPosts.filter((p: any) => !pinnedSet.has(p.id));
 
-  // 2. Filter published posts that have not yet been pinned to Pinterest
-  const unpinnedPosts = postsRes.rows.filter((p: any) => {
-    if (p.status !== 'published') return false;
-    // Skip if already pinned
-    if (p.pinterest_pinned || p.metadata?.pinterest_pinned) return false;
-    return true;
-  });
-
-  if (unpinnedPosts.length === 0) {
+  if (unpinned.length === 0) {
     return {
       success: true,
-      message: 'All published posts have already been pinned to Pinterest.',
+      message: 'Tất cả bài viết đã xuất bản đều đã được ghim lên Pinterest!',
+      total_published: allPosts.length,
+      total_pinned: pinnedSet.size,
+      remaining: 0,
+      pinned_this_run: 0,
+      details: [],
     };
   }
 
-  // 3. Pick the oldest unpinned post (FIFO)
-  const targetPost = unpinnedPosts[0];
+  const batch = unpinned.slice(0, Math.max(1, Math.min(limit, 20)));
+  const details: any[] = [];
+  let successCount = 0;
 
-  // 4. Resolve the best matching Board name according to URL MAP / Taxonomy
-  let boardName = 'Ideas de Regalos';
+  for (const post of batch) {
+    const targetBoard = resolveBoardForPost(post);
+    try {
+      const pinResult = await publishPostToPinterest(token, post as Post, targetBoard);
+      details.push({
+        post_id: post.id,
+        slug: post.slug,
+        title: post.title,
+        board: targetBoard,
+        pin_id: pinResult?.id,
+      });
+      successCount++;
+    } catch (err: any) {
+      details.push({
+        post_id: post.id,
+        slug: post.slug,
+        title: post.title,
+        board: targetBoard,
+        error: err?.message || String(err),
+      });
+    }
 
-  if (targetPost.primary_category_id && catMap.has(targetPost.primary_category_id)) {
-    boardName = `Regalos ${catMap.get(targetPost.primary_category_id)}`;
-  } else if (targetPost.category_ids?.length && catMap.has(targetPost.category_ids[0])) {
-    boardName = `Regalos ${catMap.get(targetPost.category_ids[0])}`;
-  } else if ((targetPost as any).cluster) {
-    boardName = `Regalos para ${(targetPost as any).cluster}`;
+    if (batch.length > 1) {
+      await new Promise((r) => setTimeout(r, 800));
+    }
   }
 
-  // Clean board name: remove duplicate words like "Regalos Regalos..."
-  boardName = boardName.replace(/^Regalos\s+para\s+Regalos/i, 'Regalos para');
-  boardName = boardName.replace(/^Regalos\s+Regalos/i, 'Regalos');
-  if (!boardName.toLowerCase().startsWith('regalos')) {
-    boardName = `Regalos: ${boardName}`;
-  }
+  const updatedState = await getPinterestSyncState();
 
-  // 5. Publish Pin via Pinterest API
-  try {
-    const pinRes = await publishPostToPinterest(token, targetPost, boardName);
+  return {
+    success: successCount > 0,
+    message: `Đã đồng bộ thành công ${successCount}/${batch.length} bài viết lên Pinterest.`,
+    total_published: allPosts.length,
+    total_pinned: updatedState.pinned_post_ids.length,
+    remaining: Math.max(0, allPosts.length - updatedState.pinned_post_ids.length),
+    pinned_this_run: successCount,
+    details,
+  };
+}
 
-    // 6. Mark post as pinned so it is never repeated
-    await db.update('posts', targetPost.id, {
-      pinterest_pinned: true,
-      pinterest_pin_id: pinRes?.id,
-      pinterest_board: boardName,
-      pinterest_pinned_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-
-    return {
-      success: true,
-      message: `Successfully pinned "${targetPost.title}" to board "${boardName}"`,
-      post_id: targetPost.id,
-      pin_id: pinRes?.id,
-      board: boardName,
-    };
-  } catch (err: any) {
-    console.error(`[Pinterest] Error pinning post ${targetPost.id}:`, err);
-    return {
-      success: false,
-      message: err.message || String(err),
-      post_id: targetPost.id,
-      board: boardName,
-    };
-  }
+/**
+ * Worker: Pin next oldest post (legacy backwards compatibility)
+ */
+export async function pinNextOldestPost() {
+  const result = await syncUnpinnedPostsToPinterest(1);
+  const first = result.details[0];
+  return {
+    success: result.pinned_this_run > 0,
+    message: result.message,
+    post_id: first?.post_id,
+    pin_id: first?.pin_id,
+    board: first?.board,
+  };
 }

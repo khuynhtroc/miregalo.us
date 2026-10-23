@@ -34,7 +34,7 @@ export default async function BlogIndexPage() {
   const totalPages = Math.ceil(total / perPage);
 
   const blogCategories = categories.filter((c) => c.group === 'blog');
-  const breadcrumbs = [{ name: 'Blog' }];
+  const breadcrumbs = [{ name: 'Inicio', path: '/' }, { name: 'Blog', path: '/blog/' }];
 
   return (
     <>

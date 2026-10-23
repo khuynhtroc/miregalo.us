@@ -174,14 +174,18 @@ export async function sharePostToAllChannels(
   }
 
   // 4. Pinterest
-  const shouldSharePinterest = options?.forceChannels?.includes('pinterest') || (settings.pinterest_enabled && settings.pinterest_access_token);
-  if (shouldSharePinterest) {
+  const activePinterestToken = (settings.pinterest_access_token || process.env.PINTEREST_ACCESS_TOKEN || '').trim();
+  const shouldSharePinterest =
+    options?.forceChannels?.includes('pinterest') ||
+    (settings.pinterest_enabled && Boolean(activePinterestToken));
+
+  if (shouldSharePinterest && activePinterestToken) {
     tasks.push(
       (async (): Promise<ChannelShareResult> => {
         const timestamp = new Date().toISOString();
         try {
-          const boardName = settings.pinterest_board_name || 'Ideas de Regalos';
-          const token = await getValidPinterestAccessToken(settings.pinterest_access_token);
+          const boardName = settings.pinterest_board_name?.trim() || undefined;
+          const token = await getValidPinterestAccessToken(activePinterestToken);
           if (!token) throw new Error('Pinterest Access Token chưa được cấu hình.');
           const pinRes = await publishPostToPinterest(token, post, boardName);
           if (pinRes) {
@@ -190,7 +194,7 @@ export async function sharePostToAllChannels(
               success: true,
               post_id: pinRes.id,
               url: `https://www.pinterest.com/pin/${pinRes.id}/`,
-              message: `Đã ghim lên board "${boardName}"`,
+              message: `Đã ghim lên Pinterest thành công`,
               timestamp,
             };
           }

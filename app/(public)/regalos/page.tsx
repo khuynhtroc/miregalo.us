@@ -50,7 +50,7 @@ export default async function RegalosSiloPage() {
     },
   ];
 
-  const crumbs = [{ name: 'Regalos', path: '/regalos/' }];
+  const crumbs = [{ name: 'Inicio', path: '/' }, { name: 'Regalos', path: '/regalos/' }];
 
   return (
     <>

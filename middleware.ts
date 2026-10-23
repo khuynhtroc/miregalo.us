@@ -14,6 +14,20 @@ const GONE_SLUGS = new Set([
 ]);
 
 export function middleware(req: NextRequest) {
+  const proto = req.headers.get('x-forwarded-proto');
+  const host = req.headers.get('host') || '';
+
+  // 1. Enforce HTTPS redirect
+  if (proto === 'http') {
+    const targetHost = host === 'miregalo.us' ? 'www.miregalo.us' : host;
+    return NextResponse.redirect(`https://${targetHost}${req.nextUrl.pathname}${req.nextUrl.search}`, 301);
+  }
+
+  // 2. Canonical apex domain -> www redirect
+  if (host === 'miregalo.us') {
+    return NextResponse.redirect(`https://www.miregalo.us${req.nextUrl.pathname}${req.nextUrl.search}`, 301);
+  }
+
   const parts = req.nextUrl.pathname.split('/').filter(Boolean);
   const last = parts[parts.length - 1]?.toLowerCase();
   if (last && GONE_SLUGS.has(last)) {

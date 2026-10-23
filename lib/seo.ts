@@ -162,16 +162,53 @@ export function faqSchema(faqs: FaqItem[]) {
   };
 }
 
-export function breadcrumbSchema(crumbs: { name: string; path?: string }[]) {
+export function breadcrumbSchema(
+  crumbs: { name: string; path?: string; url?: string }[],
+  currentPageFallbackPath?: string
+) {
+  if (!crumbs || crumbs.length === 0) {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Inicio',
+          item: absUrl('/'),
+        },
+      ],
+    };
+  }
+
+  // Prepend root home crumb if missing
+  const hasHome =
+    crumbs[0]?.path === '/' ||
+    (crumbs[0] as any)?.url === '/' ||
+    crumbs[0]?.name?.toLowerCase() === 'inicio';
+  const fullCrumbs = hasHome
+    ? crumbs
+    : [{ name: 'Inicio', path: '/' }, ...crumbs];
+
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: crumbs.map((c, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      name: c.name,
-      ...(c.path ? { item: absUrl(c.path) } : {}),
-    })),
+    itemListElement: fullCrumbs.map((c, i) => {
+      let rawPath = c.path || (c as any)?.url;
+      if (!rawPath && i === fullCrumbs.length - 1 && currentPageFallbackPath) {
+        rawPath = currentPageFallbackPath;
+      }
+      if (!rawPath) {
+        rawPath = '/';
+      }
+
+      return {
+        '@type': 'ListItem',
+        position: i + 1,
+        name: c.name || 'Página',
+        item: absUrl(rawPath),
+      };
+    }),
   };
 }
 

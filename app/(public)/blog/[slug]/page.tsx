@@ -46,7 +46,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const breadcrumbs = [
     { name: 'Blog', path: '/blog/' },
     ...(primaryCat ? [{ name: primaryCat.name, path: `/${primaryCat.slug}/` }] : []),
-    { name: post.title },
+    { name: post.title, path: `/blog/${post.slug}/` },
   ];
 
   return (

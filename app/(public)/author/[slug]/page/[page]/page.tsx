@@ -55,9 +55,9 @@ export default async function AuthorPaginationPage({ params }: PageProps) {
   if (page > totalPages && totalPages > 0) notFound();
 
   const breadcrumbs = [
-    { name: 'Autores' },
+    { name: 'Inicio', path: '/' },
     { name: author.name, path: `/author/${author.slug}/` },
-    { name: `Página ${page}` },
+    { name: `Página ${page}`, path: `/author/${author.slug}/page/${page}/` },
   ];
 
   return (

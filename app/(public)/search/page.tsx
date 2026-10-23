@@ -71,8 +71,8 @@ export default async function SearchPage({ searchParams }: PageProps) {
     .slice(0, 16);
 
   const breadcrumbs = [
-    { name: 'Inicio', url: '/' },
-    { name: 'Buscar' },
+    { name: 'Inicio', path: '/' },
+    { name: 'Buscar', path: '/search/' },
   ];
 
   return (

@@ -43,7 +43,7 @@ export default async function BlogPaginationPage({ params }: PageProps) {
 
   if (page > totalPages && totalPages > 0) notFound();
 
-  const breadcrumbs = [{ name: 'Blog', path: '/blog/' }, { name: `Página ${page}` }];
+  const breadcrumbs = [{ name: 'Inicio', path: '/' }, { name: 'Blog', path: '/blog/' }, { name: `Página ${page}`, path: `/blog/page/${page}/` }];
 
   return (
     <>

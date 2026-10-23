@@ -47,7 +47,7 @@ export default async function AuthorPage({ params }: PageProps) {
   });
   const totalPages = Math.ceil(total / perPage);
 
-  const breadcrumbs = [{ name: 'Autores' }, { name: author.name }];
+  const breadcrumbs = [{ name: 'Inicio', path: '/' }, { name: author.name, path: `/author/${author.slug}/` }];
 
   return (
     <>

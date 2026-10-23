@@ -67,7 +67,7 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
   }
 
   // Construct Breadcrumbs
-  const crumbs: Crumb[] = [{ name: 'Regalos', path: '/regalos/' }];
+  const crumbs: Crumb[] = [{ name: 'Inicio', path: '/' }, { name: 'Regalos', path: '/regalos/' }];
 
   if (segments.length === 1) {
     crumbs.push({ name: catalogUrl.page_title, path: catalogUrl.url });

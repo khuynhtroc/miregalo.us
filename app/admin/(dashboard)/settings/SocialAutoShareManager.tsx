@@ -260,8 +260,11 @@ export function SocialAutoShareManager() {
         if (channel === 'facebook' && data.page_name) successText += ` (Page: "${data.page_name}")`;
         if (channel === 'twitter' && data.username) successText += ` (Tài khoản: ${data.username})`;
         if (channel === 'medium' && data.username) successText += ` (Tác giả: @${data.username})`;
-        if (channel === 'pinterest' && data.boards_count) {
-          successText += ` (Tìm thấy ${data.boards_count} bảng: ${data.sample_boards?.join(', ')})`;
+        if (channel === 'pinterest') {
+          if (data.username) successText += ` (Tài khoản: @${data.username})`;
+          if (typeof data.boards_count === 'number') {
+            successText += ` · ${data.boards_count} bảng${data.sample_boards?.length ? `: ${data.sample_boards.join(', ')}` : ''}`;
+          }
         }
         if (channel === 'webhook') successText += ' (Webhook phản hồi 200 OK)';
 
@@ -332,6 +335,48 @@ export function SocialAutoShareManager() {
         channel,
         success: false,
         message: '❌ Lỗi kết nối khi gửi yêu cầu đăng thử',
+      });
+    } finally {
+      setTestingChannel(null);
+    }
+  };
+
+  const handleBatchSyncPinterest = async () => {
+    setTestingChannel('pinterest_sync');
+    setTestResult(null);
+    try {
+      if (settings) {
+        await fetch('/api/admin/social/settings/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(settings),
+        });
+      }
+
+      const res = await fetch('/api/admin/social/pinterest/sync/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ limit: 5 }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTestResult({
+          channel: 'pinterest',
+          success: true,
+          message: `✅ ${data.message} (Đã ghim: ${data.total_pinned}/${data.total_published} · Còn lại: ${data.remaining})`,
+        });
+      } else {
+        setTestResult({
+          channel: 'pinterest',
+          success: false,
+          message: `❌ Đồng bộ thất bại: ${data.message || data.error || 'Có lỗi xảy ra'}`,
+        });
+      }
+    } catch {
+      setTestResult({
+        channel: 'pinterest',
+        success: false,
+        message: '❌ Lỗi kết nối khi đồng bộ bài viết lên Pinterest',
       });
     } finally {
       setTestingChannel(null);
@@ -1094,7 +1139,7 @@ export function SocialAutoShareManager() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
           <button
             type="button"
             className="btn-secondary"
@@ -1123,6 +1168,15 @@ export function SocialAutoShareManager() {
             style={{ background: '#e60023' }}
           >
             {testingChannel === 'pinterest_post' ? 'Đang ghim thử...' : '🚀 Ghim thử bài mới nhất lên Pinterest'}
+          </button>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null || !settings.pinterest_access_token}
+            onClick={handleBatchSyncPinterest}
+            style={{ borderColor: '#e60023', color: '#e60023', fontWeight: 600 }}
+          >
+            {testingChannel === 'pinterest_sync' ? 'Đang đồng bộ...' : '🔄 Đồng bộ 5 bài tiếp theo chưa ghim'}
           </button>
         </div>
       </div>

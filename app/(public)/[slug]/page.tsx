@@ -148,7 +148,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
       ...(category.group !== 'hub'
         ? [{ name: category.group.charAt(0).toUpperCase() + category.group.slice(1), path: `/${category.group}/` }]
         : []),
-      { name: category.name },
+      { name: category.name, path: `/${category.slug}/` },
     ];
 
     return (
@@ -262,7 +262,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
       { slug: 'divulgacion-de-afiliados', title: 'Divulgación de Afiliados', icon: '⚖️' },
     ];
 
-    const breadcrumbs = [{ name: 'Inicio', path: '/' }, { name: post.title }];
+    const breadcrumbs = [{ name: 'Inicio', path: '/' }, { name: post.title, path: postPath(post) }];
 
     return (
       <>
@@ -403,7 +403,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
           { name: primaryCat.name, path: `/${primaryCat.slug}/` },
         ]
       : [{ name: 'Regalos', path: '/regalos/' }]),
-    { name: post.title },
+    { name: post.title, path: postPath(post) },
   ];
 
   return (
