@@ -4,6 +4,11 @@ import {
   testFacebookConnection,
   testTwitterConnection,
   testMediumConnection,
+  testTelegramConnection,
+  testBlueskyConnection,
+  testThreadsConnection,
+  testMastodonConnection,
+  testDiscordConnection,
   testSocialWebhook,
   getPinterestToken,
   testPinterestConnection,
@@ -47,11 +52,36 @@ export async function POST(req: NextRequest) {
       }
 
       if (channel === 'pinterest') {
-        const accessToken = credentials?.access_token || await getPinterestToken();
+        const accessToken = credentials?.access_token || (await getPinterestToken());
         if (!accessToken) {
           return NextResponse.json({ success: false, error: 'Chưa điền Pinterest Access Token' });
         }
         return NextResponse.json(await testPinterestConnection(accessToken));
+      }
+
+      if (channel === 'telegram') {
+        const { bot_token, chat_id } = credentials || {};
+        return NextResponse.json(await testTelegramConnection(bot_token, chat_id));
+      }
+
+      if (channel === 'bluesky') {
+        const { identifier, app_password } = credentials || {};
+        return NextResponse.json(await testBlueskyConnection(identifier, app_password));
+      }
+
+      if (channel === 'threads') {
+        const { user_id, access_token } = credentials || {};
+        return NextResponse.json(await testThreadsConnection(user_id, access_token));
+      }
+
+      if (channel === 'mastodon') {
+        const { instance_url, access_token } = credentials || {};
+        return NextResponse.json(await testMastodonConnection(instance_url, access_token));
+      }
+
+      if (channel === 'discord') {
+        const { webhook_url } = credentials || {};
+        return NextResponse.json(await testDiscordConnection(webhook_url));
       }
 
       if (channel === 'webhook') {
@@ -65,7 +95,6 @@ export async function POST(req: NextRequest) {
 
     // Action 2: Test Post Share (send sample or real post)
     if (action === 'test_post') {
-      // Find post or create sample post
       let postToShare: any = null;
       if (post_id) {
         postToShare = await db.findOne('posts', { id: post_id });

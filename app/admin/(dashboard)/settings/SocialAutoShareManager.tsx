@@ -268,6 +268,21 @@ export function SocialAutoShareManager() {
             successText += ` · ${data.boards_count} bảng${data.sample_boards?.length ? `: ${data.sample_boards.join(', ')}` : ''}`;
           }
         }
+        if (channel === 'telegram') {
+          successText += ` (Bot: @${data.bot_username || 'ok'} ➔ Channel: "${data.chat_title || ''}")`;
+        }
+        if (channel === 'bluesky' && data.handle) {
+          successText += ` (Bluesky: @${data.handle})`;
+        }
+        if (channel === 'threads' && data.username) {
+          successText += ` (Threads: @${data.username} · ID: ${data.user_id})`;
+        }
+        if (channel === 'mastodon' && data.username) {
+          successText += ` (Mastodon: ${data.username}@${data.instance || 'mastodon.social'})`;
+        }
+        if (channel === 'discord' && data.channel_name) {
+          successText += ` (Discord: ${data.channel_name})`;
+        }
         if (channel === 'webhook') successText += ' (Webhook phản hồi 200 OK)';
 
         setTestResult({
@@ -1225,7 +1240,490 @@ export function SocialAutoShareManager() {
         </div>
       </div>
 
-      {/* ── 5. WEBHOOK (MAKE.COM / ZAPIER / N8N) ──────── */}
+      {/* ── 5. TELEGRAM CHANNEL (BOT API) ────────────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#24A1DE',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.2rem',
+              }}
+            >
+              ✈️
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  Telegram Channel (Bot API)
+                </h3>
+                <span className="badge" style={{ background: '#e0f2fe', color: '#0369a1' }}>
+                  Token Vĩnh Viễn · Lấy trong 30 giây
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động đăng bài kèm ảnh lớn và link sang Telegram Channel (cả bài mới & lịch bài cũ 4 tiếng/bài)
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.telegram_enabled)}
+              onChange={(e) => setSettings({ ...settings, telegram_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Telegram Bot Token (Từ @BotFather)</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder="VD: 7482910482:AAH..."
+              value={settings.telegram_bot_token || ''}
+              onChange={(e) => setSettings({ ...settings, telegram_bot_token: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">Nhắn <code>/newbot</code> cho <code>@BotFather</code> trên Telegram để nhận Token vĩnh viễn</p>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Channel Username hoặc Chat ID</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="VD: @miregalo_us hoặc -1001234567890"
+              value={settings.telegram_chat_id || ''}
+              onChange={(e) => setSettings({ ...settings, telegram_chat_id: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">Thêm Bot vừa tạo làm Admin (Quản trị viên) của Channel với quyền Post Messages</p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('telegram', {
+                bot_token: settings.telegram_bot_token,
+                chat_id: settings.telegram_chat_id,
+              })
+            }
+          >
+            {testingChannel === 'telegram_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !settings.telegram_bot_token || !settings.telegram_chat_id}
+            onClick={() => handleTestPost('telegram')}
+            style={{ background: '#24A1DE' }}
+          >
+            {testingChannel === 'telegram_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên Telegram Channel'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 6. BLUESKY (AT PROTOCOL) ─────────────────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#0285FF',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.2rem',
+              }}
+            >
+              🦋
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  Bluesky (bsky.app)
+                </h3>
+                <span className="badge" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+                  Không Cần Duyệt App · Traffic Mỹ Cao
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động đăng bài kèm thẻ Link Card + ảnh Thumbnail lên Bluesky (chỉ cần Handle & App Password)
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.bluesky_enabled)}
+              onChange={(e) => setSettings({ ...settings, bluesky_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Bluesky Handle (hoặc Email)</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="VD: miregalo.bsky.social"
+              value={settings.bluesky_identifier || ''}
+              onChange={(e) => setSettings({ ...settings, bluesky_identifier: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">Tạo tài khoản tại <a href="https://bsky.app" target="_blank" rel="noreferrer">bsky.app</a></p>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">App Password (Mật khẩu ứng dụng)</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder="xxxx-xxxx-xxxx-xxxx"
+              value={settings.bluesky_app_password || ''}
+              onChange={(e) => setSettings({ ...settings, bluesky_app_password: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">Vào <code>Settings &gt; Privacy and security &gt; App Passwords</code> trên Bluesky để tạo mã</p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('bluesky', {
+                identifier: settings.bluesky_identifier,
+                app_password: settings.bluesky_app_password,
+              })
+            }
+          >
+            {testingChannel === 'bluesky_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !settings.bluesky_identifier || !settings.bluesky_app_password}
+            onClick={() => handleTestPost('bluesky')}
+            style={{ background: '#0285FF' }}
+          >
+            {testingChannel === 'bluesky_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên Bluesky'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 7. MASTODON (OPEN SOCIAL API) ────────────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#6364FF',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.1rem',
+              }}
+            >
+              🐘
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  Mastodon (mastodon.social)
+                </h3>
+                <span className="badge" style={{ background: '#eef2ff', color: '#4f46e5' }}>
+                  Token Vĩnh Viễn · Không Cần Duyệt
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động đăng bài công khai kèm khung ảnh OpenGraph lớn và hashtag lên Mastodon
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.mastodon_enabled)}
+              onChange={(e) => setSettings({ ...settings, mastodon_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Mastodon Server URL</label>
+            <input
+              className="form-input"
+              type="url"
+              placeholder="https://mastodon.social"
+              value={settings.mastodon_instance_url || 'https://mastodon.social'}
+              onChange={(e) => setSettings({ ...settings, mastodon_instance_url: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">Mặc định: <code>https://mastodon.social</code></p>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Access Token (Your access token)</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder="Dán Your access token từ mục Development..."
+              value={settings.mastodon_access_token || ''}
+              onChange={(e) => setSettings({ ...settings, mastodon_access_token: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">Vào <code>Preferences &gt; Development &gt; New application</code> để copy <code>Your access token</code> ngay lập tức</p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('mastodon', {
+                instance_url: settings.mastodon_instance_url || 'https://mastodon.social',
+                access_token: settings.mastodon_access_token,
+              })
+            }
+          >
+            {testingChannel === 'mastodon_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !settings.mastodon_access_token}
+            onClick={() => handleTestPost('mastodon')}
+            style={{ background: '#6364FF' }}
+          >
+            {testingChannel === 'mastodon_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên Mastodon'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 8. THREADS BY META (GRAPH API) ───────────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#101010',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.2rem',
+              }}
+            >
+              @
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  Threads by Meta
+                </h3>
+                <span className="badge" style={{ background: '#f3f4f6', color: '#111827' }}>
+                  Chung Meta Developer
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động đăng bài kèm thẻ Link Preview sang tài khoản Threads thông qua Meta Threads API
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.threads_enabled)}
+              onChange={(e) => setSettings({ ...settings, threads_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Threads User ID (Để trống sẽ tự động lấy từ Token)</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="Tự động nhận diện qua /me"
+              value={settings.threads_user_id || ''}
+              onChange={(e) => setSettings({ ...settings, threads_user_id: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Threads Access Token</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder="THQ..."
+              value={settings.threads_access_token || ''}
+              onChange={(e) => setSettings({ ...settings, threads_access_token: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">Cấp quyền <code>threads_basic</code> và <code>threads_content_publish</code> trong Meta App</p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('threads', {
+                user_id: settings.threads_user_id,
+                access_token: settings.threads_access_token,
+              })
+            }
+          >
+            {testingChannel === 'threads_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !settings.threads_access_token}
+            onClick={() => handleTestPost('threads')}
+            style={{ background: '#101010' }}
+          >
+            {testingChannel === 'threads_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên Threads'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 9. DISCORD CHANNEL WEBHOOK ───────────────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#5865F2',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.1rem',
+              }}
+            >
+              🎮
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  Discord Server Channel
+                </h3>
+                <span className="badge" style={{ background: '#eef2ff', color: '#4338ca' }}>
+                  Chỉ Cần 1 Link Webhook · Vĩnh Viễn
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động đăng thẻ Rich Embed kèm ảnh lớn sang kênh Discord
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.discord_enabled)}
+              onChange={(e) => setSettings({ ...settings, discord_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Discord Webhook URL</label>
+          <input
+            className="form-input"
+            type="url"
+            placeholder="https://discord.com/api/webhooks/..."
+            value={settings.discord_webhook_url || ''}
+            onChange={(e) => setSettings({ ...settings, discord_webhook_url: e.target.value })}
+            style={{ fontFamily: 'monospace' }}
+          />
+          <p className="form-hint">Vào <code>Edit Channel &gt; Integrations &gt; Webhooks &gt; New Webhook &gt; Copy Webhook URL</code></p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('discord', {
+                webhook_url: settings.discord_webhook_url,
+              })
+            }
+          >
+            {testingChannel === 'discord_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !settings.discord_webhook_url}
+            onClick={() => handleTestPost('discord')}
+            style={{ background: '#5865F2' }}
+          >
+            {testingChannel === 'discord_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên Discord'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 10. WEBHOOK (MAKE.COM / ZAPIER / N8N) ──────── */}
       <div className="admin-card">
         <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

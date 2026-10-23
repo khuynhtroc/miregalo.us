@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { db } from '@/lib/db';
 import type { Post } from '@/lib/types';
-import { getSocialSettings, saveSocialSettings } from './index';
+import { getSocialSettings, saveSocialSettings, sharePostToAllChannels } from './index';
 import { shareToFacebook } from './facebook';
 import type { FacebookBackfillState } from './types';
 
@@ -256,6 +256,19 @@ export async function executeFacebookBackfillStep(options?: {
   };
   await saveSocialSettings({ facebook_backfill: successState });
 
+  // Also cross-post the historical article to any other enabled channels (Telegram, Bluesky, Threads, Mastodon, Pinterest, Discord, X, etc.)
+  let extraChannelsReport: any = null;
+  try {
+    const multi = await sharePostToAllChannels(post, {
+      excludeChannels: ['facebook'],
+      ignoreGlobalToggle: true,
+    });
+    extraChannelsReport = {
+      attempted: multi.total_attempted,
+      succeeded: multi.total_success,
+    };
+  } catch {}
+
   return {
     httpStatus: 200,
     body: {
@@ -267,6 +280,7 @@ export async function executeFacebookBackfillStep(options?: {
       post_slug: post.slug,
       facebook_post_id: result.post_id,
       facebook_url: result.url,
+      extra_channels: extraChannelsReport,
       next_post_at: successState.next_post_at,
       cursor: nextCursor,
       total_posts: lockedState.post_ids.length,
