@@ -9,7 +9,7 @@ function getSiteUrl(): string {
 }
 
 function buildPostUrl(post: Post): string {
-  return `${getSiteUrl()}${postPath(post.slug, post.category_slug)}`;
+  return `${getSiteUrl()}${postPath(post.slug)}`;
 }
 
 function resolveAbsoluteImageUrl(post: Post): string | null {
