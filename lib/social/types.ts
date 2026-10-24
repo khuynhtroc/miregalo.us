@@ -9,6 +9,12 @@ export type SocialChannelId =
   | 'threads'
   | 'mastodon'
   | 'discord'
+  | 'linkedin'
+  | 'hubspot'
+  | 'devto'
+  | 'wordpress'
+  | 'tumblr'
+  | 'blogger'
   | 'webhook';
 
 export interface SocialSettings {
@@ -89,7 +95,38 @@ export interface SocialSettings {
   discord_enabled?: boolean;
   discord_webhook_url?: string;
 
-  // 10. Webhook (Make / Zapier / n8n)
+  // 10. LinkedIn (Profile / Company Page)
+  linkedin_enabled?: boolean;
+  linkedin_access_token?: string;
+  linkedin_author_urn?: string;
+  linkedin_template?: string;
+
+  // 11. HubSpot CMS Blog (Hotspot)
+  hubspot_enabled?: boolean;
+  hubspot_access_token?: string;
+  hubspot_blog_id?: string;
+
+  // 12. Dev.to (Forem Canonical SEO)
+  devto_enabled?: boolean;
+  devto_api_key?: string;
+
+  // 13. WordPress.com / WordPress Web 2.0
+  wordpress_enabled?: boolean;
+  wordpress_site_url?: string;
+  wordpress_username?: string;
+  wordpress_app_password?: string;
+
+  // 14. Tumblr (Web 2.0 Backlink)
+  tumblr_enabled?: boolean;
+  tumblr_blog_name?: string;
+  tumblr_access_token?: string;
+
+  // 15. Google Blogger / Blogspot
+  blogger_enabled?: boolean;
+  blogger_blog_id?: string;
+  blogger_access_token?: string;
+
+  // 16. Webhook (Make / Zapier / n8n)
   webhook_enabled: boolean;
   webhook_url: string;
   webhook_secret?: string;

@@ -289,6 +289,30 @@ export function SocialAutoShareManager() {
         if (channel === 'discord' && data.channel_name) {
           successText += ` (Discord: ${data.channel_name})`;
         }
+        if (channel === 'linkedin') {
+          successText += ` (LinkedIn: ${data.name || data.urn || 'ok'})`;
+          if (data.urn && settings) {
+            setSettings({ ...settings, linkedin_author_urn: data.urn });
+          }
+        }
+        if (channel === 'hubspot') {
+          successText += ` (HubSpot Blog: ${data.blog_name || data.blog_id || 'ok'})`;
+          if (data.blog_id && settings) {
+            setSettings({ ...settings, hubspot_blog_id: data.blog_id });
+          }
+        }
+        if (channel === 'devto' && data.username) {
+          successText += ` (Dev.to: @${data.username})`;
+        }
+        if (channel === 'wordpress' && data.user) {
+          successText += ` (WordPress: ${data.user} @ ${data.site || ''})`;
+        }
+        if (channel === 'tumblr' && data.blog_title) {
+          successText += ` (Tumblr: "${data.blog_title}")`;
+        }
+        if (channel === 'blogger' && data.blog_name) {
+          successText += ` (Blogger: "${data.blog_name}")`;
+        }
         if (channel === 'webhook') successText += ' (Webhook phản hồi 200 OK)';
 
         setTestResult({
@@ -1848,7 +1872,619 @@ export function SocialAutoShareManager() {
         </div>
       </div>
 
-      {/* ── 10. WEBHOOK (MAKE.COM / ZAPIER / N8N) ──────── */}
+      {/* ── 10. LINKEDIN (PROFILE / COMPANY PAGE) ────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#0A66C2',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.15rem',
+              }}
+            >
+              in
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  LinkedIn (Personal Profile / Company Page)
+                </h3>
+                <span className="badge" style={{ background: '#e0f2fe', color: '#0369a1' }}>
+                  DA 99 · Index Cực Nhanh · Tự Lấy Author URN
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động chia sẻ bài viết kèm thẻ Rich Article Preview lên trang cá nhân hoặc trang công ty LinkedIn
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.linkedin_enabled)}
+              onChange={(e) => setSettings({ ...settings, linkedin_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">LinkedIn OAuth2 Access Token</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder="AQV..."
+              value={settings.linkedin_access_token || ''}
+              onChange={(e) => setSettings({ ...settings, linkedin_access_token: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">
+              Lấy tại <code>linkedin.com/developers/tools/oauth</code> (Cấp quyền <code>openid, profile, w_member_social</code>)
+            </p>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Author URN hoặc Company ID (Để trống để tự động lấy)</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="urn:li:person:... hoặc ID số của Company Page"
+              value={settings.linkedin_author_urn || ''}
+              onChange={(e) => setSettings({ ...settings, linkedin_author_urn: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">Để trống và bấm Kiểm tra kết nối — hệ thống sẽ tự động lấy mã URN tài khoản của bạn!</p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('linkedin', {
+                access_token: settings.linkedin_access_token,
+                author_urn: settings.linkedin_author_urn,
+              })
+            }
+          >
+            {testingChannel === 'linkedin_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối & Tự lấy URN'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !settings.linkedin_access_token}
+            onClick={() => handleTestPost('linkedin')}
+            style={{ background: '#0A66C2' }}
+          >
+            {testingChannel === 'linkedin_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên LinkedIn'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 11. HUBSPOT CMS BLOG (HOTSPOT) ───────────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#ff7a59',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.15rem',
+              }}
+            >
+              H
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  HubSpot CMS Blog (Hotspot SEO Backlink)
+                </h3>
+                <span className="badge" style={{ background: '#fff1ed', color: '#c2410c' }}>
+                  DA 93 · Dofollow Backlink · Private App Token Vĩnh Viễn
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động xuất bản bài tóm tắt kèm ảnh bìa và Backlink Dofollow trỏ về bài gốc thông qua HubSpot CMS API
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.hubspot_enabled)}
+              onChange={(e) => setSettings({ ...settings, hubspot_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">HubSpot Private App Access Token</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder="pat-na1-... hoặc pat-eu1-..."
+              value={settings.hubspot_access_token || ''}
+              onChange={(e) => setSettings({ ...settings, hubspot_access_token: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">
+              Lấy tại HubSpot: <code>Settings &gt; Integrations &gt; Private Apps &gt; Create (cấp quyền content)</code>
+            </p>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">HubSpot Blog ID / Content Group ID (Tự động tìm nếu để trống)</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="Để trống để hệ thống tự lấy Blog ID"
+              value={settings.hubspot_blog_id || ''}
+              onChange={(e) => setSettings({ ...settings, hubspot_blog_id: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">Để trống và bấm Kiểm tra kết nối — hệ thống sẽ tự động điền Blog ID đầu tiên trong HubSpot</p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('hubspot', {
+                access_token: settings.hubspot_access_token,
+                blog_id: settings.hubspot_blog_id,
+              })
+            }
+          >
+            {testingChannel === 'hubspot_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối & Tự lấy Blog ID'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !settings.hubspot_access_token}
+            onClick={() => handleTestPost('hubspot')}
+            style={{ background: '#ff7a59' }}
+          >
+            {testingChannel === 'hubspot_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên HubSpot Blog'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 12. DEV.TO (FOREM CANONICAL SEO) ─────────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#090909',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+              }}
+            >
+              DEV
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  Dev.to (Forem Community)
+                </h3>
+                <span className="badge" style={{ background: '#e6f7ed', color: '#027a48' }}>
+                  DA 92 · SEO Canonical + Dofollow · Lấy Key Trong 10 Giây
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động đăng bài kèm thẻ <code>canonical_url</code> và Backlink Dofollow trỏ thẳng về miregalo.us
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.devto_enabled)}
+              onChange={(e) => setSettings({ ...settings, devto_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Dev.to API Key (Vĩnh viễn)</label>
+          <input
+            className="form-input"
+            type="password"
+            placeholder="Nhập API Key từ dev.to/settings/extensions"
+            value={settings.devto_api_key || ''}
+            onChange={(e) => setSettings({ ...settings, devto_api_key: e.target.value })}
+            style={{ fontFamily: 'monospace' }}
+          />
+          <p className="form-hint">
+            Lấy miễn phí trong 10 giây tại: <code>https://dev.to/settings/extensions</code> ➔ mục <strong>DEV Community API Keys</strong> ➔ Generate API Key
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('devto', {
+                api_key: settings.devto_api_key,
+              })
+            }
+          >
+            {testingChannel === 'devto_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối Dev.to'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !settings.devto_api_key}
+            onClick={() => handleTestPost('devto')}
+            style={{ background: '#090909' }}
+          >
+            {testingChannel === 'devto_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên Dev.to'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 13. WORDPRESS.COM / WORDPRESS WEB 2.0 ─────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#21759b',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.15rem',
+              }}
+            >
+              W
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  WordPress (WordPress.com / Web 2.0 Vệ Tinh)
+                </h3>
+                <span className="badge" style={{ background: '#e0f2fe', color: '#0369a1' }}>
+                  DA 99 · Contextual Dofollow Backlink · App Password Vĩnh Viễn
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động xuất bản bài viết vệ tinh kèm ảnh và Contextual Backlink Dofollow qua WordPress REST API
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.wordpress_enabled)}
+              onChange={(e) => setSettings({ ...settings, wordpress_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">WordPress Site URL</label>
+            <input
+              className="form-input"
+              type="url"
+              placeholder="https://miregalo.wordpress.com"
+              value={settings.wordpress_site_url || ''}
+              onChange={(e) => setSettings({ ...settings, wordpress_site_url: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">WordPress Username</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="admin hoặc email"
+              value={settings.wordpress_username || ''}
+              onChange={(e) => setSettings({ ...settings, wordpress_username: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Application Password (Mật khẩu ứng dụng)</label>
+          <input
+            className="form-input"
+            type="password"
+            placeholder="xxxx xxxx xxxx xxxx xxxx xxxx"
+            value={settings.wordpress_app_password || ''}
+            onChange={(e) => setSettings({ ...settings, wordpress_app_password: e.target.value })}
+            style={{ fontFamily: 'monospace' }}
+          />
+          <p className="form-hint">
+            Tạo trong WordPress: <code>Users &gt; Profile &gt; Application Passwords</code> (hoặc trong <code>wordpress.com/me/security/two-step-auth</code>)
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('wordpress', {
+                site_url: settings.wordpress_site_url,
+                username: settings.wordpress_username,
+                app_password: settings.wordpress_app_password,
+              })
+            }
+          >
+            {testingChannel === 'wordpress_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối WordPress'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={
+              testingChannel !== null ||
+              !settings.wordpress_site_url ||
+              !settings.wordpress_username ||
+              !settings.wordpress_app_password
+            }
+            onClick={() => handleTestPost('wordpress')}
+            style={{ background: '#21759b' }}
+          >
+            {testingChannel === 'wordpress_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên WordPress'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 14. TUMBLR (WEB 2.0 BACKLINK) ────────────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#36465d',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.25rem',
+              }}
+            >
+              t
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  Tumblr (Web 2.0 SEO Backlink)
+                </h3>
+                <span className="badge" style={{ background: '#f1f5f9', color: '#334155' }}>
+                  DA 98 · Rich Image + Link Post
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động đăng bài kèm ảnh bìa, thẻ tag và link về bài gốc lên blog Tumblr của bạn
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.tumblr_enabled)}
+              onChange={(e) => setSettings({ ...settings, tumblr_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Tên Blog Tumblr</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="VD: miregalo.tumblr.com"
+              value={settings.tumblr_blog_name || ''}
+              onChange={(e) => setSettings({ ...settings, tumblr_blog_name: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Tumblr OAuth2 Access Token</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder="Nhập Access Token từ api.tumblr.com/console"
+              value={settings.tumblr_access_token || ''}
+              onChange={(e) => setSettings({ ...settings, tumblr_access_token: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">
+              Đăng ký App tại <code>tumblr.com/oauth/apps</code> và lấy Token tại <code>api.tumblr.com/console</code>
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('tumblr', {
+                blog_name: settings.tumblr_blog_name,
+                access_token: settings.tumblr_access_token,
+              })
+            }
+          >
+            {testingChannel === 'tumblr_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối Tumblr'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !settings.tumblr_blog_name || !settings.tumblr_access_token}
+            onClick={() => handleTestPost('tumblr')}
+            style={{ background: '#36465d' }}
+          >
+            {testingChannel === 'tumblr_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên Tumblr'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 15. GOOGLE BLOGGER / BLOGSPOT ────────────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: '#f57c00',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.15rem',
+              }}
+            >
+              B
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  Google Blogger / Blogspot
+                </h3>
+                <span className="badge" style={{ background: '#fff7ed', color: '#c2410c' }}>
+                  DA 99 · Hệ Sinh Thái Google · Ép Index Nhanh
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động đăng bài kèm ảnh và Backlink Dofollow lên Blogspot (Blogger API v3)
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.blogger_enabled)}
+              onChange={(e) => setSettings({ ...settings, blogger_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Blogger Blog ID</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="VD: 321390019283..."
+              value={settings.blogger_blog_id || ''}
+              onChange={(e) => setSettings({ ...settings, blogger_blog_id: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">Dãy số cuối trên thanh địa chỉ khi bạn vào quản trị trang Blogger.com</p>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Google OAuth2 Access Token (scope: blogger)</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder="ya29.a0..."
+              value={settings.blogger_access_token || ''}
+              onChange={(e) => setSettings({ ...settings, blogger_access_token: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">
+              Lấy tại <code>developers.google.com/oauthplayground</code> ➔ chọn <code>Blogger API v3</code>
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('blogger', {
+                blog_id: settings.blogger_blog_id,
+                access_token: settings.blogger_access_token,
+              })
+            }
+          >
+            {testingChannel === 'blogger_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối Blogger'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !settings.blogger_blog_id || !settings.blogger_access_token}
+            onClick={() => handleTestPost('blogger')}
+            style={{ background: '#f57c00' }}
+          >
+            {testingChannel === 'blogger_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài lên Blogger'}
+          </button>
+        </div>
+      </div>
+
+      {/* ── 16. WEBHOOK (MAKE.COM / ZAPIER / N8N) ──────── */}
       <div className="admin-card">
         <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

@@ -11,6 +11,12 @@ import { shareToBluesky, testBlueskyConnection } from './bluesky';
 import { shareToThreads, testThreadsConnection } from './threads';
 import { shareToMastodon, testMastodonConnection } from './mastodon';
 import { shareToDiscord, testDiscordConnection } from './discord';
+import { shareToLinkedIn, testLinkedInConnection, resolveLinkedInAuthorUrn } from './linkedin';
+import { shareToHubSpot, testHubSpotConnection, resolveHubSpotBlogInfo } from './hubspot';
+import { shareToDevTo, testDevToConnection } from './devto';
+import { shareToWordPress, testWordPressConnection } from './wordpress';
+import { shareToTumblr, testTumblrConnection } from './tumblr';
+import { shareToBlogger, testBloggerConnection } from './blogger';
 import { triggerSocialWebhook, testSocialWebhook } from './webhook';
 
 export * from './types';
@@ -25,6 +31,12 @@ export * from './bluesky';
 export * from './threads';
 export * from './mastodon';
 export * from './discord';
+export * from './linkedin';
+export * from './hubspot';
+export * from './devto';
+export * from './wordpress';
+export * from './tumblr';
+export * from './blogger';
 export * from './webhook';
 
 export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
@@ -108,6 +120,31 @@ export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
 
   discord_enabled: false,
   discord_webhook_url: '',
+
+  linkedin_enabled: false,
+  linkedin_access_token: '',
+  linkedin_author_urn: '',
+  linkedin_template: '🎁 {title}\n\n{excerpt}\n\n👉 {url}\n\n#regalos #ideaspararegalar #miregalo',
+
+  hubspot_enabled: false,
+  hubspot_access_token: '',
+  hubspot_blog_id: '',
+
+  devto_enabled: false,
+  devto_api_key: '',
+
+  wordpress_enabled: false,
+  wordpress_site_url: '',
+  wordpress_username: '',
+  wordpress_app_password: '',
+
+  tumblr_enabled: false,
+  tumblr_blog_name: '',
+  tumblr_access_token: '',
+
+  blogger_enabled: false,
+  blogger_blog_id: '',
+  blogger_access_token: '',
 
   webhook_enabled: false,
   webhook_url: '',
@@ -349,7 +386,84 @@ export async function sharePostToAllChannels(
     tasks.push(shareToDiscord(post, settings.discord_webhook_url));
   }
 
-  // 10. Webhook (Make / Zapier / n8n)
+  // 10. LinkedIn
+  const shouldShareLinkedIn =
+    !excluded.has('linkedin') &&
+    (options?.forceChannels?.includes('linkedin') ||
+      (!options?.forceChannels && settings.linkedin_enabled && settings.linkedin_access_token));
+  if (shouldShareLinkedIn && settings.linkedin_access_token) {
+    tasks.push(
+      shareToLinkedIn(
+        post,
+        settings.linkedin_access_token,
+        settings.linkedin_author_urn,
+        settings.linkedin_template
+      )
+    );
+  }
+
+  // 11. HubSpot CMS Blog (Hotspot)
+  const shouldShareHubSpot =
+    !excluded.has('hubspot') &&
+    (options?.forceChannels?.includes('hubspot') ||
+      (!options?.forceChannels && settings.hubspot_enabled && settings.hubspot_access_token));
+  if (shouldShareHubSpot && settings.hubspot_access_token) {
+    tasks.push(shareToHubSpot(post, settings.hubspot_access_token, settings.hubspot_blog_id));
+  }
+
+  // 12. Dev.to (Forem Canonical SEO)
+  const shouldShareDevTo =
+    !excluded.has('devto') &&
+    (options?.forceChannels?.includes('devto') ||
+      (!options?.forceChannels && settings.devto_enabled && settings.devto_api_key));
+  if (shouldShareDevTo && settings.devto_api_key) {
+    tasks.push(shareToDevTo(post, settings.devto_api_key));
+  }
+
+  // 13. WordPress.com / WordPress Web 2.0
+  const shouldShareWordPress =
+    !excluded.has('wordpress') &&
+    (options?.forceChannels?.includes('wordpress') ||
+      (!options?.forceChannels &&
+        settings.wordpress_enabled &&
+        settings.wordpress_site_url &&
+        settings.wordpress_username &&
+        settings.wordpress_app_password));
+  if (
+    shouldShareWordPress &&
+    settings.wordpress_site_url &&
+    settings.wordpress_username &&
+    settings.wordpress_app_password
+  ) {
+    tasks.push(
+      shareToWordPress(
+        post,
+        settings.wordpress_site_url,
+        settings.wordpress_username,
+        settings.wordpress_app_password
+      )
+    );
+  }
+
+  // 14. Tumblr
+  const shouldShareTumblr =
+    !excluded.has('tumblr') &&
+    (options?.forceChannels?.includes('tumblr') ||
+      (!options?.forceChannels && settings.tumblr_enabled && settings.tumblr_blog_name && settings.tumblr_access_token));
+  if (shouldShareTumblr && settings.tumblr_blog_name && settings.tumblr_access_token) {
+    tasks.push(shareToTumblr(post, settings.tumblr_blog_name, settings.tumblr_access_token));
+  }
+
+  // 15. Google Blogger / Blogspot
+  const shouldShareBlogger =
+    !excluded.has('blogger') &&
+    (options?.forceChannels?.includes('blogger') ||
+      (!options?.forceChannels && settings.blogger_enabled && settings.blogger_blog_id && settings.blogger_access_token));
+  if (shouldShareBlogger && settings.blogger_blog_id && settings.blogger_access_token) {
+    tasks.push(shareToBlogger(post, settings.blogger_blog_id, settings.blogger_access_token));
+  }
+
+  // 16. Webhook (Make / Zapier / n8n)
   const shouldShareWebhook =
     !excluded.has('webhook') &&
     (options?.forceChannels?.includes('webhook') ||

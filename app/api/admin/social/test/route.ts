@@ -10,6 +10,12 @@ import {
   testThreadsConnection,
   testMastodonConnection,
   testDiscordConnection,
+  testLinkedInConnection,
+  testHubSpotConnection,
+  testDevToConnection,
+  testWordPressConnection,
+  testTumblrConnection,
+  testBloggerConnection,
   testSocialWebhook,
   getPinterestToken,
   testPinterestConnection,
@@ -89,6 +95,36 @@ export async function POST(req: NextRequest) {
       if (channel === 'discord') {
         const { webhook_url } = credentials || {};
         return NextResponse.json(await testDiscordConnection(webhook_url));
+      }
+
+      if (channel === 'linkedin') {
+        const { access_token, author_urn } = credentials || {};
+        return NextResponse.json(await testLinkedInConnection(access_token, author_urn));
+      }
+
+      if (channel === 'hubspot') {
+        const { access_token, blog_id } = credentials || {};
+        return NextResponse.json(await testHubSpotConnection(access_token, blog_id));
+      }
+
+      if (channel === 'devto') {
+        const { api_key } = credentials || {};
+        return NextResponse.json(await testDevToConnection(api_key));
+      }
+
+      if (channel === 'wordpress') {
+        const { site_url, username, app_password } = credentials || {};
+        return NextResponse.json(await testWordPressConnection(site_url, username, app_password));
+      }
+
+      if (channel === 'tumblr') {
+        const { blog_name, access_token } = credentials || {};
+        return NextResponse.json(await testTumblrConnection(blog_name, access_token));
+      }
+
+      if (channel === 'blogger') {
+        const { blog_id, access_token } = credentials || {};
+        return NextResponse.json(await testBloggerConnection(blog_id, access_token));
       }
 
       if (channel === 'webhook') {

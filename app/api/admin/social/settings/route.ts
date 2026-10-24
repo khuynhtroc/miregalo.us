@@ -5,6 +5,8 @@ import {
   saveSocialSettings,
   resolvePermanentFacebookPageToken,
   resolveInstagramAccountInfo,
+  resolveLinkedInAuthorUrn,
+  resolveHubSpotBlogInfo,
   executeFacebookBackfillStep,
 } from '@/lib/social';
 
@@ -110,6 +112,26 @@ export async function POST(req: NextRequest) {
       const igInfo = await resolveInstagramAccountInfo(igToken, igUserId, fbPageId);
       if (igInfo.igUserId) {
         editableSettings.instagram_user_id = igInfo.igUserId;
+      }
+    }
+
+    // Automatically resolve LinkedIn Author URN if token is provided
+    const liToken = (editableSettings.linkedin_access_token ?? current.linkedin_access_token ?? '').trim();
+    const liUrn = (editableSettings.linkedin_author_urn ?? current.linkedin_author_urn ?? '').trim();
+    if (liToken && !liUrn) {
+      const liInfo = await resolveLinkedInAuthorUrn(liToken);
+      if (liInfo.urn) {
+        editableSettings.linkedin_author_urn = liInfo.urn;
+      }
+    }
+
+    // Automatically resolve HubSpot Blog ID if token is provided
+    const hsToken = (editableSettings.hubspot_access_token ?? current.hubspot_access_token ?? '').trim();
+    const hsBlogId = (editableSettings.hubspot_blog_id ?? current.hubspot_blog_id ?? '').trim();
+    if (hsToken && !hsBlogId) {
+      const hsInfo = await resolveHubSpotBlogInfo(hsToken);
+      if (hsInfo.blogId) {
+        editableSettings.hubspot_blog_id = hsInfo.blogId;
       }
     }
 
