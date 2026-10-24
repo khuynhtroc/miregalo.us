@@ -1,15 +1,15 @@
 import type { Post } from '@/lib/types';
-import { getPublicPostPath } from '@/lib/site-url';
+import { SITE_URL, postPath } from '@/lib/urls';
 import type { ChannelShareResult } from './types';
 
 const FB_GRAPH_VERSION = 'v21.0';
 
 function getSiteUrl(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.miregalo.us').replace(/\/$/, '');
+  return (process.env.NEXT_PUBLIC_SITE_URL || SITE_URL || 'https://www.miregalo.us').replace(/\/$/, '');
 }
 
 function buildPostUrl(post: Post): string {
-  return `${getSiteUrl()}${getPublicPostPath(post)}`;
+  return `${getSiteUrl()}${postPath(post.slug, post.category_slug)}`;
 }
 
 function resolveAbsoluteImageUrl(post: Post): string | null {
