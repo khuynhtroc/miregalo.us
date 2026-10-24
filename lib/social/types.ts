@@ -1,5 +1,6 @@
 export type SocialChannelId =
   | 'facebook'
+  | 'instagram'
   | 'twitter'
   | 'medium'
   | 'pinterest'
@@ -23,6 +24,12 @@ export interface SocialSettings {
   facebook_app_id?: string;
   facebook_app_secret?: string;
   facebook_template?: string;
+
+  // 1b. Instagram Business / Creator (Graph API)
+  instagram_enabled?: boolean;
+  instagram_user_id?: string;
+  instagram_access_token?: string;
+  instagram_template?: string;
 
   // 2. X (Twitter)
   twitter_enabled: boolean;

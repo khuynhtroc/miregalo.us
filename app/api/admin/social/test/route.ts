@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import {
   testFacebookConnection,
+  testInstagramConnection,
   testTwitterConnection,
   testMediumConnection,
   testTelegramConnection,
@@ -31,6 +32,12 @@ export async function POST(req: NextRequest) {
       if (channel === 'facebook') {
         const { page_id, access_token } = credentials || {};
         const result = await testFacebookConnection(page_id, access_token);
+        return NextResponse.json(result);
+      }
+
+      if (channel === 'instagram') {
+        const { user_id, access_token, facebook_page_id } = credentials || {};
+        const result = await testInstagramConnection(user_id, access_token, facebook_page_id);
         return NextResponse.json(result);
       }
 

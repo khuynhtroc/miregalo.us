@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 import type { Post } from '@/lib/types';
 import type { SocialSettings, SocialChannelId, ChannelShareResult, MultiShareReport } from './types';
 import { shareToFacebook, testFacebookConnection } from './facebook';
+import { shareToInstagram, testInstagramConnection, resolveInstagramAccountInfo } from './instagram';
 import { shareToTwitter, testTwitterConnection } from './twitter';
 import { shareToMedium, testMediumConnection } from './medium';
 import { getValidPinterestAccessToken, publishPostToPinterest } from './pinterest';
@@ -14,6 +15,7 @@ import { triggerSocialWebhook, testSocialWebhook } from './webhook';
 
 export * from './types';
 export * from './facebook';
+export * from './instagram';
 export * from './facebook-backfill';
 export * from './twitter';
 export * from './medium';
@@ -51,6 +53,12 @@ export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
   facebook_app_id: '1132334105813486',
   facebook_app_secret: '',
   facebook_template: '🎁 {title}\n\n{excerpt}\n\n👉 Descubre todas las ideas aquí: {url}',
+
+  instagram_enabled: false,
+  instagram_user_id: '',
+  instagram_access_token: '',
+  instagram_template:
+    '🎁 {title}\n\n{excerpt}\n\n👉 Descubre la guía completa en: {url}\n\n#regalos #ideaspararegalar #miregalo #regalosoriginales #guiaDeRegalos',
 
   twitter_enabled: false,
   twitter_api_key: '',
@@ -177,6 +185,24 @@ export async function sharePostToAllChannels(
         settings.facebook_page_id,
         settings.facebook_access_token,
         settings.facebook_template
+      )
+    );
+  }
+
+  // 1b. Instagram Business / Creator
+  const igToken = (settings.instagram_access_token || settings.facebook_access_token || '').trim();
+  const shouldShareInstagram =
+    !excluded.has('instagram') &&
+    (options?.forceChannels?.includes('instagram') ||
+      (!options?.forceChannels && settings.instagram_enabled && Boolean(igToken)));
+  if (shouldShareInstagram && igToken) {
+    tasks.push(
+      shareToInstagram(
+        post,
+        settings.instagram_user_id || '',
+        igToken,
+        settings.instagram_template,
+        settings.facebook_page_id
       )
     );
   }

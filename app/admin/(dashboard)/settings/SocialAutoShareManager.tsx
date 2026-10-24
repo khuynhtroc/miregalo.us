@@ -260,6 +260,12 @@ export function SocialAutoShareManager() {
       if (data.success) {
         let successText = 'Kết nối thành công!';
         if (channel === 'facebook' && data.page_name) successText += ` (Page: "${data.page_name}")`;
+        if (channel === 'instagram') {
+          successText += ` (Instagram: @${data.username || data.name || 'ok'} · ID: ${data.igUserId || ''})`;
+          if (data.igUserId && settings) {
+            setSettings({ ...settings, instagram_user_id: data.igUserId });
+          }
+        }
         if (channel === 'twitter' && data.username) successText += ` (Tài khoản: ${data.username})`;
         if (channel === 'medium' && data.username) successText += ` (Tác giả: @${data.username})`;
         if (channel === 'pinterest') {
@@ -790,8 +796,127 @@ export function SocialAutoShareManager() {
           )}
         </div>
         <p className="form-hint" style={{ marginTop: '12px' }}>
-          Hệ thống tự động xếp toàn bộ bài viết đã xuất bản theo thứ tự từ cũ nhất đến mới nhất và đăng lên Fanpage theo chu kỳ đã chọn (mặc định 4 tiếng/bài). Lịch này hoạt động độc lập với công tắc “Tự động chia sẻ bài mới”.
+          Hệ thống tự động xếp toàn bộ bài viết đã xuất bản theo thứ tự từ cũ nhất đến mới nhất và đăng lên Fanpage (cùng toàn bộ các mạng xã hội đã bật bên dưới) theo chu kỳ đã chọn (mặc định 4 tiếng/bài). Lịch này hoạt động độc lập với công tắc “Tự động chia sẻ bài mới”.
         </p>
+      </div>
+
+      {/* ── 1B. INSTAGRAM BUSINESS / CREATOR ─────────── */}
+      <div className="admin-card">
+        <div className="admin-card-header" style={{ borderBottom: '1px solid #f0f0f4', paddingBottom: '14px', marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '8px',
+                background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.2rem',
+              }}
+            >
+              📸
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 className="admin-card-title" style={{ fontSize: '1.05rem' }}>
+                  Instagram (Business / Creator Feed)
+                </h3>
+                <span className="badge" style={{ background: '#fdf2f8', color: '#be185d' }}>
+                  Dùng Chung Meta App Với Fanpage · Tự Chuyển Ảnh Chuẩn JPEG
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#69707d' }}>
+                Tự động đăng ảnh bìa bài viết (tự chuẩn hóa tỷ lệ &amp; định dạng JPEG) kèm Caption và Hashtag lên Instagram Feed
+              </p>
+            </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={Boolean(settings.instagram_enabled)}
+              onChange={(e) => setSettings({ ...settings, instagram_enabled: e.target.checked })}
+              style={{ width: '18px', height: '18px' }}
+            />
+            <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#344054' }}>Kích hoạt</span>
+          </label>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Instagram Business User ID (Tự động tìm nếu để trống)</label>
+            <input
+              className="form-input"
+              type="text"
+              placeholder="VD: 178414... (Hoặc để trống, hệ thống tự lấy từ Fanpage)"
+              value={settings.instagram_user_id || ''}
+              onChange={(e) => setSettings({ ...settings, instagram_user_id: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">
+              Nếu Instagram của bạn đã liên kết với Fanpage Facebook ở trên, bạn có thể <strong>để trống ô này</strong> và bấm Kiểm tra kết nối — hệ thống sẽ tự điền ID!
+            </p>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Instagram / Meta Access Token</label>
+            <input
+              className="form-input"
+              type="password"
+              placeholder="EAA... hoặc IGAA... (Để trống nếu dùng chung Token với Fanpage)"
+              value={settings.instagram_access_token || ''}
+              onChange={(e) => setSettings({ ...settings, instagram_access_token: e.target.value })}
+              style={{ fontFamily: 'monospace' }}
+            />
+            <p className="form-hint">
+              Hỗ trợ cả <strong>Meta Graph Token (<code>EAA...</code>)</strong> có quyền <code>instagram_basic, instagram_content_publish</code> HOẶC <strong>Instagram Token (<code>IG...</code>)</strong> tạo trong mục <em>Instagram &gt; API setup with Instagram login</em>.
+            </p>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Mẫu Caption Instagram (Template)</label>
+          <textarea
+            className="form-textarea"
+            rows={3}
+            value={settings.instagram_template || ''}
+            onChange={(e) => setSettings({ ...settings, instagram_template: e.target.value })}
+            style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
+          />
+          <p className="form-hint">
+            Biến: <code>&#123;title&#125;</code>, <code>&#123;excerpt&#125;</code>, <code>&#123;url&#125;</code>
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', paddingTop: '12px', borderTop: '1px solid #f0f0f4', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            disabled={testingChannel !== null}
+            onClick={() =>
+              handleTestConnection('instagram', {
+                user_id: settings.instagram_user_id,
+                access_token: settings.instagram_access_token || settings.facebook_access_token,
+                facebook_page_id: settings.facebook_page_id,
+              })
+            }
+          >
+            {testingChannel === 'instagram_conn' ? 'Đang kiểm tra...' : '🔍 Kiểm tra kết nối & Tự lấy ID Instagram'}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={testingChannel !== null || !(settings.instagram_access_token || settings.facebook_access_token)}
+            onClick={() => handleTestPost('instagram')}
+            style={{ background: '#dc2743' }}
+          >
+            {testingChannel === 'instagram_post' ? 'Đang đăng thử...' : '🚀 Đăng thử bài mới nhất lên Instagram'}
+          </button>
+        </div>
       </div>
 
       {/* ── 2. X (TWITTER) ───────────────────────────── */}

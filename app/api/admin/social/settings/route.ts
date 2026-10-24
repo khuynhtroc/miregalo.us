@@ -4,6 +4,7 @@ import {
   getSocialSettings,
   saveSocialSettings,
   resolvePermanentFacebookPageToken,
+  resolveInstagramAccountInfo,
   executeFacebookBackfillStep,
 } from '@/lib/social';
 
@@ -93,6 +94,22 @@ export async function POST(req: NextRequest) {
       const resolved = await resolvePermanentFacebookPageToken(fbPageId, fbToken, fbAppId, fbAppSecret);
       if (resolved.token) {
         editableSettings.facebook_access_token = resolved.token;
+      }
+    }
+
+    // Automatically resolve Instagram Business Account ID if token or Facebook Page is available
+    const igToken = (
+      editableSettings.instagram_access_token ??
+      current.instagram_access_token ??
+      editableSettings.facebook_access_token ??
+      current.facebook_access_token ??
+      ''
+    ).trim();
+    const igUserId = (editableSettings.instagram_user_id ?? current.instagram_user_id ?? '').trim();
+    if (igToken && (!igUserId || editableSettings.instagram_enabled)) {
+      const igInfo = await resolveInstagramAccountInfo(igToken, igUserId, fbPageId);
+      if (igInfo.igUserId) {
+        editableSettings.instagram_user_id = igInfo.igUserId;
       }
     }
 
