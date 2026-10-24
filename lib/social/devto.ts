@@ -71,7 +71,7 @@ export async function shareToDevTo(
     const itemsPreview = Array.isArray(post.items)
       ? post.items
           .slice(0, 5)
-          .map((it, idx) => `### ${idx + 1}. ${it.heading || 'Idea recomendada'}\n${(it.body_html || '').replace(/<[^>]+>/g, '').trim()}`)
+          .map((it, idx) => `### ${idx + 1}. ${it.heading || 'Idea recomendada'}\n${(it.description_html || (it as any).body_html || '').replace(/<[^>]+>/g, '').trim()}`)
           .join('\n\n')
       : '';
 
