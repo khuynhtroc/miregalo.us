@@ -53,6 +53,9 @@ function formatPinterestApiError(status: number, responseBody: unknown, fallback
     const scopes = missing || 'boards:write và pins:write';
     return `Pinterest từ chối thao tác vì Access Token thiếu quyền ${scopes}. Hãy bấm “Kết nối lại Pinterest” để cấp boards:read, boards:write, pins:read và pins:write; token cũ không thể tự thêm quyền.`;
   }
+  if (/Trial access/i.test(raw)) {
+    return 'Pinterest báo lỗi (Trial Access): App Pinterest của bạn hiện mới ở cấp độ Dùng thử (Trial Access) nên Pinterest chặn tạo Pin thật trên api.pinterest.com. Hãy vào developers.pinterest.com/apps/ chọn App của bạn và bấm "Apply for Standard Access" để Pinterest mở quyền tạo Pin thật, hoặc dùng link RSS Feed https://www.miregalo.us/pinterest-catalog.xml để Pinterest tự kéo Pin tự động.';
+  }
   const message = data?.message || data?.detail || data?.error || raw || fallback;
   return `Pinterest API (HTTP ${status}): ${String(message)}`;
 }
