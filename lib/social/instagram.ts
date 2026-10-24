@@ -9,11 +9,15 @@ function getSiteUrl(): string {
 }
 
 function buildPostUrl(post: Post): string {
-  return `${getSiteUrl()}${postPath(post.slug)}`;
+  return `${getSiteUrl()}${postPath(post)}`;
 }
 
 function resolveAbsoluteImageUrl(post: Post): string | null {
-  const raw = post.cover_image || post.og_image || '';
+  const raw =
+    post.og_image ||
+    post.hero_image ||
+    post.items?.find((it) => it?.image)?.image ||
+    '';
   if (!raw || !raw.trim()) return null;
   if (raw.startsWith('http://') || raw.startsWith('https://')) return raw.trim();
   const siteUrl = getSiteUrl();
