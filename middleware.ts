@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
- * Permanently removed posts (adult / off-brand content, removed 2026-10-14).
- * Served as 410 Gone so search engines drop them quickly.
+ * Permanently removed posts (adult / off-brand / empty stub content).
+ * Served as 410 Gone so search engines and AdSense crawlers drop them immediately.
  */
 const GONE_SLUGS = new Set([
   'regalos-bisexual-dating-apps',
@@ -11,6 +11,38 @@ const GONE_SLUGS = new Set([
   'regalos-signs-he-doesnt-want-you-sexually',
   'regalos-how-to-get-turned-on',
   'regalos-sex-bucket-list',
+  'regalos-how-to-please-your-man',
+  'regalos-what-is-a-pillow-talk',
+  'regalos-san-valentin-underwear-para-hombres',
+  'regalos-sexy-cumpleanos-dress-ideas',
+  'regalos-sexy-cumpleanos-outfits',
+  'regalos-sexy-regalos-esposa',
+  'regalos-sexy-san-valentin',
+  'regalos-sexy-regalos-esposo',
+  'regalos-naughty-san-valentin-day',
+  'regalos-naughty-navipapa',
+  'regalos-dirty-navipapa-chistes',
+  'regalos-dirty-santa',
+  'regalos-is-my-novio-cheating',
+  'regalos-characteristics-of-cheating-woman',
+  'regalos-leave-an-abusive-relationship',
+  'regalos-the-effects-of-divorce',
+  'regalos-dating-after-divorce',
+  'regalos-divorced-papa-success',
+  'regalos-divorce',
+  'regalos-dating-bad-boys',
+  'regalos-iconic-poker-couples-to-inspire',
+  'regalos-how-business-travelers-benefit-from-esim-in-asia',
+  'regalos-how-to-ace-digital-nomad-as-solo-woman',
+  'regalos-impact-of-absent-fathers',
+  'regalos-londons-skyline-a-romp-through-the-ages',
+  'regalos-hogan-assessment-key-to-smarter-hiring-leadership',
+  'regalos-create-perfect-voiceovers-with-text-to-speech',
+  'regalos-unlock-versatility-acryliic-sign-holders',
+  'regalos-beyond-fossils-keeping-the-spark-wonder-alive',
+  'regalos-loveable-new-journey-announcement',
+  'regalos-loveable-new-journey-announcement-2',
+  'regalos-luna-linh',
 ]);
 
 export function middleware(req: NextRequest) {

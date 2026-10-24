@@ -17,9 +17,11 @@ export function AdBanner({
 }: AdBannerProps) {
   const adRef = useRef<HTMLModElement | null>(null);
   const pushedRef = useRef(false);
+  const cleanSlotId = (slotId || '').trim();
 
   useEffect(() => {
-    // Only push if not already pushed and adsbygoogle is available in window
+    // Only push if a valid AdSense slot ID is configured and not already pushed
+    if (!cleanSlotId) return;
     if (!pushedRef.current && typeof window !== 'undefined') {
       try {
         const win = window as any;
@@ -31,7 +33,14 @@ export function AdBanner({
         console.warn('[AdSense] Push notice:', e);
       }
     }
-  }, []);
+  }, [cleanSlotId]);
+
+  // Do not render empty placeholder boxes when manual ad slots are not configured yet
+  // (Google AdSense Auto Ads handles placement automatically via the <head> script,
+  // and empty ad containers violate AdSense layout/placeholder policies during review).
+  if (!cleanSlotId) {
+    return null;
+  }
 
   // Style variations based on placement
   let containerStyle: React.CSSProperties = {

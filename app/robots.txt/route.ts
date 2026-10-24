@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const settings = await getSettings();
 
-  let body = 'User-agent: *\n';
+  let body = 'User-agent: Mediapartners-Google\nAllow: /\n\nUser-agent: *\n';
 
   if (settings.noindex_site) {
     body += 'Disallow: /\n';
