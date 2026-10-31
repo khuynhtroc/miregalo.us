@@ -1,10 +1,32 @@
 import 'server-only';
 import { createSign } from 'crypto';
+import { db } from '@/lib/db';
 
 const GSC_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 let cachedToken: { token: string; expiresAt: number } | null = null;
+
+async function resolveGscCredentials(): Promise<{ clientEmail: string; privateKey: string } | null> {
+  let clientEmail = process.env.GSC_CLIENT_EMAIL?.trim() || '';
+  let privateKey = process.env.GSC_PRIVATE_KEY?.trim() || '';
+
+  if (!clientEmail || !privateKey) {
+    try {
+      const saved = await db.getSetting<{ client_email?: string; private_key?: string }>('google_indexing_settings');
+      clientEmail = clientEmail || saved?.client_email?.trim() || '';
+      privateKey = privateKey || saved?.private_key?.trim() || '';
+    } catch {
+      // ignore db read errors
+    }
+  }
+
+  if (!clientEmail || !privateKey) return null;
+  return {
+    clientEmail,
+    privateKey: privateKey.replace(/\\n/g, '\n'),
+  };
+}
 
 export function isGscConfigured(): boolean {
   return Boolean(process.env.GSC_CLIENT_EMAIL && process.env.GSC_PRIVATE_KEY);
@@ -14,15 +36,15 @@ export function isGscConfigured(): boolean {
  * Returns a valid OAuth2 / Service Account access token for Google Search Console API.
  */
 export async function getGscAccessToken(): Promise<string | null> {
-  if (!isGscConfigured()) return null;
+  const creds = await resolveGscCredentials();
+  if (!creds) return null;
 
   const now = Math.floor(Date.now() / 1000);
   if (cachedToken && cachedToken.expiresAt > now + 60) {
     return cachedToken.token;
   }
 
-  const clientEmail = process.env.GSC_CLIENT_EMAIL!;
-  const privateKey = process.env.GSC_PRIVATE_KEY!.replace(/\\n/g, '\n');
+  const { clientEmail, privateKey } = creds;
 
   // Build JWT header and payload
   const header = { alg: 'RS256', typ: 'JWT' };

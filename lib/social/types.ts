@@ -1,21 +1,39 @@
 export type SocialChannelId =
   | 'facebook'
   | 'instagram'
+  | 'threads'
   | 'twitter'
-  | 'medium'
+  | 'linkedin'
+  | 'bluesky'
   | 'pinterest'
   | 'telegram'
-  | 'bluesky'
-  | 'threads'
-  | 'mastodon'
   | 'discord'
-  | 'linkedin'
-  | 'hubspot'
+  | 'mastodon'
+  | 'medium'
   | 'devto'
   | 'wordpress'
+  | 'hubspot'
   | 'tumblr'
   | 'blogger'
-  | 'webhook';
+  | 'webhook'
+  // Extended Channels from Matrix
+  | 'tiktok'
+  | 'youtube'
+  | 'google_business'
+  | 'reddit'
+  | 'slack'
+  | 'dribbble'
+  | 'whop'
+  | 'twitch'
+  | 'skool'
+  | 'kick'
+  | 'warpcast'
+  | 'vk'
+  | 'lemmy'
+  | 'mewe'
+  | 'nostr'
+  | 'listmonk'
+  | 'hashnode';
 
 export interface SocialSettings {
   auto_share_enabled: boolean;
@@ -130,6 +148,128 @@ export interface SocialSettings {
   webhook_enabled: boolean;
   webhook_url: string;
   webhook_secret?: string;
+
+  // 17. TikTok
+  tiktok_enabled?: boolean;
+  tiktok_access_token?: string;
+  tiktok_open_id?: string;
+  tiktok_webhook_url?: string;
+  tiktok_template?: string;
+
+  // 18. YouTube
+  youtube_enabled?: boolean;
+  youtube_api_key?: string;
+  youtube_channel_id?: string;
+  youtube_webhook_url?: string;
+  youtube_template?: string;
+
+  // 19. Google My Business
+  google_business_enabled?: boolean;
+  google_business_account_id?: string;
+  google_business_location_id?: string;
+  google_business_access_token?: string;
+  google_business_webhook_url?: string;
+  google_business_template?: string;
+
+  // 20. Reddit
+  reddit_enabled?: boolean;
+  reddit_client_id?: string;
+  reddit_client_secret?: string;
+  reddit_username?: string;
+  reddit_password?: string;
+  reddit_subreddit?: string;
+  reddit_webhook_url?: string;
+  reddit_template?: string;
+
+  // 21. Slack
+  slack_enabled?: boolean;
+  slack_webhook_url?: string;
+  slack_channel?: string;
+  slack_template?: string;
+
+  // 22. Dribbble
+  dribbble_enabled?: boolean;
+  dribbble_access_token?: string;
+  dribbble_webhook_url?: string;
+  dribbble_template?: string;
+
+  // 23. Whop
+  whop_enabled?: boolean;
+  whop_api_key?: string;
+  whop_company_id?: string;
+  whop_webhook_url?: string;
+  whop_template?: string;
+
+  // 24. Twitch
+  twitch_enabled?: boolean;
+  twitch_client_id?: string;
+  twitch_access_token?: string;
+  twitch_broadcaster_id?: string;
+  twitch_webhook_url?: string;
+  twitch_template?: string;
+
+  // 25. Skool
+  skool_enabled?: boolean;
+  skool_community_id?: string;
+  skool_webhook_url?: string;
+  skool_template?: string;
+
+  // 26. Kick
+  kick_enabled?: boolean;
+  kick_channel_id?: string;
+  kick_webhook_url?: string;
+  kick_template?: string;
+
+  // 27. Warpcast (Farcaster)
+  warpcast_enabled?: boolean;
+  warpcast_api_key?: string;
+  warpcast_signer_uuid?: string;
+  warpcast_webhook_url?: string;
+  warpcast_template?: string;
+
+  // 28. VK (VKontakte)
+  vk_enabled?: boolean;
+  vk_access_token?: string;
+  vk_owner_id?: string;
+  vk_webhook_url?: string;
+  vk_template?: string;
+
+  // 29. Lemmy
+  lemmy_enabled?: boolean;
+  lemmy_instance_url?: string;
+  lemmy_jwt_token?: string;
+  lemmy_community_id?: string;
+  lemmy_webhook_url?: string;
+  lemmy_template?: string;
+
+  // 30. MeWe
+  mewe_enabled?: boolean;
+  mewe_access_token?: string;
+  mewe_webhook_url?: string;
+  mewe_template?: string;
+
+  // 31. Nostr
+  nostr_enabled?: boolean;
+  nostr_private_key?: string;
+  nostr_relays?: string;
+  nostr_webhook_url?: string;
+  nostr_template?: string;
+
+  // 32. Listmonk
+  listmonk_enabled?: boolean;
+  listmonk_url?: string;
+  listmonk_username?: string;
+  listmonk_password?: string;
+  listmonk_list_id?: string;
+  listmonk_webhook_url?: string;
+  listmonk_template?: string;
+
+  // 33. Hashnode
+  hashnode_enabled?: boolean;
+  hashnode_access_token?: string;
+  hashnode_publication_id?: string;
+  hashnode_webhook_url?: string;
+  hashnode_template?: string;
 }
 
 export interface FacebookBackfillState {
@@ -147,12 +287,15 @@ export interface FacebookBackfillState {
   skipped_count: number;
   lock_id: string | null;
   lock_until: string | null;
+  channels?: SocialChannelId[];
+  last_channels_posted?: string[];
 }
 
 export interface ChannelShareResult {
   channel: SocialChannelId;
   success: boolean;
   post_id?: string;
+  postId?: string;
   url?: string;
   message?: string;
   error?: string;

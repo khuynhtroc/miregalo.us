@@ -3,11 +3,19 @@ import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import type { Redirect } from '@/lib/types';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const res = await db.find('redirects', { order: [{ field: 'hits', asc: false }] });
+  const { searchParams } = new URL(req.url);
+  const limit = Math.min(parseInt(searchParams.get('limit') || '100', 10), 500);
+  const offset = parseInt(searchParams.get('offset') || '0', 10);
+
+  const res = await db.find('redirects', {
+    order: [{ field: 'hits', asc: false }],
+    limit,
+    offset,
+  });
   return NextResponse.json(res);
 }
 

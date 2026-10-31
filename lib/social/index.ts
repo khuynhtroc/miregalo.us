@@ -18,6 +18,33 @@ import { shareToWordPress, testWordPressConnection } from './wordpress';
 import { shareToTumblr, testTumblrConnection } from './tumblr';
 import { shareToBlogger, testBloggerConnection } from './blogger';
 import { triggerSocialWebhook, testSocialWebhook } from './webhook';
+import { shareToReddit, testRedditConnection } from './reddit';
+import { shareToSlack, testSlackConnection } from './slack';
+import { shareToGoogleBusiness, testGoogleBusinessConnection } from './google-business';
+import { shareToHashnode, testHashnodeConnection } from './hashnode';
+import { shareToVk, testVkConnection } from './vk';
+import { shareToLemmy, testLemmyConnection } from './lemmy';
+import { shareToWarpcast, testWarpcastConnection } from './warpcast';
+import { shareToNostr, testNostrConnection } from './nostr';
+import { shareToListmonk, testListmonkConnection } from './listmonk';
+import {
+  shareToTikTok,
+  testTikTokConnection,
+  shareToYouTube,
+  testYouTubeConnection,
+  shareToDribbble,
+  testDribbbleConnection,
+  shareToWhop,
+  testWhopConnection,
+  shareToTwitch,
+  testTwitchConnection,
+  shareToSkool,
+  testSkoolConnection,
+  shareToKick,
+  testKickConnection,
+  shareToMeWe,
+  testMeWeConnection,
+} from './extended-community';
 
 export * from './types';
 export * from './facebook';
@@ -38,6 +65,16 @@ export * from './wordpress';
 export * from './tumblr';
 export * from './blogger';
 export * from './webhook';
+export * from './reddit';
+export * from './slack';
+export * from './google-business';
+export * from './hashnode';
+export * from './vk';
+export * from './lemmy';
+export * from './warpcast';
+export * from './nostr';
+export * from './listmonk';
+export * from './extended-community';
 
 export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
   auto_share_enabled: false,
@@ -62,7 +99,7 @@ export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
   facebook_enabled: false,
   facebook_page_id: '',
   facebook_access_token: '',
-  facebook_app_id: '1132334105813486',
+  facebook_app_id: '2272148170382644',
   facebook_app_secret: '',
   facebook_template: '🎁 {title}\n\n{excerpt}\n\n👉 Descubre todas las ideas aquí: {url}',
 
@@ -149,6 +186,94 @@ export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
   webhook_enabled: false,
   webhook_url: '',
   webhook_secret: '',
+
+  // Extended
+  tiktok_enabled: false,
+  tiktok_webhook_url: '',
+  tiktok_access_token: '',
+
+  youtube_enabled: false,
+  youtube_webhook_url: '',
+  youtube_api_key: '',
+  youtube_channel_id: '',
+
+  google_business_enabled: false,
+  google_business_webhook_url: '',
+  google_business_account_id: '',
+  google_business_location_id: '',
+  google_business_access_token: '',
+
+  reddit_enabled: false,
+  reddit_webhook_url: '',
+  reddit_client_id: '',
+  reddit_client_secret: '',
+  reddit_username: '',
+  reddit_password: '',
+  reddit_subreddit: '',
+
+  slack_enabled: false,
+  slack_webhook_url: '',
+  slack_channel: '',
+
+  dribbble_enabled: false,
+  dribbble_webhook_url: '',
+  dribbble_access_token: '',
+
+  whop_enabled: false,
+  whop_webhook_url: '',
+  whop_api_key: '',
+  whop_company_id: '',
+
+  twitch_enabled: false,
+  twitch_webhook_url: '',
+  twitch_client_id: '',
+  twitch_access_token: '',
+  twitch_broadcaster_id: '',
+
+  skool_enabled: false,
+  skool_webhook_url: '',
+  skool_community_id: '',
+
+  kick_enabled: false,
+  kick_webhook_url: '',
+  kick_channel_id: '',
+
+  warpcast_enabled: false,
+  warpcast_webhook_url: '',
+  warpcast_api_key: '',
+  warpcast_signer_uuid: '',
+
+  vk_enabled: false,
+  vk_webhook_url: '',
+  vk_access_token: '',
+  vk_owner_id: '',
+
+  lemmy_enabled: false,
+  lemmy_webhook_url: '',
+  lemmy_instance_url: '',
+  lemmy_jwt_token: '',
+  lemmy_community_id: '',
+
+  mewe_enabled: false,
+  mewe_webhook_url: '',
+  mewe_access_token: '',
+
+  nostr_enabled: false,
+  nostr_webhook_url: '',
+  nostr_private_key: '',
+  nostr_relays: '',
+
+  listmonk_enabled: false,
+  listmonk_webhook_url: '',
+  listmonk_url: '',
+  listmonk_username: '',
+  listmonk_password: '',
+  listmonk_list_id: '',
+
+  hashnode_enabled: false,
+  hashnode_webhook_url: '',
+  hashnode_access_token: '',
+  hashnode_publication_id: '',
 };
 
 /**
@@ -470,6 +595,175 @@ export async function sharePostToAllChannels(
       (!options?.forceChannels && settings.webhook_enabled && settings.webhook_url));
   if (shouldShareWebhook) {
     tasks.push(triggerSocialWebhook(post, settings.webhook_url, settings.webhook_secret));
+  }
+
+  // 17. TikTok
+  const shouldShareTikTok =
+    !excluded.has('tiktok') &&
+    (options?.forceChannels?.includes('tiktok') ||
+      (!options?.forceChannels && settings.tiktok_enabled && (settings.tiktok_webhook_url || settings.tiktok_access_token)));
+  if (shouldShareTikTok) {
+    tasks.push(shareToTikTok(post, { webhookUrl: settings.tiktok_webhook_url, accessToken: settings.tiktok_access_token }));
+  }
+
+  // 18. YouTube
+  const shouldShareYouTube =
+    !excluded.has('youtube') &&
+    (options?.forceChannels?.includes('youtube') ||
+      (!options?.forceChannels && settings.youtube_enabled && (settings.youtube_webhook_url || settings.youtube_api_key)));
+  if (shouldShareYouTube) {
+    tasks.push(shareToYouTube(post, { webhookUrl: settings.youtube_webhook_url, apiKey: settings.youtube_api_key, channelId: settings.youtube_channel_id }));
+  }
+
+  // 19. Google My Business
+  const shouldShareGmb =
+    !excluded.has('google_business') &&
+    (options?.forceChannels?.includes('google_business') ||
+      (!options?.forceChannels && settings.google_business_enabled && (settings.google_business_webhook_url || settings.google_business_access_token)));
+  if (shouldShareGmb) {
+    tasks.push(
+      shareToGoogleBusiness(post, {
+        webhookUrl: settings.google_business_webhook_url,
+        accountId: settings.google_business_account_id,
+        locationId: settings.google_business_location_id,
+        accessToken: settings.google_business_access_token,
+      }, settings.google_business_template)
+    );
+  }
+
+  // 20. Reddit
+  const shouldShareReddit =
+    !excluded.has('reddit') &&
+    (options?.forceChannels?.includes('reddit') ||
+      (!options?.forceChannels && settings.reddit_enabled && (settings.reddit_webhook_url || settings.reddit_client_id)));
+  if (shouldShareReddit) {
+    tasks.push(
+      shareToReddit(post, {
+        webhookUrl: settings.reddit_webhook_url,
+        clientId: settings.reddit_client_id,
+        clientSecret: settings.reddit_client_secret,
+        username: settings.reddit_username,
+        password: settings.reddit_password,
+        subreddit: settings.reddit_subreddit,
+      }, settings.reddit_template)
+    );
+  }
+
+  // 21. Slack
+  const shouldShareSlack =
+    !excluded.has('slack') &&
+    (options?.forceChannels?.includes('slack') ||
+      (!options?.forceChannels && settings.slack_enabled && settings.slack_webhook_url));
+  if (shouldShareSlack && settings.slack_webhook_url) {
+    tasks.push(shareToSlack(post, settings.slack_webhook_url, settings.slack_channel, settings.slack_template));
+  }
+
+  // 22. Dribbble
+  const shouldShareDribbble =
+    !excluded.has('dribbble') &&
+    (options?.forceChannels?.includes('dribbble') ||
+      (!options?.forceChannels && settings.dribbble_enabled && (settings.dribbble_webhook_url || settings.dribbble_access_token)));
+  if (shouldShareDribbble) {
+    tasks.push(shareToDribbble(post, { webhookUrl: settings.dribbble_webhook_url, accessToken: settings.dribbble_access_token }));
+  }
+
+  // 23. Whop
+  const shouldShareWhop =
+    !excluded.has('whop') &&
+    (options?.forceChannels?.includes('whop') ||
+      (!options?.forceChannels && settings.whop_enabled && (settings.whop_webhook_url || settings.whop_api_key)));
+  if (shouldShareWhop) {
+    tasks.push(shareToWhop(post, { webhookUrl: settings.whop_webhook_url, apiKey: settings.whop_api_key, communityId: settings.whop_company_id }));
+  }
+
+  // 24. Twitch
+  const shouldShareTwitch =
+    !excluded.has('twitch') &&
+    (options?.forceChannels?.includes('twitch') ||
+      (!options?.forceChannels && settings.twitch_enabled && (settings.twitch_webhook_url || settings.twitch_access_token)));
+  if (shouldShareTwitch) {
+    tasks.push(shareToTwitch(post, { webhookUrl: settings.twitch_webhook_url, clientId: settings.twitch_client_id, accessToken: settings.twitch_access_token, broadcasterId: settings.twitch_broadcaster_id }));
+  }
+
+  // 25. Skool
+  const shouldShareSkool =
+    !excluded.has('skool') &&
+    (options?.forceChannels?.includes('skool') ||
+      (!options?.forceChannels && settings.skool_enabled && (settings.skool_webhook_url || settings.skool_community_id)));
+  if (shouldShareSkool) {
+    tasks.push(shareToSkool(post, { webhookUrl: settings.skool_webhook_url, communityId: settings.skool_community_id }));
+  }
+
+  // 26. Kick
+  const shouldShareKick =
+    !excluded.has('kick') &&
+    (options?.forceChannels?.includes('kick') ||
+      (!options?.forceChannels && settings.kick_enabled && (settings.kick_webhook_url || settings.kick_channel_id)));
+  if (shouldShareKick) {
+    tasks.push(shareToKick(post, { webhookUrl: settings.kick_webhook_url, channelId: settings.kick_channel_id }));
+  }
+
+  // 27. Warpcast
+  const shouldShareWarpcast =
+    !excluded.has('warpcast') &&
+    (options?.forceChannels?.includes('warpcast') ||
+      (!options?.forceChannels && settings.warpcast_enabled && (settings.warpcast_webhook_url || settings.warpcast_api_key)));
+  if (shouldShareWarpcast) {
+    tasks.push(shareToWarpcast(post, { webhookUrl: settings.warpcast_webhook_url, apiKey: settings.warpcast_api_key, signerUuid: settings.warpcast_signer_uuid }, settings.warpcast_template));
+  }
+
+  // 28. VK
+  const shouldShareVk =
+    !excluded.has('vk') &&
+    (options?.forceChannels?.includes('vk') ||
+      (!options?.forceChannels && settings.vk_enabled && (settings.vk_webhook_url || settings.vk_access_token)));
+  if (shouldShareVk) {
+    tasks.push(shareToVk(post, { webhookUrl: settings.vk_webhook_url, accessToken: settings.vk_access_token, ownerId: settings.vk_owner_id }, settings.vk_template));
+  }
+
+  // 29. Lemmy
+  const shouldShareLemmy =
+    !excluded.has('lemmy') &&
+    (options?.forceChannels?.includes('lemmy') ||
+      (!options?.forceChannels && settings.lemmy_enabled && (settings.lemmy_webhook_url || (settings.lemmy_instance_url && settings.lemmy_jwt_token))));
+  if (shouldShareLemmy) {
+    tasks.push(shareToLemmy(post, { webhookUrl: settings.lemmy_webhook_url, instanceUrl: settings.lemmy_instance_url, jwtToken: settings.lemmy_jwt_token, communityId: settings.lemmy_community_id }, settings.lemmy_template));
+  }
+
+  // 30. MeWe
+  const shouldShareMeWe =
+    !excluded.has('mewe') &&
+    (options?.forceChannels?.includes('mewe') ||
+      (!options?.forceChannels && settings.mewe_enabled && (settings.mewe_webhook_url || settings.mewe_access_token)));
+  if (shouldShareMeWe) {
+    tasks.push(shareToMeWe(post, { webhookUrl: settings.mewe_webhook_url, accessToken: settings.mewe_access_token }));
+  }
+
+  // 31. Nostr
+  const shouldShareNostr =
+    !excluded.has('nostr') &&
+    (options?.forceChannels?.includes('nostr') ||
+      (!options?.forceChannels && settings.nostr_enabled && (settings.nostr_webhook_url || settings.nostr_private_key)));
+  if (shouldShareNostr) {
+    tasks.push(shareToNostr(post, { webhookUrl: settings.nostr_webhook_url, privateKey: settings.nostr_private_key, relays: settings.nostr_relays }, settings.nostr_template));
+  }
+
+  // 32. Listmonk
+  const shouldShareListmonk =
+    !excluded.has('listmonk') &&
+    (options?.forceChannels?.includes('listmonk') ||
+      (!options?.forceChannels && settings.listmonk_enabled && (settings.listmonk_webhook_url || (settings.listmonk_url && settings.listmonk_username))));
+  if (shouldShareListmonk) {
+    tasks.push(shareToListmonk(post, { webhookUrl: settings.listmonk_webhook_url, url: settings.listmonk_url, username: settings.listmonk_username, password: settings.listmonk_password, listId: settings.listmonk_list_id }, settings.listmonk_template));
+  }
+
+  // 33. Hashnode
+  const shouldShareHashnode =
+    !excluded.has('hashnode') &&
+    (options?.forceChannels?.includes('hashnode') ||
+      (!options?.forceChannels && settings.hashnode_enabled && (settings.hashnode_webhook_url || (settings.hashnode_access_token && settings.hashnode_publication_id))));
+  if (shouldShareHashnode) {
+    tasks.push(shareToHashnode(post, { webhookUrl: settings.hashnode_webhook_url, accessToken: settings.hashnode_access_token, publicationId: settings.hashnode_publication_id }, settings.hashnode_template));
   }
 
   const settled = await Promise.allSettled(tasks);

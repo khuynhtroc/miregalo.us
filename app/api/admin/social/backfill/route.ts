@@ -16,10 +16,23 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const { action, interval_minutes, start_at, post_immediately } = await req.json();
+    const { action, interval_minutes, start_at, post_immediately, channels } = await req.json();
     const settings = await getSocialSettings();
     const current = settings.facebook_backfill;
     const now = new Date();
+
+    if (action === 'update_channels') {
+      const cleanChannels = Array.isArray(channels)
+        ? channels.filter((c: any) => typeof c === 'string' && c.trim())
+        : (current.channels || ['facebook']);
+      const updated = await saveSocialSettings({
+        facebook_backfill: {
+          ...current,
+          channels: cleanChannels,
+        },
+      });
+      return NextResponse.json({ success: true, state: updated.facebook_backfill });
+    }
 
     if (action === 'start') {
       if (current.lock_until && new Date(current.lock_until) > now) {
@@ -28,7 +41,8 @@ export async function POST(req: NextRequest) {
           { status: 409 }
         );
       }
-      if (!settings.facebook_page_id || !settings.facebook_access_token) {
+      const chosenChannels = Array.isArray(channels) && channels.length > 0 ? channels : (current.channels || ['facebook']);
+      if (chosenChannels.includes('facebook') && (!settings.facebook_page_id || !settings.facebook_access_token)) {
         return NextResponse.json(
           { error: 'Nhập Page ID và Page Access Token rồi lưu cấu hình trước khi tạo hàng đợi bài cũ.' },
           { status: 400 }
@@ -40,7 +54,7 @@ export async function POST(req: NextRequest) {
       const shouldPostImmediately =
         Boolean(post_immediately) || startAtDate.getTime() <= now.getTime() + 60 * 1000;
 
-      const { state: nextState, totalPosts } = await buildFacebookBackfillQueue(interval, startAtDate);
+      const { state: nextState, totalPosts } = await buildFacebookBackfillQueue(interval, startAtDate, chosenChannels);
       if (!totalPosts) {
         return NextResponse.json(
           { error: 'Không tìm thấy bài viết đã xuất bản để đưa vào hàng đợi.' },
@@ -72,9 +86,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === 'post_now') {
-      if (!settings.facebook_page_id || !settings.facebook_access_token) {
+      const activeChannels = current.channels && current.channels.length > 0 ? current.channels : ['facebook'];
+      if (activeChannels.includes('facebook') && (!settings.facebook_page_id || !settings.facebook_access_token)) {
         return NextResponse.json(
-          { error: 'Nhập Page ID và Page Access Token hợp lệ trước khi đăng bài.' },
+          { error: 'Nhập Page ID và Page Access Token hợp lệ trước khi đăng bài lên Fanpage.' },
           { status: 400 }
         );
       }
@@ -83,7 +98,7 @@ export async function POST(req: NextRequest) {
       if (step.httpStatus >= 400 || !step.body.posted) {
         return NextResponse.json(
           {
-            error: step.body.error || step.body.message || 'Không thể đăng bài tiếp theo lên Fanpage.',
+            error: step.body.error || step.body.message || 'Không thể đăng bài tiếp theo lên các mạng xã hội đã chọn.',
             state: latest.facebook_backfill,
           },
           { status: step.httpStatus >= 400 ? step.httpStatus : 400 }
@@ -94,6 +109,8 @@ export async function POST(req: NextRequest) {
         posted: true,
         post_title: step.body.post_title,
         facebook_url: step.body.facebook_url,
+        succeeded_channels: step.body.succeeded_channels,
+        failed_channels: step.body.failed_channels,
         state: latest.facebook_backfill,
       });
     }
@@ -121,6 +138,24 @@ export async function POST(req: NextRequest) {
           ...current,
           status: 'scheduled',
           next_post_at: retryAt,
+          last_error: null,
+          lock_id: null,
+          lock_until: null,
+        },
+      });
+      return NextResponse.json({ success: true, state: updated.facebook_backfill });
+    }
+
+    if (action === 'skip') {
+      const nextCursor = current.cursor + 1;
+      const isComplete = nextCursor >= (current.post_ids?.length || 0);
+      const updated = await saveSocialSettings({
+        facebook_backfill: {
+          ...current,
+          status: isComplete ? 'completed' : 'scheduled',
+          cursor: nextCursor,
+          skipped_count: (current.skipped_count || 0) + 1,
+          next_post_at: isComplete ? null : now.toISOString(),
           last_error: null,
           lock_id: null,
           lock_until: null,

@@ -171,8 +171,13 @@ export async function testFacebookConnection(
       if (userMsg) detail += ` - ${userMsg}`;
 
       if (code === 190) {
-        detail +=
-          '. Nguyên nhân: Token ngắn hạn (1 giờ) từ Graph API Explorer đã hết hạn. Hãy lấy lại Token mới trong Graph API Explorer và điền thêm App Secret bên dưới rồi bấm Lưu Cấu Hình để hệ thống tự động đổi sang Token Vĩnh Viễn không bao giờ hết hạn!';
+        if (subcode === 460) {
+          detail +=
+            '. Nguyên nhân: Phiên đăng nhập Facebook của tài khoản quản trị viên đã bị Facebook thu hồi (do tài khoản cá nhân vừa đổi mật khẩu Facebook, đăng xuất khỏi các thiết bị, hoặc Facebook kích hoạt kiểm tra bảo mật - Mã 190, subcode 460). Hãy vào Meta Graph API Explorer tạo lại User Token mới, dán vào ô Token bên dưới rồi bấm "Lưu Cấu Hình" để hệ thống tự động cấp lại Token Vĩnh Viễn!';
+        } else {
+          detail +=
+            '. Nguyên nhân: Token ngắn hạn từ Graph API Explorer đã hết hạn hoặc không còn hiệu lực. Hãy lấy lại User Token mới trong Graph API Explorer, dán vào ô bên dưới rồi bấm "Lưu Cấu Hình" để hệ thống tự động đổi sang Token Vĩnh Viễn!';
+        }
       }
 
       return { success: false, error: detail };
@@ -247,9 +252,16 @@ export async function shareToFacebook(
     const data = await res.json();
     if (!res.ok || data.error) {
       const fbErr = data.error;
-      const errMsg = fbErr
-        ? `${fbErr.message}${fbErr.code ? ` (Mã lỗi: ${fbErr.code})` : ''}`
+      let errMsg = fbErr
+        ? `${fbErr.message}${fbErr.code ? ` (Mã lỗi: ${fbErr.code}${fbErr.error_subcode ? `, subcode: ${fbErr.error_subcode}` : ''})` : ''}`
         : 'Lỗi khi đăng bài lên Facebook Fanpage';
+      if (fbErr?.code === 190) {
+        if (fbErr?.error_subcode === 460) {
+          errMsg += ' - Phiên đăng nhập Facebook của tài khoản quản trị vừa bị Facebook hủy bỏ (do đổi mật khẩu hoặc bảo mật). Vui lòng tạo User Token mới trong Graph API Explorer và bấm Lưu Cấu Hình để cấp lại Token Vĩnh Viễn.';
+        } else {
+          errMsg += ' - Token Facebook đã hết hạn. Hãy cập nhật Token mới trong Cài Đặt.';
+        }
+      }
       return {
         channel: 'facebook',
         success: false,

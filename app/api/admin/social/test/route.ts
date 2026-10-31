@@ -20,6 +20,23 @@ import {
   getPinterestToken,
   testPinterestConnection,
   sharePostToAllChannels,
+  testRedditConnection,
+  testSlackConnection,
+  testGoogleBusinessConnection,
+  testHashnodeConnection,
+  testVkConnection,
+  testLemmyConnection,
+  testWarpcastConnection,
+  testNostrConnection,
+  testListmonkConnection,
+  testTikTokConnection,
+  testYouTubeConnection,
+  testDribbbleConnection,
+  testWhopConnection,
+  testTwitchConnection,
+  testSkoolConnection,
+  testKickConnection,
+  testMeWeConnection,
 } from '@/lib/social';
 import { db } from '@/lib/db';
 
@@ -131,6 +148,75 @@ export async function POST(req: NextRequest) {
         const { webhook_url, webhook_secret } = credentials || {};
         const result = await testSocialWebhook(webhook_url, webhook_secret);
         return NextResponse.json(result);
+      }
+
+      // Extended Channels
+      if (channel === 'tiktok') {
+        return NextResponse.json(await testTikTokConnection(credentials || {}));
+      }
+
+      if (channel === 'youtube') {
+        return NextResponse.json(await testYouTubeConnection(credentials || {}));
+      }
+
+      if (channel === 'google_business') {
+        return NextResponse.json(await testGoogleBusinessConnection(credentials || {}));
+      }
+
+      if (channel === 'reddit') {
+        return NextResponse.json(await testRedditConnection(credentials || {}));
+      }
+
+      if (channel === 'slack') {
+        return NextResponse.json(await testSlackConnection(credentials?.webhook_url || ''));
+      }
+
+      if (channel === 'dribbble') {
+        return NextResponse.json(await testDribbbleConnection(credentials || {}));
+      }
+
+      if (channel === 'whop') {
+        return NextResponse.json(await testWhopConnection(credentials || {}));
+      }
+
+      if (channel === 'twitch') {
+        return NextResponse.json(await testTwitchConnection(credentials || {}));
+      }
+
+      if (channel === 'skool') {
+        return NextResponse.json(await testSkoolConnection(credentials || {}));
+      }
+
+      if (channel === 'kick') {
+        return NextResponse.json(await testKickConnection(credentials || {}));
+      }
+
+      if (channel === 'warpcast') {
+        return NextResponse.json(await testWarpcastConnection(credentials || {}));
+      }
+
+      if (channel === 'vk') {
+        return NextResponse.json(await testVkConnection(credentials || {}));
+      }
+
+      if (channel === 'lemmy') {
+        return NextResponse.json(await testLemmyConnection(credentials || {}));
+      }
+
+      if (channel === 'mewe') {
+        return NextResponse.json(await testMeWeConnection(credentials || {}));
+      }
+
+      if (channel === 'nostr') {
+        return NextResponse.json(await testNostrConnection(credentials || {}));
+      }
+
+      if (channel === 'listmonk') {
+        return NextResponse.json(await testListmonkConnection(credentials || {}));
+      }
+
+      if (channel === 'hashnode') {
+        return NextResponse.json(await testHashnodeConnection(credentials || {}));
       }
 
       return NextResponse.json({ success: false, error: 'Kênh không hợp lệ' }, { status: 400 });

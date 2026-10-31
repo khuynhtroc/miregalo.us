@@ -3,13 +3,14 @@ import { db } from '@/lib/db';
 import type { Post } from '@/lib/types';
 import { getSocialSettings, saveSocialSettings, sharePostToAllChannels } from './index';
 import { shareToFacebook } from './facebook';
-import type { FacebookBackfillState } from './types';
+import type { FacebookBackfillState, SocialChannelId } from './types';
 
 const LOCK_MS = 10 * 60 * 1000;
 
 export async function buildFacebookBackfillQueue(
   intervalMinutes = 240,
-  startAtDate?: Date
+  startAtDate?: Date,
+  channels?: SocialChannelId[]
 ): Promise<{ state: FacebookBackfillState; totalPosts: number }> {
   const now = new Date();
   const effectiveStart =
@@ -45,6 +46,8 @@ export async function buildFacebookBackfillQueue(
     skipped_count: 0,
     lock_id: null,
     lock_until: null,
+    channels: channels && channels.length > 0 ? channels : ['facebook'],
+    last_channels_posted: [],
   };
 
   return { state: nextState, totalPosts: postIds.length };
@@ -106,11 +109,17 @@ export async function executeFacebookBackfillStep(options?: {
     };
   }
 
-  if (!settings.facebook_page_id || !settings.facebook_access_token) {
+  const selectedChannels: SocialChannelId[] =
+    Array.isArray(state.channels) && state.channels.length > 0
+      ? state.channels
+      : ['facebook'];
+
+  const requiresFacebook = selectedChannels.includes('facebook');
+  if (requiresFacebook && (!settings.facebook_page_id || !settings.facebook_access_token)) {
     const failedState: FacebookBackfillState = {
       ...state,
       status: 'error',
-      last_error: 'Facebook Page ID or Page Access Token is missing. Save valid credentials, then resume the queue.',
+      last_error: 'Facebook Page ID hoặc Token bị thiếu. Vui lòng kiểm tra lại cấu hình Facebook Fanpage.',
       lock_id: null,
       lock_until: null,
     };
@@ -193,12 +202,10 @@ export async function executeFacebookBackfillStep(options?: {
     };
   }
 
-  const result = await shareToFacebook(
-    post,
-    lockedSettings.facebook_page_id,
-    lockedSettings.facebook_access_token,
-    lockedSettings.facebook_template
-  );
+  const multi = await sharePostToAllChannels(post, {
+    forceChannels: selectedChannels,
+    ignoreGlobalToggle: true,
+  });
 
   const latest = await getSocialSettings();
   const latestState = latest.facebook_backfill;
@@ -208,19 +215,23 @@ export async function executeFacebookBackfillStep(options?: {
       body: {
         status: latestState.status,
         posted: false,
-        message: 'Queue changed during Facebook publishing; result was not applied to the new queue.',
+        message: 'Queue changed during publishing; result was not applied to the new queue.',
       },
     };
   }
 
-  if (!result.success) {
+  const resultsList = Object.values(multi.results);
+  const succeeded = resultsList.filter((r) => r.success).map((r) => r.channel);
+  const failed = resultsList.filter((r) => !r.success).map((r) => `${r.channel}: ${r.error || 'Failed'}`);
+
+  if (succeeded.length === 0) {
     const errorState: FacebookBackfillState = {
       ...latestState,
       status: latestState.status === 'paused' ? 'paused' : 'error',
       cursor,
       skipped_count: skippedCount,
       next_post_at: null,
-      last_error: result.error || 'Facebook did not confirm the post.',
+      last_error: failed.join(' | ') || 'Không thể đăng lên các mạng xã hội đã chọn.',
       lock_id: null,
       lock_until: null,
     };
@@ -250,24 +261,12 @@ export async function executeFacebookBackfillStep(options?: {
     next_post_at: pausedDuringPublish || isComplete ? null : new Date(Date.now() + intervalMs).toISOString(),
     last_posted_at: postedAt,
     last_post_title: post.title,
-    last_error: null,
+    last_error: failed.length > 0 ? `Đã đăng: ${succeeded.join(', ')} (Lỗi: ${failed.join(', ')})` : null,
+    last_channels_posted: succeeded,
     lock_id: null,
     lock_until: null,
   };
   await saveSocialSettings({ facebook_backfill: successState });
-
-  // Also cross-post the historical article to any other enabled channels (Telegram, Bluesky, Threads, Mastodon, Pinterest, Discord, X, etc.)
-  let extraChannelsReport: any = null;
-  try {
-    const multi = await sharePostToAllChannels(post, {
-      excludeChannels: ['facebook'],
-      ignoreGlobalToggle: true,
-    });
-    extraChannelsReport = {
-      attempted: multi.total_attempted,
-      succeeded: multi.total_success,
-    };
-  } catch {}
 
   return {
     httpStatus: 200,
@@ -278,9 +277,11 @@ export async function executeFacebookBackfillStep(options?: {
       post_id: post.id,
       post_title: post.title,
       post_slug: post.slug,
-      facebook_post_id: result.post_id,
-      facebook_url: result.url,
-      extra_channels: extraChannelsReport,
+      facebook_post_id: multi.results.facebook?.post_id,
+      facebook_url: multi.results.facebook?.url || null,
+      succeeded_channels: succeeded,
+      failed_channels: failed,
+      multi_report: multi,
       next_post_at: successState.next_post_at,
       cursor: nextCursor,
       total_posts: lockedState.post_ids.length,

@@ -10,7 +10,7 @@ import { generateSeoOpportunities } from './opportunities';
 export async function syncGscData(options: GscSyncOptions = {}): Promise<GscSyncResult> {
   const startTime = Date.now();
   const token = await getGscAccessToken();
-  const isMock = !token || !isGscConfigured();
+  const isMock = !token;
 
   const now = new Date();
   const endDate = options.endDate || now.toISOString().split('T')[0];
@@ -25,7 +25,8 @@ export async function syncGscData(options: GscSyncOptions = {}): Promise<GscSync
     rawMetrics = await generateMockGscTelemetry();
   } else {
     // Live Search Console API call
-    const siteUrl = options.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
+    const rawSiteUrl = options.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.miregalo.us/';
+    const siteUrl = rawSiteUrl.endsWith('/') || rawSiteUrl.startsWith('sc-domain:') ? rawSiteUrl : `${rawSiteUrl}/`;
     const apiUrl = `https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(
       siteUrl
     )}/searchAnalytics/query`;

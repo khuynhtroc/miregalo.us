@@ -317,14 +317,22 @@ const g = globalThis as unknown as { __redirectCache?: { at: number; map: Map<st
 
 export async function getRedirectMap(): Promise<Map<string, Redirect>> {
   const now = Date.now();
-  if (g.__redirectCache && now - g.__redirectCache.at < 60_000) return g.__redirectCache.map;
+  if (g.__redirectCache && now - g.__redirectCache.at < 300_000) return g.__redirectCache.map;
   const { rows } = await db.find('redirects', {
     eq: { active: true },
     select: 'source,destination,status_code,active',
+    limit: 1000,
   });
   const map = new Map(rows.map((r) => [normalizePath(r.source), r]));
   g.__redirectCache = { at: now, map };
   return map;
+}
+
+export async function findRedirectByPath(path: string): Promise<Redirect | null> {
+  const normalized = normalizePath(path);
+  const map = await getRedirectMap();
+  if (map.has(normalized)) return map.get(normalized) || null;
+  return db.findOne('redirects', { source: normalized, active: true });
 }
 export function invalidateRedirectCache() {
   g.__redirectCache = undefined;

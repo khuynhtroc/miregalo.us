@@ -16,3 +16,10 @@ npm-debug.log*
 .open-next
 .wrangler
 wrangler.jsonc
+
+scripts/*-audit.json
+scripts/all-images-audit.json
+scripts/*-summary.json
+scripts/mapped-page-queries.json
+scripts/serp-cache.json
+public/*.csv

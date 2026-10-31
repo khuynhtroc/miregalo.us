@@ -1,11 +1,17 @@
+import fs from 'fs';
 import { createClient } from '@supabase/supabase-js';
 
-const url = 'https://tvgipyhvvtovgttnyivw.supabase.co';
-const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2Z2lweWh2dnRvdmd0dG55aXZ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MTI0Mzg2OCwiZXhwIjoyMTA2ODE5ODY4fQ.n03zTL69UhHEk524ItXwcOtqu1MtvL1iu9uOoXH-oi0';
-const sb = createClient(url, key);
+const envFile = fs.readFileSync('.env.local', 'utf-8');
+const env = {};
+envFile.split('\n').forEach((line) => {
+  const [k, ...v] = line.trim().split('=');
+  if (k && v.length) env[k.trim()] = v.join('=').trim().replace(/^["']|["']$/g, '');
+});
+const sb = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
 
 async function main() {
-  const { data: job } = await sb.from('content_jobs').select('*').eq('id', 'job-kw-038').single();
+  const jobId = process.argv[2] || 'job-kw-047';
+  const { data: job } = await sb.from('content_jobs').select('*').eq('id', jobId).single();
   if (job) {
     const payload = job.payload || {};
     payload.status = 'scheduled';
@@ -13,8 +19,8 @@ async function main() {
       stage: 'research',
       payload,
       updated_at: new Date().toISOString(),
-    }).eq('id', 'job-kw-038');
-    console.log('Reset job-kw-038 result:', error ? error.message : 'SUCCESS');
+    }).eq('id', jobId);
+    console.log(`Reset ${jobId} result:`, error ? error.message : 'SUCCESS');
   }
 }
 

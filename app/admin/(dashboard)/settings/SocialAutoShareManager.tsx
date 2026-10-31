@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import type { SocialSettings } from '@/lib/social/types';
 import { X_OAUTH_CALLBACK_URL } from '@/lib/social/twitter-oauth-config';
 import { PINTEREST_OAUTH_CALLBACK_URL } from '@/lib/social/pinterest-oauth-config';
+import { ExtendedSocialChannelsCards } from './ExtendedSocialChannelsCards';
 
 type SocialSettingsWithConnections = Omit<SocialSettings, 'pinterest_access_token'> & {
   pinterest_access_token?: string;
@@ -13,6 +14,50 @@ type SocialSettingsWithConnections = Omit<SocialSettings, 'pinterest_access_toke
   pinterest_client_secret_configured?: boolean;
   pinterest_token_configured?: boolean;
 };
+
+const AVAILABLE_BACKFILL_CHANNELS = [
+  // Cột 1 theo ma trận
+  { id: 'facebook', name: 'Facebook Fanpage', icon: '📘' },
+  { id: 'linkedin', name: 'LinkedIn', icon: '💼' },
+  { id: 'tiktok', name: 'TikTok', icon: '🎵' },
+  { id: 'reddit', name: 'Reddit', icon: '🤖' },
+  { id: 'slack', name: 'Slack', icon: '⚡' },
+  { id: 'mastodon', name: 'Mastodon', icon: '🐘' },
+  { id: 'skool', name: 'Skool', icon: '🎓' },
+  { id: 'vk', name: 'VKontakte', icon: '🔷' },
+  { id: 'nostr', name: 'Nostr', icon: '🦩' },
+  { id: 'medium', name: 'Medium', icon: '✍️' },
+
+  // Cột 2 theo ma trận
+  { id: 'instagram', name: 'Instagram Feed', icon: '📸' },
+  { id: 'bluesky', name: 'Bluesky', icon: '🦋' },
+  { id: 'youtube', name: 'YouTube', icon: '▶️' },
+  { id: 'telegram', name: 'Telegram', icon: '✈️' },
+  { id: 'pinterest', name: 'Pinterest', icon: '📌' },
+  { id: 'whop', name: 'Whop', icon: '🟧' },
+  { id: 'kick', name: 'Kick', icon: '🟢' },
+  { id: 'lemmy', name: 'Lemmy', icon: '🐭' },
+  { id: 'listmonk', name: 'Listmonk', icon: '📧' },
+  { id: 'hashnode', name: 'Hashnode', icon: '🔷' },
+
+  // Cột 3 theo ma trận
+  { id: 'threads', name: 'Threads', icon: '🧵' },
+  { id: 'twitter', name: 'X / Twitter', icon: '✖️' },
+  { id: 'google_business', name: 'Google My Business', icon: '🏪' },
+  { id: 'discord', name: 'Discord', icon: '💬' },
+  { id: 'dribbble', name: 'Dribbble', icon: '🏀' },
+  { id: 'twitch', name: 'Twitch', icon: '👾' },
+  { id: 'warpcast', name: 'Warpcast', icon: '🟪' },
+  { id: 'mewe', name: 'MeWe', icon: '👥' },
+  { id: 'wordpress', name: 'WordPress', icon: '📰' },
+  { id: 'devto', name: 'Dev.to', icon: '👩‍💻' },
+
+  // Kênh phụ trợ
+  { id: 'hubspot', name: 'HubSpot', icon: '🟠' },
+  { id: 'tumblr', name: 'Tumblr', icon: '🔮' },
+  { id: 'blogger', name: 'Blogger', icon: '🅱️' },
+  { id: 'webhook', name: 'Custom Webhook', icon: '🔌' },
+] as const;
 
 function suggestedBackfillStart() {
   const date = new Date();
@@ -122,17 +167,21 @@ export function SocialAutoShareManager() {
     }
   };
 
-  const handleBackfillAction = async (action: 'start' | 'post_now' | 'pause' | 'resume' | 'reset') => {
+  const handleBackfillAction = async (
+    action: 'start' | 'post_now' | 'pause' | 'resume' | 'reset' | 'skip' | 'update_channels',
+    extraPayload?: Record<string, any>
+  ) => {
     if (!settings) return;
-    if (action === 'reset' && !window.confirm('Xóa hàng đợi hiện tại? Các bài đã đăng sẽ không bị xóa khỏi Facebook.')) return;
+    if (action === 'reset' && !window.confirm('Xóa hàng đợi hiện tại? Các bài đã đăng sẽ không bị xóa.')) return;
 
     setBackfillBusy(true);
     setMsg(null);
     try {
-      const payload: Record<string, unknown> = { action };
+      const payload: Record<string, unknown> = { action, ...extraPayload };
       if (action === 'start') {
         payload.start_at = backfillStartAt ? new Date(backfillStartAt).toISOString() : new Date().toISOString();
         payload.interval_minutes = backfillInterval;
+        payload.channels = settings.facebook_backfill.channels || ['facebook'];
       }
       const res = await fetch('/api/admin/social/backfill/', {
         method: 'POST',
@@ -144,7 +193,7 @@ export function SocialAutoShareManager() {
         if (data.state) {
           setSettings((current) => (current ? { ...current, facebook_backfill: data.state } : current));
         }
-        setMsg({ type: 'error', text: data.error || 'Không thể cập nhật hàng đợi Facebook.' });
+        setMsg({ type: 'error', text: data.error || 'Không thể cập nhật hàng đợi đăng bài.' });
         return;
       }
 
@@ -155,18 +204,127 @@ export function SocialAutoShareManager() {
             ? `✅ Đã tạo hàng đợi ${data.total_posts} bài (cũ nhất ➔ mới nhất) và đăng ngay bài đầu tiên: “${data.first_post_title}”!`
             : `✅ Đã tạo hàng đợi ${data.total_posts} bài, sắp từ cũ đến mới. Bài đầu tiên sẽ được đăng theo giờ đã chọn.`
           : action === 'post_now'
-            ? `🚀 Đã đăng thành công bài tiếp theo lên Fanpage: “${data.post_title}”!`
+            ? `🚀 Đã đăng thành công bài tiếp theo: “${data.post_title}”${data.succeeded_channels?.length ? ` lên [${data.succeeded_channels.join(', ')}]` : ''}!`
             : action === 'pause'
-              ? '⏸ Đã tạm dừng hàng đợi Facebook.'
+              ? '⏸ Đã tạm dừng hàng đợi đăng bài.'
               : action === 'resume'
-                ? '▶ Đã tiếp tục hàng đợi Facebook.'
-                : '🗑 Đã xóa hàng đợi. Bài đã đăng vẫn còn trên Fanpage.';
+                ? '▶ Đã tiếp tục hàng đợi đăng bài.'
+                : action === 'skip'
+                  ? '⏭ Đã bỏ qua bài viết lỗi và chuyển sang bài tiếp theo.'
+                  : action === 'update_channels'
+                    ? '✅ Đã lưu danh sách mạng xã hội áp dụng cho hàng đợi!'
+                    : '🗑 Đã xóa hàng đợi. Bài đã đăng vẫn còn trên các mạng xã hội.';
       setMsg({ type: 'success', text: successMessage });
     } catch (error: any) {
-      setMsg({ type: 'error', text: error?.message || 'Lỗi kết nối khi cập nhật hàng đợi Facebook.' });
+      setMsg({ type: 'error', text: error?.message || 'Lỗi kết nối khi cập nhật hàng đợi.' });
     } finally {
       setBackfillBusy(false);
     }
+  };
+
+  const isChannelConfigured = (chId: string): boolean => {
+    if (!settings) return false;
+    switch (chId) {
+      case 'facebook':
+        return Boolean(settings.facebook_page_id && settings.facebook_access_token);
+      case 'instagram':
+        return Boolean(settings.instagram_user_id || settings.instagram_access_token || settings.facebook_access_token);
+      case 'threads':
+        return Boolean(settings.threads_access_token);
+      case 'twitter':
+        return Boolean(settings.twitter_oauth2_connected || (settings.twitter_api_key && settings.twitter_access_token));
+      case 'bluesky':
+        return Boolean(settings.bluesky_identifier && settings.bluesky_app_password);
+      case 'pinterest':
+        return Boolean(settings.pinterest_token_configured || settings.pinterest_oauth_connected);
+      case 'telegram':
+        return Boolean(settings.telegram_bot_token && settings.telegram_chat_id);
+      case 'linkedin':
+        return Boolean(settings.linkedin_access_token);
+      case 'discord':
+        return Boolean(settings.discord_webhook_url);
+      case 'mastodon':
+        return Boolean(settings.mastodon_access_token);
+      case 'hubspot':
+        return Boolean(settings.hubspot_access_token);
+      case 'devto':
+        return Boolean(settings.devto_api_key);
+      case 'wordpress':
+        return Boolean(settings.wordpress_site_url && settings.wordpress_username && settings.wordpress_app_password);
+      case 'medium':
+        return Boolean(settings.medium_integration_token);
+      case 'tumblr':
+        return Boolean(settings.tumblr_blog_name && settings.tumblr_access_token);
+      case 'blogger':
+        return Boolean(settings.blogger_blog_id && settings.blogger_access_token);
+      case 'webhook':
+        return Boolean(settings.webhook_url);
+      case 'tiktok':
+        return Boolean(settings.tiktok_webhook_url || settings.tiktok_access_token);
+      case 'youtube':
+        return Boolean(settings.youtube_webhook_url || settings.youtube_api_key);
+      case 'google_business':
+        return Boolean(settings.google_business_webhook_url || (settings.google_business_account_id && settings.google_business_location_id && settings.google_business_access_token));
+      case 'reddit':
+        return Boolean(settings.reddit_webhook_url || (settings.reddit_client_id && settings.reddit_client_secret && settings.reddit_username && settings.reddit_password));
+      case 'slack':
+        return Boolean(settings.slack_webhook_url);
+      case 'dribbble':
+        return Boolean(settings.dribbble_webhook_url || settings.dribbble_access_token);
+      case 'whop':
+        return Boolean(settings.whop_webhook_url || (settings.whop_api_key && settings.whop_company_id));
+      case 'twitch':
+        return Boolean(settings.twitch_webhook_url || (settings.twitch_client_id && settings.twitch_access_token));
+      case 'skool':
+        return Boolean(settings.skool_webhook_url || settings.skool_community_id);
+      case 'kick':
+        return Boolean(settings.kick_webhook_url || settings.kick_channel_id);
+      case 'warpcast':
+        return Boolean(settings.warpcast_webhook_url || (settings.warpcast_api_key && settings.warpcast_signer_uuid));
+      case 'vk':
+        return Boolean(settings.vk_webhook_url || settings.vk_access_token);
+      case 'lemmy':
+        return Boolean(settings.lemmy_webhook_url || (settings.lemmy_instance_url && settings.lemmy_jwt_token));
+      case 'mewe':
+        return Boolean(settings.mewe_webhook_url || settings.mewe_access_token);
+      case 'nostr':
+        return Boolean(settings.nostr_webhook_url || settings.nostr_private_key);
+      case 'listmonk':
+        return Boolean(settings.listmonk_webhook_url || (settings.listmonk_url && settings.listmonk_username && settings.listmonk_password));
+      case 'hashnode':
+        return Boolean(settings.hashnode_webhook_url || (settings.hashnode_access_token && settings.hashnode_publication_id));
+      default:
+        return false;
+    }
+  };
+
+  const handleToggleChannel = async (channelId: string) => {
+    if (!settings) return;
+    const currentChannels: string[] =
+      settings.facebook_backfill?.channels && settings.facebook_backfill.channels.length > 0
+        ? settings.facebook_backfill.channels
+        : ['facebook'];
+
+    let nextChannels: string[];
+    if (currentChannels.includes(channelId)) {
+      if (currentChannels.length === 1) {
+        setMsg({ type: 'error', text: 'Cần giữ lại ít nhất 1 mạng xã hội trong hàng đợi đăng bài.' });
+        return;
+      }
+      nextChannels = currentChannels.filter((c) => c !== channelId);
+    } else {
+      nextChannels = [...currentChannels, channelId];
+    }
+
+    setSettings({
+      ...settings,
+      facebook_backfill: {
+        ...settings.facebook_backfill,
+        channels: nextChannels as any,
+      },
+    });
+
+    await handleBackfillAction('update_channels', { channels: nextChannels });
   };
 
   const handleConnectX = async () => {
@@ -641,8 +799,8 @@ export function SocialAutoShareManager() {
             <input
               className="form-input"
               type="text"
-              placeholder="1132334105813486"
-              value={settings.facebook_app_id || '1132334105813486'}
+              placeholder="2272148170382644"
+              value={settings.facebook_app_id || ''}
               onChange={(e) => setSettings({ ...settings, facebook_app_id: e.target.value })}
               style={{ fontFamily: 'monospace' }}
             />
@@ -700,23 +858,86 @@ export function SocialAutoShareManager() {
         </div>
       </div>
 
-      {/* ── FACEBOOK HISTORICAL POST BACKFILL ────────── */}
+      {/* ── MULTI-CHANNEL HISTORICAL POST BACKFILL ────────── */}
       <div className="admin-card" style={{ border: '1px solid #d6e4ff', background: '#f8fbff' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
           <div>
-            <h3 className="admin-card-title" style={{ fontSize: '1.05rem', marginBottom: '6px' }}>
-              📚 Đăng lại bài cũ lên Facebook theo lịch
+            <h3 className="admin-card-title" style={{ fontSize: '1.08rem', marginBottom: '6px' }}>
+              📚 Đăng lại bài cũ lên Mạng Xã Hội theo lịch (Multi-Channel Backfill)
             </h3>
             <p style={{ margin: 0, fontSize: '0.84rem', color: '#53627c', lineHeight: 1.55 }}>
-              Tạo hàng đợi riêng từ các bài hướng dẫn quà tặng và bài blog đã xuất bản, đăng bài cũ nhất trước rồi lần lượt đến bài mới hơn. Lịch này hoạt động độc lập với công tắc chia sẻ bài mới.
+              Tạo hàng đợi riêng từ các bài hướng dẫn quà tặng và bài blog đã xuất bản, tự động đăng theo lịch từ bài cũ nhất đến mới nhất. Bạn có thể chọn đăng lên Facebook và các mạng xã hội khác cùng lúc. Tiến trình tiếp tục bám sát tiến trình hiện tại.
             </p>
           </div>
-          <span style={{ padding: '5px 10px', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 700, background: '#e7f0ff', color: '#175cd3' }}>
-            Chỉ đăng lên Facebook
+          <span style={{ padding: '6px 12px', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 700, background: '#e7f0ff', color: '#175cd3' }}>
+            {(() => {
+              const chs = settings.facebook_backfill.channels;
+              const count = chs && chs.length > 0 ? chs.length : 1;
+              return `Đang áp dụng ${count} Mạng Xã Hội`;
+            })()}
           </span>
         </div>
 
-        <div className="form-row" style={{ marginTop: '18px' }}>
+        {/* ── BỘ CHỌN MẠNG XÃ HỘI ÁP DỤNG TRONG HÀNG ĐỢI ── */}
+        {(() => {
+          const currentChannels =
+            settings.facebook_backfill.channels && settings.facebook_backfill.channels.length > 0
+              ? settings.facebook_backfill.channels
+              : ['facebook'];
+
+          return (
+            <div style={{ marginTop: '16px', padding: '14px 16px', borderRadius: '8px', background: '#ffffff', border: '1px solid #d0d5dd' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
+                <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#1d2939' }}>
+                  🌐 Tích chọn các Mạng Xã Hội cùng đăng bài theo lịch (Tiến trình bám sát tiến trình hiện tại):
+                </span>
+                <span style={{ fontSize: '0.8rem', color: '#475467' }}>
+                  Đang chọn: <strong style={{ color: '#175cd3' }}>{currentChannels.length} mạng xã hội</strong>
+                </span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
+                {AVAILABLE_BACKFILL_CHANNELS.map((ch) => {
+                  const isSelected = currentChannels.includes(ch.id);
+                  const configured = isChannelConfigured(ch.id);
+                  return (
+                    <label
+                      key={ch.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: isSelected ? '1.5px solid #175cd3' : '1px solid #eaecf0',
+                        background: isSelected ? '#eff8ff' : '#fcfcfd',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleToggleChannel(ch.id)}
+                        disabled={backfillBusy}
+                        style={{ width: '17px', height: '17px', accentColor: '#175cd3', cursor: 'pointer' }}
+                      />
+                      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: isSelected ? 700 : 500, color: '#1d2939' }}>
+                          {ch.icon} {ch.name}
+                        </span>
+                        <span style={{ fontSize: '0.73rem', color: configured ? '#027a48' : '#98a2b3' }}>
+                          {configured ? '● Đã kết nối' : '○ Chưa kết nối'}
+                        </span>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
+        <div className="form-row" style={{ marginTop: '16px' }}>
           <div className="form-group">
             <label className="form-label">Thời điểm đăng bài đầu tiên (giờ trên máy bạn)</label>
             <input
@@ -750,6 +971,10 @@ export function SocialAutoShareManager() {
           const queue = settings.facebook_backfill;
           const total = queue.post_ids?.length || 0;
           const remaining = Math.max(0, total - queue.cursor);
+          const currentChannels =
+            queue.channels && queue.channels.length > 0
+              ? queue.channels
+              : ['facebook'];
           const statusLabel = {
             idle: 'Chưa tạo hàng đợi',
             scheduled: 'Đang chạy theo lịch',
@@ -765,6 +990,17 @@ export function SocialAutoShareManager() {
                 <strong style={{ color: statusColor }}>{statusLabel}</strong>
                 {total > 0 && <span style={{ color: '#475467', fontSize: '0.84rem' }}>Đã xử lý {queue.cursor}/{total} · Còn {remaining} · Bỏ qua {queue.skipped_count}</span>}
               </div>
+              <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.8rem', color: '#475467' }}>Mạng xã hội áp dụng:</span>
+                {currentChannels.map((cId) => {
+                  const chInfo = AVAILABLE_BACKFILL_CHANNELS.find((c) => c.id === cId);
+                  return (
+                    <span key={cId} style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '0.78rem', background: '#eff8ff', color: '#175cd3', fontWeight: 600 }}>
+                      {chInfo?.icon || '🌐'} {chInfo?.name || cId}
+                    </span>
+                  );
+                })}
+              </div>
               {queue.next_post_at && queue.status === 'scheduled' && (
                 <p style={{ margin: '8px 0 0', fontSize: '0.83rem', color: '#475467' }}>
                   Bài tiếp theo dự kiến: {new Date(queue.next_post_at).toLocaleString()}
@@ -773,6 +1009,11 @@ export function SocialAutoShareManager() {
               {queue.last_post_title && queue.last_posted_at && (
                 <p style={{ margin: '6px 0 0', fontSize: '0.83rem', color: '#475467' }}>
                   Bài gần nhất: “{queue.last_post_title}” · {new Date(queue.last_posted_at).toLocaleString()}
+                </p>
+              )}
+              {queue.last_channels_posted && queue.last_channels_posted.length > 0 && (
+                <p style={{ margin: '6px 0 0', fontSize: '0.83rem', color: '#027a48' }}>
+                  ✓ Đã đăng thành công lên: <strong>{queue.last_channels_posted.join(', ')}</strong>
                 </p>
               )}
               {queue.last_error && <p style={{ margin: '8px 0 0', fontSize: '0.84rem', color: '#b42318' }}>Lỗi: {queue.last_error}</p>}
@@ -785,7 +1026,7 @@ export function SocialAutoShareManager() {
             <button
               type="button"
               className="btn-primary"
-              disabled={backfillBusy || !settings.facebook_page_id || !settings.facebook_access_token}
+              disabled={backfillBusy}
               onClick={() => handleBackfillAction('start')}
               style={{ background: '#1877f2' }}
             >
@@ -796,11 +1037,11 @@ export function SocialAutoShareManager() {
             <button
               type="button"
               className="btn-primary"
-              disabled={backfillBusy || !settings.facebook_page_id || !settings.facebook_access_token}
+              disabled={backfillBusy}
               onClick={() => handleBackfillAction('post_now')}
               style={{ background: '#027a48' }}
             >
-              {backfillBusy ? 'Đang đăng...' : '⚡ Đăng ngay 1 bài tiếp theo (Cũ ➔ Mới)'}
+              {backfillBusy ? 'Đang đăng...' : '⚡ Đăng ngay 1 bài tiếp theo lên các MXH đã chọn (Cũ ➔ Mới)'}
             </button>
           )}
           {settings.facebook_backfill.status === 'scheduled' && (
@@ -809,9 +1050,14 @@ export function SocialAutoShareManager() {
             </button>
           )}
           {(settings.facebook_backfill.status === 'paused' || settings.facebook_backfill.status === 'error') && (
-            <button type="button" className="btn-primary" disabled={backfillBusy} onClick={() => handleBackfillAction('resume')} style={{ background: '#1877f2' }}>
-              {settings.facebook_backfill.status === 'error' ? '↻ Thử lại bài đang lỗi' : '▶ Tiếp tục hàng đợi'}
-            </button>
+            <>
+              <button type="button" className="btn-primary" disabled={backfillBusy} onClick={() => handleBackfillAction('resume')} style={{ background: '#1877f2' }}>
+                {settings.facebook_backfill.status === 'error' ? '↻ Thử lại bài đang lỗi' : '▶ Tiếp tục hàng đợi'}
+              </button>
+              <button type="button" className="btn-secondary" disabled={backfillBusy} onClick={() => handleBackfillAction('skip')}>
+                ⏭ Bỏ qua bài này
+              </button>
+            </>
           )}
           {settings.facebook_backfill.status !== 'idle' && (
             <button type="button" className="btn-secondary" disabled={backfillBusy} onClick={() => handleBackfillAction('reset')}>
@@ -820,7 +1066,7 @@ export function SocialAutoShareManager() {
           )}
         </div>
         <p className="form-hint" style={{ marginTop: '12px' }}>
-          Hệ thống tự động xếp toàn bộ bài viết đã xuất bản theo thứ tự từ cũ nhất đến mới nhất và đăng lên Fanpage (cùng toàn bộ các mạng xã hội đã bật bên dưới) theo chu kỳ đã chọn (mặc định 4 tiếng/bài). Lịch này hoạt động độc lập với công tắc “Tự động chia sẻ bài mới”.
+          Hệ thống tự động xếp toàn bộ bài viết đã xuất bản theo thứ tự từ cũ nhất đến mới nhất và đăng đồng thời lên tất cả các mạng xã hội bạn đã tích chọn ở trên theo chu kỳ đã chọn (mặc định 4 tiếng/bài). Tiến trình tiếp tục bám sát tiến trình đã thực hiện.
         </p>
       </div>
 
@@ -2583,6 +2829,15 @@ export function SocialAutoShareManager() {
           </button>
         </div>
       </div>
+
+      {/* ── 17 EXTENDED CHANNELS (MA TRẬN 30 KÊNH) ── */}
+      <ExtendedSocialChannelsCards
+        settings={settings}
+        setSettings={setSettings}
+        testingChannel={testingChannel}
+        handleTestConnection={handleTestConnection}
+        handleTestPost={handleTestPost}
+      />
 
       {/* ── BOTTOM SAVE BUTTON ───────────────────────── */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
