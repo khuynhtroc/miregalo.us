@@ -1,6 +1,7 @@
 import { SITE_URL, postPath } from '@/lib/urls';
 import type { Post } from '@/lib/types';
 import type { ChannelShareResult } from './types';
+import { buildOptimizedFacebookStatus } from './seo-content-generator';
 
 const FB_GRAPH_API = 'https://graph.facebook.com/v19.0';
 
@@ -220,12 +221,18 @@ export async function shareToFacebook(
     const title = post.title || 'Guía de Regalos';
     const excerpt = post.seo_description || post.excerpt || '';
 
-    const message = template
+    const isLegacyOrAuto =
+      !template ||
+      template.includes('{auto_seo}') ||
+      template.trim().startsWith('🎁 {title}') ||
+      template.length < 100;
+
+    const message = !isLegacyOrAuto
       ? template
           .replace(/{title}/g, title)
           .replace(/{excerpt}/g, excerpt)
           .replace(/{url}/g, postUrl)
-      : `🎁 ${title}\n\n${excerpt}\n\n👉 Descubre todas las ideas y detalles aquí: ${postUrl}`;
+      : buildOptimizedFacebookStatus({ ...post, urlPath: postPath(post), url: postUrl }, SITE_URL);
 
     // Warm Facebook's OpenGraph cache so the first share of an older URL always renders its og:image
     try {

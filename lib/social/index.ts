@@ -101,13 +101,12 @@ export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
   facebook_access_token: '',
   facebook_app_id: '2272148170382644',
   facebook_app_secret: '',
-  facebook_template: '🎁 {title}\n\n{excerpt}\n\n👉 Descubre todas las ideas aquí: {url}',
+  facebook_template: '{auto_seo}',
 
   instagram_enabled: false,
   instagram_user_id: '',
   instagram_access_token: '',
-  instagram_template:
-    '🎁 {title}\n\n{excerpt}\n\n👉 Descubre la guía completa en: {url}\n\n#regalos #ideaspararegalar #miregalo #regalosoriginales #guiaDeRegalos',
+  instagram_template: '{auto_seo}',
 
   twitter_enabled: false,
   twitter_api_key: '',
@@ -138,7 +137,7 @@ export const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
   telegram_enabled: false,
   telegram_bot_token: '',
   telegram_chat_id: '',
-  telegram_template: '🎁 {title}\n\n{excerpt}\n\n👉 Descubre todas las ideas aquí:\n{url}',
+  telegram_template: '{auto_seo}',
 
   bluesky_enabled: false,
   bluesky_identifier: '',

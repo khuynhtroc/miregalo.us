@@ -1,6 +1,7 @@
 import { SITE_URL, postPath } from '@/lib/urls';
 import type { Post } from '@/lib/types';
 import type { ChannelShareResult } from './types';
+import { buildOptimizedTelegramMessage } from './seo-content-generator';
 
 const TG_API = 'https://api.telegram.org';
 
@@ -79,12 +80,18 @@ export async function shareToTelegram(
       post.items?.find((it) => it?.image)?.image ||
       '';
 
-    const text = template
+    const isLegacyOrAuto =
+      !template ||
+      template.includes('{auto_seo}') ||
+      template.trim().startsWith('🎁 {title}') ||
+      template.length < 80;
+
+    const text = !isLegacyOrAuto
       ? template
           .replace(/{title}/g, title)
           .replace(/{excerpt}/g, excerpt)
           .replace(/{url}/g, postUrl)
-      : `🎁 ${title}\n\n${excerpt}\n\n👉 Descubre todas las ideas aquí:\n${postUrl}`;
+      : buildOptimizedTelegramMessage({ ...post, urlPath: postPath(post), url: postUrl }, SITE_URL);
 
     // Try sending as a photo post first if the article has an image and caption <= 1024 chars
     if (imageUrl && text.length <= 1024) {
@@ -95,6 +102,7 @@ export async function shareToTelegram(
           chat_id: cleanChat,
           photo: imageUrl,
           caption: text,
+          parse_mode: isLegacyOrAuto ? 'HTML' : undefined,
         }),
       });
       const photoData = await photoRes.json();
@@ -119,6 +127,7 @@ export async function shareToTelegram(
       body: JSON.stringify({
         chat_id: cleanChat,
         text,
+        parse_mode: isLegacyOrAuto ? 'HTML' : undefined,
         disable_web_page_preview: false,
       }),
     });

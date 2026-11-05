@@ -820,15 +820,32 @@ export function SocialAutoShareManager() {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Mẫu nội dung bài đăng (Template)</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <label className="form-label" style={{ margin: 0 }}>Mẫu nội dung bài đăng (Template)</label>
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{
+                padding: '3px 10px',
+                fontSize: '0.76rem',
+                background: settings.facebook_template === '{auto_seo}' ? '#eff8ff' : '#fff',
+                color: settings.facebook_template === '{auto_seo}' ? '#175cd3' : '#475467',
+                borderColor: settings.facebook_template === '{auto_seo}' ? '#b2ddff' : '#d0d5dd',
+              }}
+              onClick={() => setSettings({ ...settings, facebook_template: '{auto_seo}' })}
+            >
+              ⚡ Chế độ Tự động chuẩn SEO GEO 5 trụ cột (Khuyên dùng)
+            </button>
+          </div>
           <textarea
             className="form-textarea"
             style={{ minHeight: '80px', fontFamily: 'monospace', fontSize: '0.85rem' }}
             value={settings.facebook_template || ''}
             onChange={(e) => setSettings({ ...settings, facebook_template: e.target.value })}
+            placeholder="{auto_seo}"
           />
           <p className="form-hint">
-            Biến hỗ trợ: <code>&#123;title&#125;</code> (tiêu đề), <code>&#123;excerpt&#125;</code> (tóm tắt), <code>&#123;url&#125;</code> (link bài viết)
+            <strong>Khuyên dùng:</strong> Để giá trị <code>&#123;auto_seo&#125;</code> (hoặc để trống) để hệ thống tự động tạo bài đăng chuẩn 5 trụ cột cho <strong>MiRegalo.us</strong>: (1) Hook Headline kèm icon danh mục, (2) Đoạn dẫn nhập Storytelling cảm xúc, (3) Khu vực phủ sóng GEO &amp; Hỗ trợ 24/7 (tự động gộp/khử trùng số điện thoại), (4) Consejo experto &amp; CTA mua hàng, (5) Cụm 8–12 Hashtags chuẩn SEO Facebook &amp; SEO GEO (US Hispanic &amp; Español).
           </p>
         </div>
 

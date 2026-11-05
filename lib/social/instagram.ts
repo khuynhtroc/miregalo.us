@@ -1,6 +1,7 @@
 import type { Post } from '@/lib/types';
 import { SITE_URL, postPath } from '@/lib/urls';
 import type { ChannelShareResult } from './types';
+import { buildOptimizedFacebookStatus } from './seo-content-generator';
 
 const FB_GRAPH_VERSION = 'v21.0';
 
@@ -53,14 +54,21 @@ export function formatInstagramCaption(post: Post, template?: string): string {
   const title = post.title || '';
   const excerpt = post.excerpt || post.seo_description || '';
 
+  const isLegacyOrAuto =
+    !template ||
+    !template.trim() ||
+    template.includes('{auto_seo}') ||
+    template.trim().startsWith('🎁 {title}') ||
+    template.length < 150;
+
   let text: string;
-  if (template && template.trim()) {
+  if (!isLegacyOrAuto && template) {
     text = template
       .replace(/\{title\}/g, title)
       .replace(/\{excerpt\}/g, excerpt)
       .replace(/\{url\}/g, url);
   } else {
-    text = `🎁 ${title}\n\n${excerpt}\n\n👉 Descubre la guía completa en: ${url}\n\n#regalos #ideaspararegalar #miregalo #regalosoriginales #guiaDeRegalos`;
+    text = buildOptimizedFacebookStatus({ ...post, urlPath: postPath(post), url }, getSiteUrl());
   }
 
   return text.length > 2150 ? text.slice(0, 2147) + '...' : text;
