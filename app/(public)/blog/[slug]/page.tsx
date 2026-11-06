@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { neutralizeMerchantHtml } from '@/lib/commerce';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -16,6 +17,7 @@ import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { TableOfContents } from '@/components/TableOfContents';
 import { extractTocItems } from '@/lib/toc';
 import { PostCard } from '@/components/PostCard';
+import { ProductCard } from '@/components/ProductCard';
 import { StoreCta } from '@/components/StoreCta';
 import { JsonLd } from '@/components/JsonLd';
 import { AdBanner } from '@/components/AdBanner';
@@ -124,6 +126,28 @@ export default async function BlogPostPage({ params }: PageProps) {
               clientId={settings.adsense_client_id}
               slotId={settings.adsense_slot_in_article}
             />
+          )}
+
+          
+          {/* Curated Product Cards if post has items */}
+          {post.items && post.items.length > 0 && (
+            <section className="article-products-section" style={{ margin: '32px 0' }}>
+              <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#111827', marginBottom: '20px' }}>
+                🎁 Regalos y Productos Destacados ({post.items.length} opciones)
+              </h2>
+              <div className="article-content">
+                {post.items.map((item, idx) => (
+                  <Fragment key={idx}>
+                    <ProductCard
+                      item={item}
+                      index={idx}
+                      productSlug={`${post.slug}-item-${idx + 1}`}
+                      variant="row"
+                    />
+                  </Fragment>
+                ))}
+              </div>
+            </section>
           )}
 
           <div

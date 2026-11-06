@@ -237,6 +237,8 @@ export interface SiteSettings {
   noindex_site: boolean;
   google_search_cx?: string;
   amazon_associates_tag?: string;
+  amazon_associates_tag_es?: string;
+  amazon_associates_tag_mx?: string;
   awin_affiliate_id?: string;
   ebay_campaign_id?: string;
   walmart_partner_id?: string;

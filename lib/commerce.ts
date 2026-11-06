@@ -1,12 +1,46 @@
 /**
- * US-market commerce helpers (miregalo.us targets US Hispanics).
- * - All Amazon traffic goes to amazon.com with the US Associates tag.
- * - Spain-only merchants (El Corte Inglés, eBay.es, Amazon.es/amzn.eu) are mapped to US equivalents.
- * - Prices are only shown when they are known USD prices; legacy EUR placeholders are hidden.
+ * US and Global Commerce helpers with Amazon Geotargeting and OneLink support.
+ * - Routes visitors from Spain to amazon.es, Mexico to amazon.com.mx, US to amazon.com, etc.
+ * - Resolves direct ASIN product links and fallback search links cleanly.
+ * - Preserves native merchants (e.g. El Corte Inglés) for local Spanish visitors.
+ * - Prices are displayed in USD when known, or hidden when EUR to avoid confusing US visitors.
  */
 
 export const DEFAULT_AMAZON_TAG = process.env.NEXT_PUBLIC_AMAZON_TAG || 'miregalo26-20';
+export const DEFAULT_AMAZON_TAG_ES = process.env.NEXT_PUBLIC_AMAZON_TAG_ES || 'miregalo09-21';
 export const PRICE_FALLBACK_LABEL = 'Ver precio en Amazon';
+
+/**
+ * Supported Amazon Marketplaces with local domains and currency.
+ * Used for Geotargeting and Amazon OneLink routing.
+ */
+export interface AmazonMarketplace {
+  countryCode: string;
+  domain: string;
+  currency: string;
+}
+
+export const AMAZON_MARKETPLACES: Record<string, { domain: string; currency: string }> = {
+  ES: { domain: 'www.amazon.es', currency: 'EUR' },
+  MX: { domain: 'www.amazon.com.mx', currency: 'MXN' },
+  US: { domain: 'www.amazon.com', currency: 'USD' },
+  GB: { domain: 'www.amazon.co.uk', currency: 'GBP' },
+  UK: { domain: 'www.amazon.co.uk', currency: 'GBP' },
+  DE: { domain: 'www.amazon.de', currency: 'EUR' },
+  AT: { domain: 'www.amazon.de', currency: 'EUR' },
+  FR: { domain: 'www.amazon.fr', currency: 'EUR' },
+  IT: { domain: 'www.amazon.it', currency: 'EUR' },
+  CA: { domain: 'www.amazon.ca', currency: 'CAD' },
+  BR: { domain: 'www.amazon.com.br', currency: 'BRL' },
+};
+
+export function resolveMarketplace(countryCode?: string | null): AmazonMarketplace {
+  const code = (countryCode || '').trim().toUpperCase();
+  if (code && AMAZON_MARKETPLACES[code]) {
+    return { countryCode: code, ...AMAZON_MARKETPLACES[code] };
+  }
+  return { countryCode: 'US', domain: 'www.amazon.com', currency: 'USD' };
+}
 
 const ASIN_RE = /(?:\/dp\/|\/gp\/product\/|\/exec\/obidos\/ASIN\/|\/o\/ASIN\/|\/gp\/aw\/d\/)([A-Z0-9]{10})/i;
 
@@ -15,8 +49,14 @@ export function extractAsin(url: string): string | null {
   return m ? m[1].toUpperCase() : null;
 }
 
-export function amazonSearchUrl(keyword: string, tag = DEFAULT_AMAZON_TAG): string {
-  return `https://www.amazon.com/s?k=${encodeURIComponent(keyword.trim().slice(0, 70))}&tag=${tag}`;
+export function amazonSearchUrl(keyword: string, tag = DEFAULT_AMAZON_TAG, domain = 'www.amazon.com'): string {
+  const lang = domain === 'www.amazon.com' ? '&language=es_US' : '';
+  return `https://${domain}/s?k=${encodeURIComponent(keyword.trim().slice(0, 70))}&tag=${tag}${lang}`;
+}
+
+export function amazonProductUrl(asin: string, tag = DEFAULT_AMAZON_TAG, domain = 'www.amazon.com'): string {
+  const lang = domain === 'www.amazon.com' ? '&language=es_US' : '';
+  return `https://${domain}/dp/${asin}/?tag=${tag}${lang}`;
 }
 
 /** Normalise a merchant label for display on the US site. */
@@ -55,41 +95,72 @@ export function usdPriceValue(price?: string | null, currency?: string | null): 
 }
 
 /**
- * Rewrite any outbound merchant URL to its US equivalent.
- * `fallbackKeyword` is used to build an amazon.com search when the source is Spain-only and non-specific.
+ * Geotargeted outbound merchant URL resolution.
+ * Automatically routes Spanish traffic to amazon.es, Mexican traffic to amazon.com.mx,
+ * US traffic to amazon.com, and handles local merchant equivalents seamlessly.
  */
-export function toUsMerchantUrl(rawUrl: string, fallbackKeyword: string, tag = DEFAULT_AMAZON_TAG): string {
+export function toTargetMerchantUrl(
+  rawUrl: string,
+  fallbackKeyword: string,
+  options: {
+    countryCode?: string | null;
+    tag?: string;
+    tagsByCountry?: Record<string, string>;
+  } = {}
+): string {
+  const marketplace = resolveMarketplace(options.countryCode);
+  const tag =
+    (options.tagsByCountry && options.tagsByCountry[marketplace.countryCode]) ||
+    options.tag ||
+    DEFAULT_AMAZON_TAG;
+
   let url = rawUrl.replace(/&amp;/g, '&').trim();
   try {
     const u = new URL(url);
     const host = u.hostname.toLowerCase();
 
-    // Awin deep links to El Corte Inglés (Spain only) -> amazon.com search
+    // Awin deep links
     if (host.includes('awin1.com')) {
       const ued = u.searchParams.get('ued') || '';
-      if (/elcorteingles\./i.test(ued)) return amazonSearchUrl(fallbackKeyword, tag);
-      if (/amazon\./i.test(ued)) return toUsMerchantUrl(ued, fallbackKeyword, tag);
+      // If El Corte Inglés and visitor is in Spain, keep native El Corte Inglés store
+      if (/elcorteingles\./i.test(ued)) {
+        if (marketplace.countryCode === 'ES') return url;
+        return amazonSearchUrl(fallbackKeyword, tag, marketplace.domain);
+      }
+      if (/amazon\./i.test(ued)) {
+        return toTargetMerchantUrl(ued, fallbackKeyword, options);
+      }
       return url;
     }
-    if (host.includes('elcorteingles.')) return amazonSearchUrl(fallbackKeyword, tag);
 
-    // Any Amazon marketplace / short link -> amazon.com
-    if (/(^|\.)amazon\.|amzn\.(eu|to|com)$|(^|\.)a\.co$/.test(host)) {
-      const asin = extractAsin(u.pathname);
-      if (asin) return `https://www.amazon.com/dp/${asin}/?tag=${tag}`;
-      const k = u.searchParams.get('k') || u.searchParams.get('field-keywords');
-      return amazonSearchUrl(k || fallbackKeyword, tag);
+    if (host.includes('elcorteingles.')) {
+      if (marketplace.countryCode === 'ES') return url;
+      return amazonSearchUrl(fallbackKeyword, tag, marketplace.domain);
     }
 
-    // eBay Spain -> eBay US
+    // Any Amazon marketplace / short link -> route to targeted local marketplace
+    if (/(^|\.)amazon\.|amzn\.(eu|to|com)$|(^|\.)a\.co$/.test(host)) {
+      const asin = extractAsin(u.pathname);
+      if (asin) return amazonProductUrl(asin, tag, marketplace.domain);
+      const k = u.searchParams.get('k') || u.searchParams.get('field-keywords');
+      return amazonSearchUrl(k || fallbackKeyword, tag, marketplace.domain);
+    }
+
+    // eBay Spain -> keep ebay.es in Spain, or www.ebay.com internationally
     if (host.endsWith('ebay.es')) {
+      if (marketplace.countryCode === 'ES') return url;
       u.hostname = 'www.ebay.com';
       return u.toString();
     }
     return url;
   } catch {
-    return amazonSearchUrl(fallbackKeyword, tag);
+    return amazonSearchUrl(fallbackKeyword, tag, marketplace.domain);
   }
+}
+
+/** Legacy wrapper for backwards compatibility */
+export function toUsMerchantUrl(rawUrl: string, fallbackKeyword: string, tag = DEFAULT_AMAZON_TAG): string {
+  return toTargetMerchantUrl(rawUrl, fallbackKeyword, { countryCode: 'US', tag });
 }
 
 /** Neutral, merchant-free CTA label used across the public UI. */

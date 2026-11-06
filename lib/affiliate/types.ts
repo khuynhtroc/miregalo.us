@@ -1,5 +1,5 @@
 export interface AffiliatePlatformConfig {
-  id: 'amazon' | 'awin' | 'ebay' | 'walmart' | 'direct';
+  id: 'amazon' | 'amazon_es' | 'amazon_mx' | 'awin' | 'ebay' | 'walmart' | 'direct';
   name: string;
   tagOrId: string;
   domain: string;

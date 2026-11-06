@@ -62,6 +62,8 @@ export async function POST(req: Request) {
         await db.setSetting('site', {
           ...site,
           amazon_associates_tag: updated.platforms?.amazon?.tagOrId ?? site.amazon_associates_tag,
+          amazon_associates_tag_es: updated.platforms?.amazon_es?.tagOrId ?? site.amazon_associates_tag_es,
+          amazon_associates_tag_mx: updated.platforms?.amazon_mx?.tagOrId ?? site.amazon_associates_tag_mx,
           awin_affiliate_id: updated.platforms?.awin?.tagOrId ?? site.awin_affiliate_id,
           ebay_campaign_id: updated.platforms?.ebay?.tagOrId ?? site.ebay_campaign_id,
           walmart_partner_id: updated.platforms?.walmart?.tagOrId ?? site.walmart_partner_id,

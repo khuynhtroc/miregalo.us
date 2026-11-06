@@ -1,7 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getSettings, listPublishedPosts, getAuthors, getCategories } from '@/lib/repo';
 import { SITE_URL, postPath } from '@/lib/urls';
 import { rfc822, stripHtml } from '@/lib/format';
+import type { Post } from '@/lib/types';
+
+export const dynamic = 'force-dynamic';
 
 function cdata(str: string): string {
   return `<![CDATA[${(str || '').replace(/]]>/g, ']]]]><![CDATA[>')}]]>`;
@@ -16,10 +19,49 @@ function xmlAttr(str: string): string {
     .replace(/>/g, '&gt;');
 }
 
-export async function GET() {
-  const [settings, { rows: posts }, authors, categories] = await Promise.all([
+/**
+ * Resolves an absolute, high-quality image URL and appropriate MIME type for Pinterest RSS ingestion
+ */
+function resolveItemImage(p: Partial<Post>): { url: string; mimeType: string } {
+  let rawUrl = (
+    p.hero_image ||
+    p.og_image ||
+    (Array.isArray(p.items) ? p.items.find((it: any) => it?.image)?.image : '') ||
+    ''
+  ).trim();
+
+  // Normalize legacy Google Cloud Storage or Loveable CDN URLs to media.miregalo.us
+  if (rawUrl) {
+    rawUrl = rawUrl
+      .replace(/^https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+      .replace(/^https?:\/\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+      .replace(/^https?:\/\/cdn\.loveable\.us\//i, 'https://media.miregalo.us/media/');
+  }
+
+  // Ensure absolute HTTPS URL and fallback to high-res Miregalo cover
+  if (!rawUrl) {
+    rawUrl = `${SITE_URL}/images/miregalo-cover.jpg`;
+  } else if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+    rawUrl = `${SITE_URL}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
+  }
+
+  const cleanPath = rawUrl.split('?')[0].toLowerCase();
+  let mimeType = 'image/jpeg';
+  if (cleanPath.endsWith('.png')) mimeType = 'image/png';
+  else if (cleanPath.endsWith('.webp')) mimeType = 'image/webp';
+  else if (cleanPath.endsWith('.gif')) mimeType = 'image/gif';
+
+  return { url: rawUrl, mimeType };
+}
+
+export async function GET(request: NextRequest) {
+  const urlObj = request ? new URL(request.url) : null;
+  const typeParam = urlObj?.searchParams.get('type')?.toLowerCase();
+  const limitParam = parseInt(urlObj?.searchParams.get('limit') || '200', 10);
+  const targetLimit = Math.min(Math.max(limitParam || 200, 20), 500);
+
+  const [settings, authors, categories] = await Promise.all([
     getSettings(),
-    listPublishedPosts({ perPage: 50, full: false }),
     getAuthors(),
     getCategories(),
   ]);
@@ -27,8 +69,46 @@ export async function GET() {
   const authorMap = new Map(authors.map((a) => [a.id, a.name]));
   const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
 
-  const itemsXml = posts
-    .filter((p) => !(p.robots && p.robots.toLowerCase().includes('noindex')))
+  let posts: Post[] = [];
+
+  if (typeParam === 'gift' || typeParam === 'giftguide' || typeParam === 'regalos') {
+    // Chỉ lấy bài Gift Guides
+    const res = await listPublishedPosts({ type: 'gift', perPage: targetLimit, full: false });
+    posts = res.rows;
+  } else if (typeParam === 'blog' || typeParam === 'news') {
+    // Chỉ lấy bài Blog & Tin tức
+    const res = await listPublishedPosts({ type: 'blog', perPage: targetLimit, full: false });
+    posts = res.rows;
+  } else {
+    // Mặc định: Phân bổ cân bằng cả Gift Guides VÀ Blog & News mới nhất
+    const half = Math.ceil(targetLimit / 2);
+    const [giftRes, blogRes] = await Promise.all([
+      listPublishedPosts({ type: 'gift', perPage: half, full: false }),
+      listPublishedPosts({ type: 'blog', perPage: half, full: false }),
+    ]);
+
+    // Gộp và sắp xếp theo ngày xuất bản mới nhất
+    const combinedMap = new Map<string, Post>();
+    for (const p of [...giftRes.rows, ...blogRes.rows]) {
+      combinedMap.set(p.id, p);
+    }
+
+    posts = Array.from(combinedMap.values()).sort(
+      (a, b) => new Date(b.published_at || b.created_at).getTime() - new Date(a.published_at || a.created_at).getTime()
+    );
+  }
+
+  // Lọc an toàn: loại bỏ trang legal/page, noindex và các stubs không có nội dung
+  const filteredPosts = posts.filter((p) => {
+    if (p.type === 'page') return false;
+    if (p.robots && p.robots.toLowerCase().includes('noindex')) return false;
+    if (p.slug && p.slug.startsWith('regalos-') && !p.hero_image && (!p.excerpt || p.excerpt.length < 20)) {
+      return false;
+    }
+    return true;
+  });
+
+  const itemsXml = filteredPosts
     .map((p) => {
       const url = `${SITE_URL}${postPath(p)}`;
       const pubDate = rfc822(p.published_at || p.created_at);
@@ -46,18 +126,21 @@ export async function GET() {
       const rawDesc = p.excerpt || p.seo_description || stripHtml(p.intro_html || p.content_html || '');
       const desc = rawDesc.length > 320 ? rawDesc.slice(0, 317) + '…' : rawDesc;
 
-      const richBody = p.intro_html || `<p>${desc}</p>`;
+      const { url: heroUrl, mimeType } = resolveItemImage(p);
+      const safeHeroUrl = xmlAttr(heroUrl);
 
-      let mediaTags = '';
-      if (p.hero_image) {
-        const heroUrl = p.hero_image.startsWith('http')
-          ? p.hero_image
-          : `${SITE_URL}${p.hero_image.startsWith('/') ? '' : '/'}${p.hero_image}`;
-        const cleanPath = heroUrl.split('?')[0].toLowerCase();
-        const mimeType = cleanPath.endsWith('.png') ? 'image/png' : cleanPath.endsWith('.webp') ? 'image/webp' : 'image/jpeg';
-        const safeHeroUrl = xmlAttr(heroUrl);
-        mediaTags = `\n      <media:content url="${safeHeroUrl}" medium="image"/>\n      <enclosure url="${safeHeroUrl}" length="0" type="${mimeType}"/>`;
-      }
+      // Media RSS tags (Pinterest compliant - non-zero length and explicit media:content + thumbnail)
+      const mediaTags = `
+      <media:content url="${safeHeroUrl}" medium="image" type="${mimeType}">
+        <media:title>${cdata(p.title)}</media:title>
+        <media:description>${cdata(desc)}</media:description>
+        <media:thumbnail url="${safeHeroUrl}"/>
+      </media:content>
+      <enclosure url="${safeHeroUrl}" length="150000" type="${mimeType}"/>`;
+
+      // Rich body with embedded image for maximal RSS consumer compatibility
+      const richBody = `<p><img src="${safeHeroUrl}" alt="${xmlAttr(p.title)}" style="max-width:100%;height:auto;border-radius:8px;"/></p>\n<p>${desc}</p>` +
+        (p.intro_html ? `\n${p.intro_html}` : '');
 
       return `    <item>
       <title>${cdata(p.title)}</title>

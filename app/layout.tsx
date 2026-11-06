@@ -47,6 +47,12 @@ export async function generateMetadata(): Promise<Metadata> {
         'google-adsense-account': 'ca-pub-2959580292222970',
       },
     },
+    other: {
+      'geo.region': 'US',
+      'geo.placename': 'United States',
+      'geo.position': '37.09024;-95.712891',
+      'ICBM': '37.09024, -95.712891',
+    },
   };
 }
 
@@ -60,8 +66,13 @@ export default async function RootLayout({
   const ga4Id = (settings.ga4_id || 'G-WRGWXTNWV3').trim();
 
   return (
-    <html lang={settings.locale || 'es'} className={poppins.variable} suppressHydrationWarning>
+    <html lang={settings.locale || 'es-US'} className={poppins.variable} suppressHydrationWarning>
       <head>
+        {/* Geo-targeting for US Hispanic Audience */}
+        <meta name="geo.region" content="US" />
+        <meta name="geo.placename" content="United States" />
+        <meta name="geo.position" content="37.09024;-95.712891" />
+        <meta name="ICBM" content="37.09024, -95.712891" />
         {/* Google Tag Manager (GTM) - Required as high as possible in <head> for GSC verification */}
         {gtmId && (
           <script

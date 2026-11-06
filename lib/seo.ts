@@ -30,13 +30,23 @@ export function buildMetadata(s: SiteSettings, m: MetaInput): Metadata {
   const url = absUrl(m.path);
   const canonical = m.canonical ? absUrl(m.canonical) : url;
   const image = m.image || s.default_og_image || undefined;
-  const ogLocale = s.locale && s.locale.includes('_') ? s.locale : 'es_ES';
+  const ogLocale = s.locale && s.locale.includes('_') ? s.locale : (s.locale === 'es-US' ? 'es_US' : 'es_US');
   return {
     title: { absolute: m.title },
     description: m.description,
     alternates: {
       canonical,
+      languages: {
+        'es-US': canonical,
+        'x-default': canonical,
+      },
       types: { 'application/rss+xml': [{ url: absUrl('/rss.xml'), title: `${s.site_name} RSS` }] },
+    },
+    other: {
+      'geo.region': 'US',
+      'geo.placename': 'United States',
+      'geo.position': '37.09024;-95.712891',
+      'ICBM': '37.09024, -95.712891',
     },
     robots: parseRobots(m.robots || '', s.noindex_site),
     openGraph: {
@@ -88,6 +98,14 @@ export function orgSchema(s: SiteSettings) {
     name: s.organization_name,
     url: s.organization_url,
     logo: absUrl(s.logo_fullsize_url || s.logo_url),
+    areaServed: {
+      '@type': 'Country',
+      name: 'United States',
+    },
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'US',
+    },
   };
 }
 
@@ -97,7 +115,7 @@ export function websiteSchema(s: SiteSettings) {
     '@type': 'WebSite',
     name: s.site_name,
     url: SITE_URL,
-    inLanguage: s.locale || 'es',
+    inLanguage: 'es-US',
     potentialAction: {
       '@type': 'SearchAction',
       target: `${SITE_URL}/search/?q={search_term_string}`,
@@ -115,7 +133,7 @@ export function blogPostingSchema(s: SiteSettings, p: Post, author: Author | nul
     description: p.seo_description || p.excerpt,
     url,
     mainEntityOfPage: url,
-    inLanguage: s.locale || 'es',
+    inLanguage: 'es-US',
     ...(p.hero_image ? { image: [absUrl(p.hero_image)] } : {}),
     datePublished: p.published_at,
     dateModified: p.updated_at,
@@ -145,12 +163,30 @@ export function itemListOfProducts(p: Post) {
     '@type': 'ItemList',
     name: p.title,
     numberOfItems: items.length,
-    itemListElement: items.map((it, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      name: it.heading,
-      url: `${absUrl(postPath(p))}#item-${i + 1}`,
-    })),
+    itemListElement: items.map((it, i) => {
+      const priceNum = it.price ? parseFloat(it.price.replace(/[^0-9.]/g, '')) : null;
+      return {
+        '@type': 'ListItem',
+        position: i + 1,
+        name: it.heading,
+        url: `${absUrl(postPath(p))}#item-${i + 1}`,
+        ...(priceNum && !isNaN(priceNum)
+          ? {
+              item: {
+                '@type': 'Product',
+                name: it.heading,
+                image: it.image ? absUrl(it.image) : undefined,
+                offers: {
+                  '@type': 'Offer',
+                  priceCurrency: 'USD',
+                  price: priceNum.toFixed(2),
+                  availability: 'https://schema.org/InStock',
+                },
+              },
+            }
+          : {}),
+      };
+    }),
   };
 }
 
