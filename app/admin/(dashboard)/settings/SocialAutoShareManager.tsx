@@ -845,6 +845,7 @@ export function SocialAutoShareManager() {
             placeholder="{auto_seo}"
           />
           <p className="form-hint">
+            <strong>📸 Định dạng đăng bài:</strong> Tự động đăng dưới dạng <strong>Ảnh đại diện bài viết + Dòng Caption (Photo Post)</strong> để tối đa hóa lượt tiếp cận tự nhiên và tương tác trên Fanpage, không đăng dạng URL link card preview cũ.<br />
             <strong>Khuyên dùng:</strong> Để giá trị <code>&#123;auto_seo&#125;</code> (hoặc để trống) để hệ thống tự động tạo bài đăng chuẩn 5 trụ cột cho <strong>MiRegalo.us</strong>: (1) Hook Headline kèm icon danh mục, (2) Đoạn dẫn nhập Storytelling cảm xúc, (3) Khu vực phủ sóng GEO &amp; Hỗ trợ 24/7 (tự động gộp/khử trùng số điện thoại), (4) Consejo experto &amp; CTA mua hàng, (5) Cụm 8–12 Hashtags chuẩn SEO Facebook &amp; SEO GEO (US Hispanic &amp; Español).
           </p>
         </div>

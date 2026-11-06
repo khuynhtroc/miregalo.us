@@ -4,6 +4,7 @@ import type { ChannelShareResult } from './types';
 import { buildOptimizedFacebookStatus } from './seo-content-generator';
 
 const FB_GRAPH_API = 'https://graph.facebook.com/v19.0';
+const DEFAULT_COVER = 'https://www.miregalo.us/images/miregalo-cover.jpg';
 
 /**
  * Automatically exchanges a short-lived User/Page token or long-lived User token
@@ -196,7 +197,8 @@ export async function testFacebookConnection(
 }
 
 /**
- * Publishes a link post to Facebook Fanpage
+ * Publishes a photo post (Featured Image + 5-pillar SEO GEO Caption) to Facebook Fanpage.
+ * Replaces the old URL link card post format with full-size photo + high-engagement caption.
  */
 export async function shareToFacebook(
   post: Post,
@@ -221,44 +223,111 @@ export async function shareToFacebook(
     const title = post.title || 'Guía de Regalos';
     const excerpt = post.seo_description || post.excerpt || '';
 
-    const isLegacyOrAuto =
+    // 1. Chuẩn bị nội dung Caption chuẩn 5 trụ cột & SEO GEO
+    let message = '';
+    const isAutoOrBlank =
       !template ||
       template.includes('{auto_seo}') ||
       template.trim().startsWith('🎁 {title}') ||
-      template.length < 100;
+      template.length < 50;
 
-    const message = !isLegacyOrAuto
-      ? template
+    if (isAutoOrBlank) {
+      const generated = buildOptimizedFacebookStatus(
+        { ...post, urlPath: postPath(post), url: postUrl },
+        SITE_URL
+      );
+      if (template && template.includes('{auto_seo}')) {
+        message = template
+          .replace(/{auto_seo}/g, generated)
           .replace(/{title}/g, title)
           .replace(/{excerpt}/g, excerpt)
-          .replace(/{url}/g, postUrl)
-      : buildOptimizedFacebookStatus({ ...post, urlPath: postPath(post), url: postUrl }, SITE_URL);
+          .replace(/{url}/g, postUrl);
+      } else {
+        message = generated;
+      }
+    } else {
+      message = template
+        .replace(/{title}/g, title)
+        .replace(/{excerpt}/g, excerpt)
+        .replace(/{url}/g, postUrl);
+    }
 
-    // Warm Facebook's OpenGraph cache so the first share of an older URL always renders its og:image
-    try {
-      await fetch(`${FB_GRAPH_API}/?id=${encodeURIComponent(postUrl)}&scrape=true`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${cleanToken}` },
+    // 2. Trích xuất và chuẩn hóa Ảnh đại diện (Featured Image / Hero Image) của bài viết
+    let rawCover = (
+      post.hero_image ||
+      post.og_image ||
+      (Array.isArray(post.items) ? post.items.find((it: any) => it?.image)?.image : '') ||
+      ''
+    ).trim();
+
+    if (!rawCover && post.content_html) {
+      const htmlImgMatch = String(post.content_html).match(/<img[^>]+src=["']([^"']+)["']/i);
+      rawCover = (htmlImgMatch && htmlImgMatch[1]) || '';
+    }
+
+    let photoUrl = rawCover || DEFAULT_COVER;
+    if (photoUrl) {
+      photoUrl = photoUrl
+        .replace(/^https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+        .replace(/^https?:\/\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+        .replace(/^https?:\/\/cdn\.loveable\.us\//i, 'https://media.miregalo.us/media/');
+
+      if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+        photoUrl = `${SITE_URL}${photoUrl.startsWith('/') ? '' : '/'}${photoUrl}`;
+      }
+    }
+
+    // Facebook /photos endpoint yêu cầu định dạng JPEG/PNG/GIF; tự động chuyển đổi file .webp qua wsrv.nl
+    if (/\.webp(\?|$)/i.test(photoUrl)) {
+      photoUrl = `https://wsrv.nl/?url=${encodeURIComponent(photoUrl)}&output=jpg&q=90`;
+    }
+
+    // Hàm gọi đăng ảnh qua /photos
+    const postPhoto = async (targetImgUrl: string) => {
+      const photoParams = new URLSearchParams({
+        url: targetImgUrl,
+        caption: message,
+        published: 'true',
       });
-    } catch {}
+      const r = await fetch(`${FB_GRAPH_API}/${cleanId}/photos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Bearer ${cleanToken}`,
+        },
+        body: photoParams.toString(),
+      });
+      const d = await r.json().catch(() => ({}));
+      return { res: r, data: d };
+    };
 
-    const params = new URLSearchParams({
-      message,
-      link: postUrl,
-    });
+    // 3. ĐĂNG DẠNG ẢNH ĐẠI DIỆN + DÒNG CAPTION (Photo Post - KHÔNG ĐĂNG DẠNG URL CARD)
+    let { res, data } = await postPhoto(photoUrl);
 
-    const res = await fetch(`${FB_GRAPH_API}/${cleanId}/feed`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Bearer ${cleanToken}`,
-      },
-      body: params.toString(),
-    });
+    // Fallback: Thử với ảnh bìa mặc định nếu URL ảnh chính bị Facebook từ chối tải
+    if ((!res.ok || data.error) && photoUrl !== DEFAULT_COVER) {
+      ({ res, data } = await postPhoto(DEFAULT_COVER));
+    }
 
-    const data = await res.json();
+    // Fallback cấp 2: Nếu cả 2 lượt đăng ảnh qua /photos đều lỗi, đăng dạng bài viết văn bản (Feed Text)
+    // TUYỆT ĐỐI KHÔNG gửi param 'link' để không bị Facebook biến thành Link Post dạng URL cũ
     if (!res.ok || data.error) {
-      const fbErr = data.error;
+      const feedParams = new URLSearchParams({
+        message,
+      });
+      res = await fetch(`${FB_GRAPH_API}/${cleanId}/feed`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Bearer ${cleanToken}`,
+        },
+        body: feedParams.toString(),
+      });
+      data = await res.json().catch(() => ({}));
+    }
+
+    if (!res.ok || data.error) {
+      const fbErr = data?.error;
       let errMsg = fbErr
         ? `${fbErr.message}${fbErr.code ? ` (Mã lỗi: ${fbErr.code}${fbErr.error_subcode ? `, subcode: ${fbErr.error_subcode}` : ''})` : ''}`
         : 'Lỗi khi đăng bài lên Facebook Fanpage';
@@ -277,13 +346,13 @@ export async function shareToFacebook(
       };
     }
 
-    const postId = data.id;
+    const postId = data.post_id || data.id;
     return {
       channel: 'facebook',
       success: true,
       post_id: postId,
       url: `https://facebook.com/${postId}`,
-      message: 'Đăng bài lên Facebook Fanpage thành công',
+      message: 'Đăng ảnh đại diện kèm Caption lên Facebook Fanpage thành công',
       timestamp,
     };
   } catch (err: any) {
