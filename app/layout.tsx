@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
 import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -7,13 +6,6 @@ import './globals.css';
 import { getSettings } from '@/lib/repo';
 import { orgSchema, websiteSchema } from '@/lib/seo';
 import { JsonLd } from '@/components/JsonLd';
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  display: 'swap',
-  variable: '--font-poppins',
-});
 
 export const dynamic = 'force-dynamic';
 
@@ -66,30 +58,38 @@ export default async function RootLayout({
   const ga4Id = (settings.ga4_id || 'G-WRGWXTNWV3').trim();
 
   return (
-    <html lang={settings.locale || 'es-US'} className={poppins.variable} suppressHydrationWarning>
+    <html lang={settings.locale || 'es-US'} suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        />
         {/* Geo-targeting for US Hispanic Audience */}
         <meta name="geo.region" content="US" />
         <meta name="geo.placename" content="United States" />
         <meta name="geo.position" content="37.09024;-95.712891" />
         <meta name="ICBM" content="37.09024, -95.712891" />
-        {/* Google Tag Manager (GTM) - Required as high as possible in <head> for GSC verification */}
+        {/* Google Tag Manager (GTM) - Required as high as possible in <head> for GSC verification (Bot filtered) */}
         {gtmId && (
           <script
             id="google-tag-manager"
             dangerouslySetInnerHTML={{
-              __html: `if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin')) {
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              __html: `(function(w,d,s,l,i){
+if(w.location&&w.location.pathname&&w.location.pathname.indexOf('/admin')===0)return;
+var ua=(w.navigator&&w.navigator.userAgent)||'';
+if((w.navigator&&w.navigator.webdriver)||/bot|crawl|spider|slurp|facebookexternalhit|facebot|meta-externalagent|meta-externalfetcher|bytespider|gptbot|claudebot|headlesschrome|phantomjs|lighthouse|pagespeed|gtmetrix|pingdom|uptimerobot|curl|wget|python|node/i.test(ua))return;
+w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${gtmId}');
-}`,
+})(window,document,'script','dataLayer','${gtmId}');`,
             }}
           />
         )}
 
-        {/* Google Analytics 4 (GA4) - Excluded on /admin to prevent internal admin traffic */}
+        {/* Google Analytics 4 (GA4) - Excluded on /admin & bots */}
         {ga4Id && (
           <script
             id="google-analytics-init"
@@ -97,7 +97,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               __html: `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+var ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+if ((typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) || (typeof navigator !== 'undefined' && navigator.webdriver) || /bot|crawl|spider|slurp|facebookexternalhit|facebot|meta-externalagent|meta-externalfetcher|bytespider|gptbot|claudebot|headlesschrome|phantomjs|lighthouse|pagespeed|gtmetrix|pingdom|uptimerobot|curl|wget|python|node/i.test(ua)) {
   window['ga-disable-${ga4Id}'] = true;
 } else {
   gtag('config', '${ga4Id}');
@@ -148,7 +149,7 @@ if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin
           );
         })()}
       </head>
-      <body className={poppins.className} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         {/* Google Tag Manager (noscript) - Required immediately after opening <body> for GSC verification */}
         {gtmId && (
           <noscript

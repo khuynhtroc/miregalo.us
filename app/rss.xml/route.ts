@@ -54,11 +54,24 @@ function resolveItemImage(p: Partial<Post>): { url: string; mimeType: string } {
   return { url: rawUrl, mimeType };
 }
 
+const gRss = globalThis as any;
+const RSS_TTL_MS = 5 * 60 * 1000;
+
 export async function GET(request: NextRequest) {
   const urlObj = request ? new URL(request.url) : null;
   const typeParam = urlObj?.searchParams.get('type')?.toLowerCase();
-  const limitParam = parseInt(urlObj?.searchParams.get('limit') || '200', 10);
-  const targetLimit = Math.min(Math.max(limitParam || 200, 20), 500);
+  const limitParam = parseInt(urlObj?.searchParams.get('limit') || '60', 10);
+  const targetLimit = Math.min(Math.max(limitParam || 60, 20), 200);
+  const cacheKey = `${typeParam || 'all'}:${targetLimit}`;
+
+  if (gRss.__rssXmlCache?.key === cacheKey && Date.now() - gRss.__rssXmlCache.ts < RSS_TTL_MS) {
+    return new NextResponse(gRss.__rssXmlCache.xml, {
+      headers: {
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=300, s-maxage=900, stale-while-revalidate=1800',
+      },
+    });
+  }
 
   const [settings, authors, categories] = await Promise.all([
     getSettings(),
@@ -179,6 +192,8 @@ export async function GET(request: NextRequest) {
 ${itemsXml}
   </channel>
 </rss>`;
+
+  gRss.__rssXmlCache = { key: cacheKey, xml, ts: Date.now() };
 
   return new NextResponse(xml, {
     headers: {

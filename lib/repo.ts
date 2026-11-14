@@ -5,11 +5,26 @@ import type { Post, Category, Author, Product, Redirect, SiteSettings, PostType,
 import { DEFAULT_SETTINGS } from '@/lib/settings-defaults';
 import { HUBS } from '@/lib/urls';
 
-/* ───────────────────────── Settings ───────────────────────── */
+/* ───────────────────────── Settings (with TTL cache for <1ms Worker CPU) ───────────────────────── */
+
+const repoCache = globalThis as unknown as {
+  __settingsCache?: { at: number; val: SiteSettings };
+  __categoriesCache?: { at: number; val: Category[] };
+  __authorsCache?: { at: number; val: Author[] };
+  __catalogUrlsCache?: { at: number; val: CatalogUrl[] };
+  __sitemapPostsCache?: { at: number; val: Post[] };
+  __catCountsCache?: { at: number; val: Record<string, number> };
+};
 
 export const getSettings = cache(async (): Promise<SiteSettings> => {
+  const now = Date.now();
+  if (repoCache.__settingsCache && now - repoCache.__settingsCache.at < 60_000) {
+    return repoCache.__settingsCache.val;
+  }
   const stored = (await db.getSetting<Partial<SiteSettings>>('site')) ?? {};
-  return { ...DEFAULT_SETTINGS, ...stored };
+  const val = { ...DEFAULT_SETTINGS, ...stored };
+  repoCache.__settingsCache = { at: now, val };
+  return val;
 });
 
 /* ───────────────────────── Categories ───────────────────────── */
@@ -26,8 +41,14 @@ function sanitizeCategory(c: Category): Category {
 }
 
 export const getCategories = cache(async (): Promise<Category[]> => {
+  const now = Date.now();
+  if (repoCache.__categoriesCache && now - repoCache.__categoriesCache.at < 60_000) {
+    return repoCache.__categoriesCache.val;
+  }
   const { rows } = await db.find('categories', { order: [{ field: 'sort_order' }, { field: 'name' }] });
-  return rows.map(sanitizeCategory);
+  const val = rows.map(sanitizeCategory);
+  repoCache.__categoriesCache = { at: now, val };
+  return val;
 });
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
@@ -44,15 +65,28 @@ export async function getCategoriesByGroup(group: Category['group']): Promise<Ca
 
 /** Article counts per category (published only). */
 export const getCategoryCounts = cache(async (): Promise<Record<string, number>> => {
+  const now = Date.now();
+  if (repoCache.__catCountsCache && now - repoCache.__catCountsCache.at < 120_000) {
+    return repoCache.__catCountsCache.val;
+  }
   const { rows } = await db.find('posts', { eq: { status: 'published' }, select: 'id,category_ids' });
   const counts: Record<string, number> = {};
   for (const p of rows) for (const id of p.category_ids ?? []) counts[id] = (counts[id] ?? 0) + 1;
+  repoCache.__catCountsCache = { at: now, val: counts };
   return counts;
 });
 
 /* ───────────────────────── Authors ───────────────────────── */
 
-export const getAuthors = cache(async (): Promise<Author[]> => (await db.find('authors', { order: [{ field: 'name' }] })).rows);
+export const getAuthors = cache(async (): Promise<Author[]> => {
+  const now = Date.now();
+  if (repoCache.__authorsCache && now - repoCache.__authorsCache.at < 120_000) {
+    return repoCache.__authorsCache.val;
+  }
+  const val = (await db.find('authors', { order: [{ field: 'name' }] })).rows;
+  repoCache.__authorsCache = { at: now, val };
+  return val;
+});
 
 export async function getAuthorBySlug(slug: string) {
   return (await getAuthors()).find((a) => a.slug === slug) ?? null;
@@ -279,14 +313,20 @@ export async function getRelatedPostsForCatalog(
   return gathered.slice(0, limit);
 }
 
-/** All published post paths – used by sitemap / URL map. */
+/** All published post paths – used by sitemap / URL map (Cached for 5 minutes to avoid Worker 10ms CPU limit). */
 export async function getAllPublishedForSitemap() {
+  const now = Date.now();
+  if (repoCache.__sitemapPostsCache && now - repoCache.__sitemapPostsCache.at < 300_000) {
+    return repoCache.__sitemapPostsCache.val;
+  }
   const { rows } = await db.find('posts', {
     eq: { status: 'published' },
     select: 'id,type,slug,title,hero_image,robots,canonical_url,published_at,updated_at,category_ids,excerpt',
     order: [{ field: 'published_at', asc: false }],
   });
-  return rows.map(sanitizePostMedia);
+  const val = rows.map(sanitizePostMedia);
+  repoCache.__sitemapPostsCache = { at: now, val };
+  return val;
 }
 
 /** Resolve the set of category ids that a hub page aggregates. */
@@ -351,7 +391,12 @@ export function normalizePath(p: string): string {
 /* ───────────────────────── Catalog URLs ───────────────────────── */
 
 export const getCatalogUrls = cache(async (): Promise<CatalogUrl[]> => {
+  const now = Date.now();
+  if (repoCache.__catalogUrlsCache && now - repoCache.__catalogUrlsCache.at < 300_000) {
+    return repoCache.__catalogUrlsCache.val;
+  }
   const { rows } = await db.find('catalog_urls', { order: [{ field: 'id', asc: true }] });
+  repoCache.__catalogUrlsCache = { at: now, val: rows };
   return rows;
 });
 
