@@ -38,6 +38,7 @@ import { TableOfContents } from '@/components/TableOfContents';
 import { SocialShareBar } from '@/components/SocialShareBar';
 import { extractTocItems, cleanContentHtml, cleanItemHeading } from '@/lib/toc';
 import { fmtDate } from '@/lib/format';
+import { buildContextualFaqsForMiregaloPost } from '@/lib/ai-seo-faq';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -406,6 +407,8 @@ export default async function DynamicSlugPage({ params }: PageProps) {
     { name: post.title, path: postPath(post) },
   ];
 
+  const resolvedFaqs = buildContextualFaqsForMiregaloPost(post);
+
   return (
     <>
       <JsonLd
@@ -413,7 +416,7 @@ export default async function DynamicSlugPage({ params }: PageProps) {
           breadcrumbSchema(breadcrumbs),
           blogPostingSchema(settings, post, author),
           itemListOfProducts(post),
-          faqSchema(post.faqs),
+          faqSchema(resolvedFaqs),
         ].filter(Boolean)}
       />
 
@@ -690,13 +693,17 @@ export default async function DynamicSlugPage({ params }: PageProps) {
           )}
 
           {/* FAQ Accordion */}
-          {post.faqs && post.faqs.length > 0 && (
+          {resolvedFaqs.length > 0 && (
             <section style={{ marginTop: '48px' }} id="preguntas-frecuentes">
-              <h2 id="faq-heading">Preguntas frecuentes</h2>
+              <h2 id="faq-heading">Preguntas frecuentes sobre {post.title}</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
-                {post.faqs.map((faq, idx) => (
+                {resolvedFaqs.map((faq, idx) => (
                   <details
                     key={idx}
+                    open={idx === 0}
+                    itemScope
+                    itemProp="mainEntity"
+                    itemType="https://schema.org/Question"
                     style={{
                       border: '1px solid var(--line)',
                       borderRadius: '12px',
@@ -704,13 +711,17 @@ export default async function DynamicSlugPage({ params }: PageProps) {
                       background: '#fff',
                     }}
                   >
-                    <summary style={{ fontWeight: 600, cursor: 'pointer', color: 'var(--ink)' }}>
+                    <summary itemProp="name" style={{ fontWeight: 600, cursor: 'pointer', color: 'var(--ink)' }}>
                       {faq.q}
                     </summary>
                     <div
+                      itemScope
+                      itemProp="acceptedAnswer"
+                      itemType="https://schema.org/Answer"
                       style={{ marginTop: '10px', color: 'var(--muted)', fontSize: '0.94rem' }}
-                      dangerouslySetInnerHTML={{ __html: faq.a }}
-                    />
+                    >
+                      <div itemProp="text" dangerouslySetInnerHTML={{ __html: faq.a }} />
+                    </div>
                   </details>
                 ))}
               </div>

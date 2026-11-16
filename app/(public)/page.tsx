@@ -4,6 +4,9 @@ import { getSettings, getCategories, getCategoryCounts, listPublishedPosts } fro
 import { buildMetadata } from '@/lib/seo';
 import { PostCard } from '@/components/PostCard';
 import { StoreCta } from '@/components/StoreCta';
+import { JsonLd } from '@/components/JsonLd';
+import { faqSchema } from '@/lib/seo';
+import { MASTER_MIREGALO_FAQS } from '@/lib/ai-seo-faq';
 import type { Post } from '@/lib/types';
 import { postPath } from '@/lib/urls';
 
@@ -370,6 +373,75 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ── 6. AI OVERVIEW & PREGUNTAS FRECUENTES (GEO/AEO) ─────── */}
+      <section className="section" style={{ background: '#f8fafc', borderTop: '1px solid #e2e8f0' }} id="preguntas-frecuentes-regalos">
+        <JsonLd data={faqSchema(MASTER_MIREGALO_FAQS)} />
+        <div className="container">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">✨ Guía Rápida &amp; Respuestas de Expertos</p>
+              <h2 className="section-title">Preguntas Frecuentes sobre Ideas de Regalos Originales</h2>
+            </div>
+          </div>
+
+          <div
+            style={{
+              background: '#ffffff',
+              border: '2px solid #f43f5e',
+              borderRadius: '18px',
+              padding: '24px',
+              marginBottom: '28px',
+              boxShadow: '0 4px 14px rgba(244,63,94,0.06)',
+            }}
+          >
+            <strong style={{ display: 'block', fontSize: '0.95rem', color: '#be123c', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+              🎁 Resumen Rápido de Miregalo.us (Edición 2026)
+            </strong>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', fontSize: '0.9rem', color: '#334155', lineHeight: 1.6 }}>
+              <div>
+                <strong style={{ color: '#0f172a' }}>1. Ideas por destinatario:</strong> Guías curadas para Mamá, Papá, Novios, Esposos, Amigos, Niños y Compañeros de trabajo.
+              </div>
+              <div>
+                <strong style={{ color: '#0f172a' }}>2. Ideas por presupuesto:</strong> Detalles económicos por menos de $25 USD, regalos de $30 a $80 USD y experiencias premium.
+              </div>
+              <div>
+                <strong style={{ color: '#0f172a' }}>3. Selección verificada:</strong> Productos con valoraciones reales 4.5★+ y envío rápido a través de tiendas oficiales en EE. UU.
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '14px' }}>
+            {MASTER_MIREGALO_FAQS.map((faq, idx) => (
+              <details
+                key={idx}
+                open={idx < 2}
+                itemScope
+                itemProp="mainEntity"
+                itemType="https://schema.org/Question"
+                style={{
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '14px',
+                  padding: '16px 20px',
+                  background: '#ffffff',
+                }}
+              >
+                <summary itemProp="name" style={{ fontWeight: 700, cursor: 'pointer', color: '#0f172a', fontSize: '0.96rem', lineHeight: 1.4 }}>
+                  {faq.q}
+                </summary>
+                <div
+                  itemScope
+                  itemProp="acceptedAnswer"
+                  itemType="https://schema.org/Answer"
+                  style={{ marginTop: '10px', color: '#475569', fontSize: '0.9rem', lineHeight: 1.6 }}
+                >
+                  <div itemProp="text">{faq.a}</div>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ── Store CTA ─────────────────────────────── */}
       <StoreCta settings={settings} />
