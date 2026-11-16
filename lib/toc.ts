@@ -30,16 +30,11 @@ export function cleanContentHtml(
   // 2. Remove duplicate product list section if post already has items rendered via ProductCard
   if (hasItems) {
     cleaned = cleaned.replace(
-      /<h2[^>]*>(?:Análisis Detallado|Selección Detallada|Nuestros \d+ Mejores)[\s\S]*?(?=<h2|$)/i,
-      ''
-    );
-  }
-
-  // 3. Remove duplicate FAQ section if post already has faqs rendered via Accordion
-  if (hasFaqs) {
-    cleaned = cleaned.replace(
-      /<h2[^>]*>(?:Preguntas Frecuentes|FAQ)[\s\S]*?(?=<h2|$)/i,
-      ''
+      /<h2[^>]*>(?:An[áa]lisis Detallado|Selecci[óo]n Detallada|Nuestros \d+ Mejores)/i,
+      (match, offset) => {
+        const nextH2 = cleaned.slice(offset + match.length).search(/<h2[^>]*>/i);
+        return nextH2 >= 0 ? match : '';
+      }
     );
   }
 
@@ -81,8 +76,7 @@ export function extractTocItems(post: {
 
   // 2. Headings in content_html (e.g. conclusion, buying advice)
   if (post.content_html) {
-    const cleanedHtml = cleanContentHtml(post.content_html, undefined, hasItems, hasFaqs);
-    const matches = Array.from(cleanedHtml.matchAll(/<h([23])[^>]*>(.*?)<\/h\1>/gi));
+    const matches = Array.from(post.content_html.matchAll(/<h([23])[^>]*>(.*?)<\/h\1>/gi));
     matches.forEach((m, idx) => {
       const level = m[1];
       const rawText = m[2].replace(/<[^>]*>/g, '').trim();

@@ -14,6 +14,8 @@ const repoCache = globalThis as unknown as {
   __catalogUrlsCache?: { at: number; val: CatalogUrl[] };
   __sitemapPostsCache?: { at: number; val: Post[] };
   __catCountsCache?: { at: number; val: Record<string, number> };
+  __postBySlugCache?: Map<string, { at: number; val: Post | null }>;
+  __postListCache?: Map<string, { at: number; val: { rows: Post[]; total: number } }>;
 };
 
 export const getSettings = cache(async (): Promise<SiteSettings> => {
@@ -168,6 +170,16 @@ export interface PostListOpts {
 }
 
 export async function listPublishedPosts(opts: PostListOpts = {}): Promise<{ rows: Post[]; total: number }> {
+  const now = Date.now();
+  const cacheKey = !opts.full ? JSON.stringify(opts) : '';
+  if (cacheKey) {
+    if (!repoCache.__postListCache) repoCache.__postListCache = new Map();
+    const hit = repoCache.__postListCache.get(cacheKey);
+    if (hit && now - hit.at < 120_000) {
+      return hit.val;
+    }
+  }
+
   const perPage = opts.perPage ?? 24;
   const page = Math.max(1, opts.page ?? 1);
   const eq: Record<string, string | boolean> = { status: 'published' };
@@ -188,17 +200,35 @@ export async function listPublishedPosts(opts: PostListOpts = {}): Promise<{ row
   });
   let rows = res.rows;
   if (opts.excludeId) rows = rows.filter((r) => r.id !== opts.excludeId).slice(0, perPage);
-  return { rows: rows.map(sanitizePostMedia), total: res.total };
+  const val = { rows: rows.map(sanitizePostMedia), total: res.total };
+  if (cacheKey && repoCache.__postListCache) {
+    if (repoCache.__postListCache.size > 150) repoCache.__postListCache.clear();
+    repoCache.__postListCache.set(cacheKey, { at: now, val });
+  }
+  return val;
 }
 
-export async function getPublishedPost(type: PostType | PostType[], slug: string): Promise<Post | null> {
+export const getPublishedPost = cache(async (type: PostType | PostType[], slug: string): Promise<Post | null> => {
+  const now = Date.now();
   const types = Array.isArray(type) ? type : [type];
+  const key = `${types.join(',')}:${slug}`;
+  if (!repoCache.__postBySlugCache) repoCache.__postBySlugCache = new Map();
+  const hit = repoCache.__postBySlugCache.get(key);
+  if (hit && now - hit.at < 180_000) {
+    return hit.val;
+  }
   for (const t of types) {
     const p = await db.findOne('posts', { type: t, slug, status: 'published' });
-    if (p) return sanitizePostMedia(p);
+    if (p) {
+      const sanitized = sanitizePostMedia(p);
+      if (repoCache.__postBySlugCache.size > 200) repoCache.__postBySlugCache.clear();
+      repoCache.__postBySlugCache.set(key, { at: now, val: sanitized });
+      return sanitized;
+    }
   }
+  repoCache.__postBySlugCache.set(key, { at: now, val: null });
   return null;
-}
+});
 
 /** Get related published posts for a given post with intelligent multi-level fallback */
 export async function getRelatedPosts(

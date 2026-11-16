@@ -4,7 +4,18 @@ import { SITE_URL, postPath } from '@/lib/urls';
 
 export const dynamic = 'force-dynamic';
 
+const gSitemapXml = globalThis as any;
+const SITEMAP_XML_TTL_MS = 10 * 60 * 1000;
+
 export async function GET() {
+  if (gSitemapXml.__sitemapXmlStr && Date.now() - gSitemapXml.__sitemapXmlStr.ts < SITEMAP_XML_TTL_MS) {
+    return new NextResponse(gSitemapXml.__sitemapXmlStr.xml, {
+      headers: {
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=1800, s-maxage=3600',
+      },
+    });
+  }
   const [categories, posts, authors, catalogUrls] = await Promise.all([
     getCategories(),
     getAllPublishedForSitemap(),
@@ -30,10 +41,10 @@ export async function GET() {
       cUrl.url_type === 'ROOT'
         ? '1.0'
         : cUrl.url_type === 'SILO'
-        ? '0.9'
-        : cUrl.priority === 'P1'
-        ? '0.9'
-        : '0.8';
+          ? '0.9'
+          : cUrl.priority === 'P1'
+            ? '0.9'
+            : '0.8';
 
     urlMap.set(loc, {
       loc,
@@ -91,16 +102,18 @@ export async function GET() {
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 ${urls
-  .map(
-    (u) => `  <url>
+      .map(
+        (u) => `  <url>
     <loc>${u.loc}</loc>
     <lastmod>${u.lastmod}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
   </url>`
-  )
-  .join('\n')}
+      )
+      .join('\n')}
 </urlset>`;
+
+  gSitemapXml.__sitemapXmlStr = { xml, ts: Date.now() };
 
   return new NextResponse(xml, {
     headers: {

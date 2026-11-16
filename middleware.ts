@@ -68,7 +68,15 @@ export function middleware(req: NextRequest) {
       headers: { 'content-type': 'text/html; charset=utf-8', 'x-robots-tag': 'noindex' },
     });
   }
-  return NextResponse.next();
+
+  const res = NextResponse.next();
+  if (req.method === 'GET' && !req.nextUrl.pathname.startsWith('/admin') && !req.nextUrl.pathname.startsWith('/api')) {
+    const edgeTTL = req.nextUrl.pathname === '/' ? 300 : 1800; // 5m home, 30m articles/categories
+    res.headers.set('Cache-Control', `public, max-age=120, s-maxage=${edgeTTL}, stale-while-revalidate=86400`);
+    res.headers.set('CDN-Cache-Control', `public, s-maxage=${edgeTTL}, stale-while-revalidate=86400`);
+    res.headers.set('Cloudflare-CDN-Cache-Control', `public, s-maxage=${edgeTTL}, stale-while-revalidate=86400`);
+  }
+  return res;
 }
 
 export const config = {
