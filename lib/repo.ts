@@ -81,11 +81,15 @@ export async function getCategoriesByGroup(group: Category['group']): Promise<Ca
 /** Article counts per category (published only). */
 export const getCategoryCounts = cache(async (): Promise<Record<string, number>> => {
   const now = Date.now();
-  if (repoCache.__catCountsCache && now - repoCache.__catCountsCache.at < 300_000) {
+  if (repoCache.__catCountsCache && now - repoCache.__catCountsCache.at < 1_800_000) {
     return repoCache.__catCountsCache.val;
   }
   try {
-    const { rows } = await db.find('posts', { eq: { status: 'published' }, select: 'id,category_ids' });
+    const { rows } = await db.find('posts', {
+      eq: { status: 'published' },
+      select: 'category_ids',
+      limit: 1000,
+    });
     const counts: Record<string, number> = {};
     for (const p of rows) for (const id of p.category_ids ?? []) counts[id] = (counts[id] ?? 0) + 1;
     repoCache.__catCountsCache = { at: now, val: counts };
@@ -251,7 +255,7 @@ export async function listPublishedPosts(opts: PostListOpts = {}): Promise<{ row
   if (opts.excludeId) rows = rows.filter((r) => r.id !== opts.excludeId).slice(0, perPage);
   const val = { rows: rows.map(sanitizePostMedia), total: res.total };
   if (cacheKey && repoCache.__postListCache) {
-    if (repoCache.__postListCache.size > 150) repoCache.__postListCache.clear();
+    if (repoCache.__postListCache.size > 40) repoCache.__postListCache.clear();
     repoCache.__postListCache.set(cacheKey, { at: now, val });
   }
   return val;
@@ -276,7 +280,7 @@ export const getPublishedPost = cache(async (type: PostType | PostType[], slug: 
     const p = rows[0];
     if (p) {
       const sanitized = sanitizePostMedia(p);
-      if (repoCache.__postBySlugCache.size > 200) repoCache.__postBySlugCache.clear();
+      if (repoCache.__postBySlugCache.size > 30) repoCache.__postBySlugCache.clear();
       repoCache.__postBySlugCache.set(key, { at: now, val: sanitized });
       return sanitized;
     }
@@ -286,7 +290,7 @@ export const getPublishedPost = cache(async (type: PostType | PostType[], slug: 
     if (hit) return hit.val;
     return null;
   }
-  if (repoCache.__postBySlugCache.size > 200) repoCache.__postBySlugCache.clear();
+  if (repoCache.__postBySlugCache.size > 30) repoCache.__postBySlugCache.clear();
   repoCache.__postBySlugCache.set(key, { at: now, val: null });
   return null;
 });
@@ -404,21 +408,20 @@ export async function getRelatedPostsForCatalog(
   return gathered.slice(0, limit);
 }
 
-/** All published post paths – used by sitemap / URL map (Cached for 5 minutes to avoid Worker 10ms CPU limit). */
+/** All published post paths – used by sitemap / URL map (Cached for 15 minutes to avoid Worker 10ms CPU limit). */
 export async function getAllPublishedForSitemap() {
   const now = Date.now();
-  if (repoCache.__sitemapPostsCache && now - repoCache.__sitemapPostsCache.at < 300_000) {
+  if (repoCache.__sitemapPostsCache && now - repoCache.__sitemapPostsCache.at < 900_000) {
     return repoCache.__sitemapPostsCache.val;
   }
   try {
     const { rows } = await db.find('posts', {
       eq: { status: 'published' },
-      select: 'id,type,slug,title,hero_image,robots,canonical_url,published_at,updated_at,category_ids,excerpt',
+      select: 'id,type,slug,robots,published_at,updated_at',
       order: [{ field: 'published_at', asc: false }],
     });
-    const val = rows.map(sanitizePostMedia);
-    repoCache.__sitemapPostsCache = { at: now, val };
-    return val;
+    repoCache.__sitemapPostsCache = { at: now, val: rows };
+    return rows;
   } catch (e) {
     console.error('[repo] getAllPublishedForSitemap failed:', (e as Error).message);
     if (repoCache.__sitemapPostsCache) return repoCache.__sitemapPostsCache.val;

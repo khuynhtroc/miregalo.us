@@ -103,11 +103,27 @@ function escapeCsv(field: string): string {
   return `"${clean}"`;
 }
 
+const gPinCsv = globalThis as unknown as {
+  __pinterestCsvCache?: Map<string, { at: number; csv: string }>;
+};
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const limitParam = parseInt(searchParams.get('limit') || '5000', 10);
-  const limit = Math.min(Math.max(limitParam, 50), 10000);
+  const limitParam = parseInt(searchParams.get('limit') || '1000', 10);
+  const limit = Math.min(Math.max(limitParam, 50), 2000);
   const page = Math.max(parseInt(searchParams.get('page') || '1', 10), 1);
+  const cacheKey = `${page}:${limit}`;
+  const now = Date.now();
+  if (!gPinCsv.__pinterestCsvCache) gPinCsv.__pinterestCsvCache = new Map();
+  const cached = gPinCsv.__pinterestCsvCache.get(cacheKey);
+  if (cached && now - cached.at < 900_000) {
+    return new NextResponse(cached.csv, {
+      headers: {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400',
+      },
+    });
+  }
 
   const batchSize = 1000;
   const numBatches = Math.ceil(limit / batchSize);
@@ -193,6 +209,8 @@ export async function GET(req: NextRequest) {
       });
 
     const csvContent = [headers, ...rows].join('\n');
+    if (gPinCsv.__pinterestCsvCache.size > 10) gPinCsv.__pinterestCsvCache.clear();
+    gPinCsv.__pinterestCsvCache.set(cacheKey, { at: now, csv: csvContent });
 
     return new NextResponse(csvContent, {
       headers: {

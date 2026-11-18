@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 
-const sbUrl = 'https://tvgipyhvvtovgttnyivw.supabase.co';
-const sbKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2Z2lweWh2dnRvdmd0dG55aXZ3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MTI0Mzg2OCwiZXhwIjoyMTA2ODE5ODY4fQ.n03zTL69UhHEk524ItXwcOtqu1MtvL1iu9uOoXH-oi0';
+const sbUrl = 'https://cewrrewgnziioyujlseg.supabase.co';
+const sbKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNld3JyZXdnbnppaW95dWpsc2VnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5NTAwNzY4MCwiZXhwIjoyMTEwNTgzNjgwfQ.DglEXEs0KVe5HZLciCKzBS0lWc6rUA0iVRaUmMI7c_0';
 const sb = createClient(sbUrl, sbKey);
 
 const DB_PATH = path.join(process.cwd(), 'data', 'db.json');

@@ -1,6 +1,6 @@
 import 'server-only';
 import { db } from '@/lib/db';
-import { getCategories } from '@/lib/repo';
+import { getCategories, sanitizeImageUrl } from '@/lib/repo';
 import type { Post, Category } from '@/lib/types';
 
 export interface SearchItemMatch {
@@ -28,7 +28,7 @@ export interface SearchResultPost {
 export interface SearchOptions {
   q: string;
   type?: 'all' | 'gift' | 'blog';
-  topic?: string; // category slug or id
+  topic?: string;
   page?: number;
   perPage?: number;
 }
@@ -53,34 +53,9 @@ export interface SearchResponse {
   }[];
 }
 
-// In-memory cache for fast search across all 1,679 posts
-let cachedPosts: Post[] | null = null;
-let lastCacheTime = 0;
-const CACHE_TTL = 3 * 60 * 1000; // 3 minutes
-
-async function getSearchablePosts(): Promise<Post[]> {
-  const now = Date.now();
-  if (cachedPosts && now - lastCacheTime < CACHE_TTL) {
-    return cachedPosts;
-  }
-
-  try {
-    // Only load card & item search fields (DO NOT select content_html/intro_html which are 60MB+)
-    const { rows } = await db.find('posts', {
-      eq: { status: 'published' },
-      select: 'id,type,slug,title,excerpt,items,hero_image,hero_alt,primary_category_id,category_ids,published_at,focus_keyword',
-      order: [{ field: 'published_at', asc: false }],
-      limit: 1000,
-    });
-
-    cachedPosts = rows as Post[];
-    lastCacheTime = now;
-    return cachedPosts;
-  } catch (err) {
-    console.error('[search] Error loading searchable posts:', err);
-    return cachedPosts || [];
-  }
-}
+const searchCache = globalThis as unknown as {
+  __searchQueryCache?: Map<string, { at: number; val: SearchResponse }>;
+};
 
 /** Normalize string: lowercase, remove accents / diacritics */
 export function normalizeText(s: string): string {
@@ -90,38 +65,6 @@ export function normalizeText(s: string): string {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
-/** Check if text matches token with basic prefix/stemming */
-function tokenMatches(normText: string, normToken: string): boolean {
-  if (normText.includes(normToken)) return true;
-  // If token is at least 5 letters, match stem
-  if (normToken.length >= 5) {
-    const stem = normToken.replace(/(?:os|as|es|o|a|e|s)$/, '');
-    if (stem.length >= 4 && normText.includes(stem)) return true;
-  }
-  return false;
-}
-
-/** Create snippet around matching term */
-function createSnippet(text: string, term: string, maxLen = 140): string {
-  const clean = (text || '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (!clean) return '';
-
-  const normClean = normalizeText(clean);
-  const normTerm = normalizeText(term);
-  const pos = normClean.indexOf(normTerm);
-
-  if (pos === -1) {
-    return clean.length > maxLen ? clean.slice(0, maxLen) + '...' : clean;
-  }
-
-  const start = Math.max(0, pos - 30);
-  const end = Math.min(clean.length, pos + normTerm.length + 90);
-  return (start > 0 ? '...' : '') + clean.slice(start, end).trim() + (end < clean.length ? '...' : '');
-}
-
 export async function searchPosts(options: SearchOptions): Promise<SearchResponse> {
   const query = (options.q || '').trim();
   const filterType = options.type || 'all';
@@ -129,7 +72,6 @@ export async function searchPosts(options: SearchOptions): Promise<SearchRespons
   const perPage = options.perPage ?? 20;
   const page = Math.max(1, options.page ?? 1);
 
-  // If query is empty, exit immediately without querying posts!
   if (!query) {
     return {
       query: '',
@@ -143,24 +85,52 @@ export async function searchPosts(options: SearchOptions): Promise<SearchRespons
     };
   }
 
-  const [posts, categories] = await Promise.all([
-    getSearchablePosts(),
-    getCategories(),
-  ]);
+  const cacheKey = `${query.toLowerCase()}:${filterType}:${filterTopic}:${page}:${perPage}`;
+  const now = Date.now();
+  if (!searchCache.__searchQueryCache) searchCache.__searchQueryCache = new Map();
+  const cached = searchCache.__searchQueryCache.get(cacheKey);
+  if (cached && now - cached.at < 300_000) {
+    return cached.val;
+  }
+
+  // Offload search filtering to PostgreSQL via Supabase to keep Worker CPU < 1ms
+  const cleanTerm = query.replace(/[^\p{L}\p{N}\s-]/gu, ' ').trim();
+  const firstWord = cleanTerm.split(/\s+/).filter((w) => w.length >= 2)[0] || cleanTerm;
+
+  let dbRows: Post[] = [];
+  let categories: Category[] = [];
+
+  try {
+    const [postsRes, cats] = await Promise.all([
+      db.find('posts', {
+        eq: { status: 'published' },
+        search: {
+          fields: ['title', 'excerpt', 'focus_keyword', 'slug'],
+          term: firstWord,
+        },
+        select:
+          'id,type,slug,title,excerpt,hero_image,hero_alt,primary_category_id,category_ids,published_at,focus_keyword',
+        order: [{ field: 'published_at', asc: false }],
+        limit: 120,
+      }),
+      getCategories(),
+    ]);
+    dbRows = postsRes.rows;
+    categories = cats;
+  } catch (e) {
+    console.error('[search] searchPosts DB query failed:', (e as Error).message);
+    categories = await getCategories();
+  }
 
   const catById = new Map<string, Category>(categories.map((c) => [c.id, c]));
   const catBySlug = new Map<string, Category>(categories.map((c) => [c.slug, c]));
 
-  const tokens = query
+  const tokens = cleanTerm
     .split(/\s+/)
     .map((t) => normalizeText(t))
     .filter((t) => t.length > 1);
+  if (tokens.length === 0) tokens.push(normalizeText(cleanTerm));
 
-  if (tokens.length === 0) {
-    tokens.push(normalizeText(query));
-  }
-
-  // Pre-filter topic category if specified
   let targetCatId: string | null = null;
   if (filterTopic) {
     if (catById.has(filterTopic)) targetCatId = filterTopic;
@@ -171,117 +141,50 @@ export async function searchPosts(options: SearchOptions): Promise<SearchRespons
   const typeCounts = { all: 0, gift: 0, blog: 0 };
   const topicCountsMap = new Map<string, number>();
 
-  for (const post of posts) {
-    let score = 0;
+  for (const post of dbRows) {
+    if (post.type === 'page') continue;
+    let score = 10;
     const normTitle = normalizeText(post.title);
     const normExcerpt = normalizeText(post.excerpt);
-    const normKeyword = normalizeText(post.focus_keyword || '');
 
-    // Title score
-    let titleMatches = 0;
     for (const tok of tokens) {
-      if (tokenMatches(normTitle, tok)) titleMatches++;
-    }
-    if (titleMatches > 0) {
-      score += 100 * (titleMatches / tokens.length);
-      if (normTitle.includes(tokens.join(' '))) score += 50;
+      if (normTitle.includes(tok)) score += 100;
+      if (normExcerpt.includes(tok)) score += 30;
     }
 
-    // Excerpt score
-    let excerptMatches = 0;
-    for (const tok of tokens) {
-      if (tokenMatches(normExcerpt, tok)) excerptMatches++;
-    }
-    if (excerptMatches > 0) {
-      score += 40 * (excerptMatches / tokens.length);
-    }
+    typeCounts.all++;
+    if (post.type === 'gift') typeCounts.gift++;
+    if (post.type === 'blog') typeCounts.blog++;
 
-    // Keyword score
-    if (normKeyword) {
-      for (const tok of tokens) {
-        if (tokenMatches(normKeyword, tok)) score += 30;
-      }
-    }
-
-    // Deep search in Items (Gift guides)
-    const matchedItems: SearchItemMatch[] = [];
-    if (Array.isArray(post.items) && post.items.length > 0) {
-      for (let i = 0; i < post.items.length; i++) {
-        const item = post.items[i];
-        const itemDesc = item.description_html || (item as any).description || '';
-        const normH = normalizeText(item.heading);
-        const normD = normalizeText(itemDesc);
-
-        let itemScore = 0;
-        for (const tok of tokens) {
-          if (tokenMatches(normH, tok)) itemScore += 25;
-          else if (tokenMatches(normD, tok)) itemScore += 15;
-        }
-
-        if (itemScore > 0) {
-          score += itemScore;
-          matchedItems.push({
-            index: i + 1,
-            heading: item.heading,
-            snippet: createSnippet(itemDesc || item.heading, tokens[0]),
-            image: item.image,
-          });
-        }
-      }
-    }
-
-    // Deep search in Blog Content
-    if (post.type === 'blog' && post.content_html) {
-      const normContent = normalizeText(post.content_html);
-      let contentMatches = 0;
-      for (const tok of tokens) {
-        if (tokenMatches(normContent, tok)) contentMatches++;
-      }
-      if (contentMatches > 0) {
-        score += 20 * (contentMatches / tokens.length);
-      }
-    }
-
-    if (score > 0) {
-      // Aggregate counts across all matching posts
-      typeCounts.all++;
-      if (post.type === 'gift') typeCounts.gift++;
-      if (post.type === 'blog') typeCounts.blog++;
-
-      // Count topics
-      const cids = Array.isArray(post.category_ids) && post.category_ids.length > 0
+    const cids =
+      Array.isArray(post.category_ids) && post.category_ids.length > 0
         ? post.category_ids
-        : (post.primary_category_id ? [post.primary_category_id] : []);
-      for (const cid of cids) {
-        topicCountsMap.set(cid, (topicCountsMap.get(cid) || 0) + 1);
-      }
-
-      // Check if post satisfies current filter
-      if (filterType !== 'all' && post.type !== filterType) {
-        continue;
-      }
-      if (targetCatId && !cids.includes(targetCatId)) {
-        continue;
-      }
-
-      matchedList.push({
-        id: post.id,
-        type: post.type,
-        slug: post.slug,
-        title: post.title,
-        excerpt: post.excerpt,
-        hero_image: post.hero_image,
-        hero_alt: post.hero_alt,
-        primary_category_id: post.primary_category_id,
-        category_ids: cids,
-        published_at: post.published_at,
-        matchedItems: matchedItems.slice(0, 4),
-        score,
-      });
+        : post.primary_category_id
+        ? [post.primary_category_id]
+        : [];
+    for (const cid of cids) {
+      topicCountsMap.set(cid, (topicCountsMap.get(cid) || 0) + 1);
     }
+
+    if (filterType !== 'all' && post.type !== filterType) continue;
+    if (targetCatId && !cids.includes(targetCatId)) continue;
+
+    matchedList.push({
+      id: post.id,
+      type: post.type,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      hero_image: sanitizeImageUrl(post.hero_image),
+      hero_alt: post.hero_alt,
+      primary_category_id: post.primary_category_id,
+      category_ids: cids,
+      published_at: post.published_at,
+      matchedItems: [],
+      score,
+    });
   }
 
-  // Sort by relevance score descending, then by publication date
   matchedList.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
     return (b.published_at || '').localeCompare(a.published_at || '');
@@ -292,7 +195,6 @@ export async function searchPosts(options: SearchOptions): Promise<SearchRespons
   const offset = (page - 1) * perPage;
   const rows = matchedList.slice(offset, offset + perPage);
 
-  // Format topic list with counts
   const topics = Array.from(topicCountsMap.entries())
     .map(([cid, count]) => {
       const cat = catById.get(cid);
@@ -305,7 +207,7 @@ export async function searchPosts(options: SearchOptions): Promise<SearchRespons
     })
     .sort((a, b) => b.count - a.count);
 
-  return {
+  const response: SearchResponse = {
     query,
     total,
     page,
@@ -315,4 +217,8 @@ export async function searchPosts(options: SearchOptions): Promise<SearchRespons
     counts: typeCounts,
     topics,
   };
+
+  if (searchCache.__searchQueryCache.size > 30) searchCache.__searchQueryCache.clear();
+  searchCache.__searchQueryCache.set(cacheKey, { at: now, val: response });
+  return response;
 }

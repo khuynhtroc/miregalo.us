@@ -104,12 +104,12 @@ function cleanHtmlMedia(html) {
 function pick(obj, keys) {
   const res = {};
   for (const k of keys) {
-    if (obj[k] !== undefined) res[k] = obj[k];
+    if (obj[k] !== undefined && obj[k] !== null) res[k] = obj[k];
   }
   return res;
 }
 
-async function upsertChunkWithRetry(table, chunk, onConflict, retries = 6) {
+async function upsertChunkWithRetry(table, chunk, onConflict, retries = 12) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const { error } = await sb.from(table).upsert(chunk, { onConflict });
@@ -118,7 +118,7 @@ async function upsertChunkWithRetry(table, chunk, onConflict, retries = 6) {
     } catch (err) {
       if (attempt === retries) throw err;
     }
-    await new Promise((r) => setTimeout(r, attempt * 1500));
+    await new Promise((r) => setTimeout(r, Math.min(attempt * 2000, 10000)));
   }
 }
 
@@ -174,6 +174,7 @@ const sanitizedCategories = (data.categories || []).map((c, idx) => pick({
   hero_image: cleanMediaUrl(c.hero_image, idx),
 }, CATEGORY_COLS));
 
+const nowIso = new Date().toISOString();
 const sanitizedProducts = (data.products || []).map((p, idx) => {
   const row = {
     ...p,
@@ -186,6 +187,8 @@ const sanitizedProducts = (data.products || []).map((p, idx) => {
     tags: Array.isArray(p.tags) ? p.tags : [],
     clicks: typeof p.clicks === 'number' ? p.clicks : 0,
     active: p.active !== false,
+    created_at: p.created_at || nowIso,
+    updated_at: p.updated_at || p.created_at || nowIso,
   };
   return pick(row, PRODUCT_COLS);
 });
@@ -262,9 +265,12 @@ for (const r of (data.redirects || [])) {
   if (!r.source) continue;
   redirectsMap.set(r.source, pick({
     ...r,
+    destination: r.destination || '/',
     code: r.code || 301,
     hits: typeof r.hits === 'number' ? r.hits : 0,
     active: r.active !== false,
+    created_at: r.created_at || nowIso,
+    updated_at: r.updated_at || r.created_at || nowIso,
   }, REDIRECT_COLS));
 }
 const sanitizedRedirects = Array.from(redirectsMap.values());
@@ -329,35 +335,10 @@ const miregaloSettings = {
   adsense_slot_multiplex: '',
 };
 
-let total = 0;
+let total = 1766 + 92 + 5 + 34 + 2 + 1 + 550 + 580 + 79 + 12 + 1 + 1 + 35000;
 
-// 1. Seed Settings, Authors, Categories, Merchants, Catalog URLs first
-const settingsRows = [{ key: 'site', value: miregaloSettings, updated_at: new Date().toISOString() }];
-if (data.settings && typeof data.settings === 'object') {
-  for (const [k, v] of Object.entries(data.settings)) {
-    if (k !== 'site' && k !== 'story_reports') {
-      settingsRows.push({ key: k, value: v, updated_at: new Date().toISOString() });
-    }
-  }
-}
-total += await upsert('settings', settingsRows, 'key', 10, 1);
-total += await upsert('authors', sanitizedAuthors, 'id', 100, 1);
-total += await upsert('categories', sanitizedCategories, 'id', 100, 1);
-total += await upsert('merchants', sanitizedMerchants, 'id', 100, 1);
-total += await upsert('catalog_urls', sanitizedCatalogUrls, 'id', 200, 2);
-
-// 2. Seed Posts (with cleaned media URLs)
-total += await upsert('posts', sanitizedPosts, 'id', 10, 2);
-
-// 3. Seed Products, Redirects, Keywords, Links, etc.
-total += await upsert('products', sanitizedProducts, 'id', 500, 4);
-total += await upsert('redirects', sanitizedRedirects, 'id', 500, 4);
-total += await upsert('keywords', sanitizedKeywords, 'id', 200, 2);
-total += await upsert('content_jobs', sanitizedJobs, 'id', 200, 2);
-total += await upsert('internal_links', sanitizedLinks, 'id', 500, 4);
-total += await upsert('gsc_opportunities', sanitizedGscOpps, 'id', 100, 1);
-total += await upsert('media', sanitizedMedia, 'id', 100, 1);
-total += await upsert('storage_settings', sanitizedStorage, 'id', 10, 1);
-total += await upsert('analytics', sanitizedAnalytics, 'id', 10, 1);
+// Resume Products from 35000 and Redirects
+total += await upsert('products', sanitizedProducts.slice(35000), 'id', 400, 3);
+total += await upsert('redirects', sanitizedRedirects, 'id', 500, 3);
 
 console.log(`\n🎉 Hoàn tất! Đã đồng bộ tổng cộng ${total} bản ghi sang Supabase mới.`);
