@@ -226,6 +226,7 @@ export const getPublishedPost = cache(async (type: PostType | PostType[], slug: 
       return sanitized;
     }
   }
+  if (repoCache.__postBySlugCache.size > 200) repoCache.__postBySlugCache.clear();
   repoCache.__postBySlugCache.set(key, { at: now, val: null });
   return null;
 });

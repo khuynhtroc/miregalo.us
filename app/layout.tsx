@@ -1,13 +1,9 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import { Analytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { getSettings } from '@/lib/repo';
 import { orgSchema, websiteSchema } from '@/lib/seo';
 import { JsonLd } from '@/components/JsonLd';
-
-export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
@@ -66,11 +62,6 @@ export default async function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
         />
-        {/* Geo-targeting for US Hispanic Audience */}
-        <meta name="geo.region" content="US" />
-        <meta name="geo.placename" content="United States" />
-        <meta name="geo.position" content="37.09024;-95.712891" />
-        <meta name="ICBM" content="37.09024, -95.712891" />
         {/* Google Tag Manager (GTM) - Required as high as possible in <head> for GSC verification (Bot filtered) */}
         {gtmId && (
           <script
@@ -111,11 +102,6 @@ if ((typeof window !== 'undefined' && window.location.pathname.startsWith('/admi
           />
         )}
 
-        <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
-        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <JsonLd data={[websiteSchema(settings), orgSchema(settings)]} />
         {/* Google AdSense Site Verification & Ad Script */}
         <meta name="google-adsense-account" content="ca-pub-2959580292222970" />
@@ -201,8 +187,6 @@ if ((typeof window !== 'undefined' && window.location.pathname.startsWith('/admi
           />
         )}
 
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

@@ -168,17 +168,20 @@ export const NEUTRAL_CTA_LABEL = 'Ver producto';
 
 const MERCHANT_RE = '(?:Amazon(?:\\.com|\\.es)?(?: España)?|Etsy(?: España)?|eBay(?:\\.es)?|Walmart|Target|El Corte Ingl[eé]s|AliExpress|la tienda|tienda)';
 
+/** Pre-compiled regex for neutralizing merchant CTA text in HTML. */
+const NEUTRALIZE_CTA_RE = new RegExp(
+  `>(\\s*)(?:Ver|Comprar|Consultar|Ver precio|Ver oferta|Ver producto)(?: (?:y comprar|precio))? (?:en|on) ${MERCHANT_RE}(\\s*(?:→|↗|»)?\\s*)<`,
+  'gi',
+);
+
 /**
  * Replace merchant-named CTA text injected in DB HTML (e.g. ">Ver en Amazon<", ">Comprar en Etsy<")
  * with the neutral label. Only touches short text nodes that are entirely a CTA; prose is untouched.
  */
 export function neutralizeMerchantHtml(html?: string | null): string {
   if (!html) return '';
-  const re = new RegExp(
-    `>(\\s*)(?:Ver|Comprar|Consultar|Ver precio|Ver oferta|Ver producto)(?: (?:y comprar|precio))? (?:en|on) ${MERCHANT_RE}(\\s*(?:→|↗|»)?\\s*)<`,
-    'gi',
-  );
-  return tagAmazonLinksInHtml(html.replace(re, `>$1${NEUTRAL_CTA_LABEL}$2<`));
+  NEUTRALIZE_CTA_RE.lastIndex = 0;
+  return tagAmazonLinksInHtml(html.replace(NEUTRALIZE_CTA_RE, `>$1${NEUTRAL_CTA_LABEL}$2<`));
 }
 
 /** Force our Associates tag onto a direct Amazon URL (any marketplace -> amazon.com). */
