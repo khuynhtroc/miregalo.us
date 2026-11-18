@@ -14,6 +14,7 @@ import {
   listPublishedPosts,
   getPublishedPost,
   getRelatedPosts,
+  findRedirectByPath,
 } from '@/lib/repo';
 import {
   buildMetadata,
@@ -236,12 +237,10 @@ export default async function DynamicSlugPage({ params }: PageProps) {
     if (blogPost) {
       return permanentRedirect(`/blog/${slug}/`);
     }
-    const redirectRule =
-      (await db.findOne('redirects', { source: `/${slug}/`, active: true })) ||
-      (await db.findOne('redirects', { source: `/${slug}`, active: true }));
+    const redirectRule = await findRedirectByPath(`/${slug}/`);
     if (redirectRule) {
       try {
-        await db.increment('redirects', redirectRule.id, 'hits');
+        if (redirectRule.id) await db.increment('redirects', redirectRule.id, 'hits');
       } catch {
         // non-fatal
       }

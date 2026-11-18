@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
-import { getSettings, getCatalogUrls, getCatalogUrlByPath, getKeywordsForUrl, getRelatedPostsForCatalog, getCategoryMap } from '@/lib/repo';
+import { getSettings, getCatalogUrls, getCatalogUrlByPath, getRelatedPostsForCatalog, getCategoryMap, sanitizeImageUrl } from '@/lib/repo';
 import { buildMetadata, breadcrumbSchema, collectionSchema, faqSchema } from '@/lib/seo';
 import { getCatalogContent } from '@/lib/catalog-content';
 import { Breadcrumbs, type Crumb } from '@/components/Breadcrumbs';
@@ -44,11 +44,10 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
     notFound();
   }
 
-  const [settings, allCatalogUrls, keywords, productsRes, catMap] = await Promise.all([
+  const [settings, allCatalogUrls, productsRes, catMap] = await Promise.all([
     getSettings(),
     getCatalogUrls(),
-    getKeywordsForUrl(catalogUrl.id),
-    db.find('products', { eq: { active: true }, limit: 20 }),
+    db.find('products', { eq: { active: true }, limit: 20 }).catch(() => ({ rows: [], total: 0 })),
     getCategoryMap(),
   ]);
 
@@ -298,7 +297,7 @@ export default async function CatalogDynamicPage({ params }: PageProps) {
                 productSlug={product.slug}
                 item={{
                   heading: product.name,
-                  image: product.image,
+                  image: sanitizeImageUrl(product.image),
                   merchant: product.merchant,
                   price: product.price,
                   description_html: `<p>${product.description}</p>`,

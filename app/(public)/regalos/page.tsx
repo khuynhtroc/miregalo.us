@@ -2,7 +2,7 @@ import { normalizeMerchant } from '@/lib/commerce';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
-import { getSettings, getCatalogUrls, getRelatedPostsForCatalog, getCategoryMap } from '@/lib/repo';
+import { getSettings, getCatalogUrls, getRelatedPostsForCatalog, getCategoryMap, sanitizeImageUrl } from '@/lib/repo';
 import { buildMetadata, breadcrumbSchema, collectionSchema, faqSchema } from '@/lib/seo';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { ProductCard } from '@/components/ProductCard';
@@ -25,7 +25,7 @@ export default async function RegalosSiloPage() {
   const [settings, catalogUrls, productsRes, catMap] = await Promise.all([
     getSettings(),
     getCatalogUrls(),
-    db.find('products', { eq: { active: true }, limit: 12 }),
+    db.find('products', { eq: { active: true }, limit: 12 }).catch(() => ({ rows: [], total: 0 })),
     getCategoryMap(),
   ]);
 
@@ -212,7 +212,7 @@ export default async function RegalosSiloPage() {
                 productSlug={product.slug}
                 item={{
                   heading: product.name,
-                  image: product.image,
+                  image: sanitizeImageUrl(product.image),
                   merchant: product.merchant,
                   price: product.price,
                   description_html: `<p>${product.description}</p>`,

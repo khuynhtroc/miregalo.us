@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
-import { getSettings, listPublishedPosts } from '@/lib/repo';
+import { getSettings, listPublishedPosts, sanitizeImageUrl } from '@/lib/repo';
 import { SITE_URL } from '@/lib/urls';
 import { Breadcrumbs } from '@/components/Breadcrumbs';
 import { JsonLd } from '@/components/JsonLd';
@@ -18,60 +18,63 @@ async function resolveProduct(rawSlug: string) {
   const cleanSlug = decodeURIComponent(rawSlug || '').trim().replace(/^\/p\//, '').replace(/\/$/, '');
   const flatSlug = cleanSlug.replace(/\//g, '-');
 
-  let product: any =
-    (await db.findOne('products', { slug: cleanSlug, active: true })) ||
-    (await db.findOne('products', { slug: flatSlug, active: true }));
-
-  if (!product && cleanSlug.startsWith('prod-')) {
-    const stripped = cleanSlug.replace(/^prod-/, '');
-    product =
-      (await db.findOne('products', { slug: stripped, active: true })) ||
-      (await db.findOne('products', { id: `prod-${stripped}`, active: true }));
-  }
-
-  if (!product && !cleanSlug.startsWith('prod-')) {
-    product =
-      (await db.findOne('products', { id: `prod-${cleanSlug}`, active: true })) ||
-      (await db.findOne('products', { id: `prod-${flatSlug}`, active: true }));
-  }
-
+  let product: any = null;
   let post: any = null;
 
-  // Resolve from post.items if not yet registered in products table
-  const itemMatch = cleanSlug.match(/^(.+)-item-(\d+)$/i);
-  if (itemMatch) {
-    const postSlug = itemMatch[1];
-    const itemNum = parseInt(itemMatch[2], 10);
-    const itemIdx = itemNum - 1;
+  try {
+    product =
+      (await db.findOne('products', { slug: cleanSlug, active: true })) ||
+      (await db.findOne('products', { slug: flatSlug, active: true }));
 
-    post =
-      (await db.findOne('posts', { slug: postSlug })) ||
-      (await db.findOne('posts', { id: postSlug })) ||
-      (await db.findOne('posts', { id: `post-${postSlug}` }));
-
-    if (!product && post && post.items && Array.isArray(post.items) && post.items[itemIdx]) {
-      const item = post.items[itemIdx];
-      product = {
-        id: `prod-${cleanSlug}`,
-        slug: cleanSlug,
-        name: item.heading || `${post.title} #${itemNum}`,
-        url: item.url || `/go/${cleanSlug}`,
-        merchant: item.merchant || 'Amazon',
-        image: item.image || 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
-        price: item.price || '',
-        currency: 'USD',
-        description: item.description_html || '<p>Producto recomendado para regalo.</p>',
-        tags: ['regalos', 'destacado'],
-        active: true,
-      };
+    if (!product && cleanSlug.startsWith('prod-')) {
+      const stripped = cleanSlug.replace(/^prod-/, '');
+      product =
+        (await db.findOne('products', { slug: stripped, active: true })) ||
+        (await db.findOne('products', { id: `prod-${stripped}`, active: true }));
     }
+
+    if (!product && !cleanSlug.startsWith('prod-')) {
+      product =
+        (await db.findOne('products', { id: `prod-${cleanSlug}`, active: true })) ||
+        (await db.findOne('products', { id: `prod-${flatSlug}`, active: true }));
+    }
+
+    // Resolve from post.items if not yet registered in products table
+    const itemMatch = cleanSlug.match(/^(.+)-item-(\d+)$/i);
+    if (itemMatch) {
+      const postSlug = itemMatch[1];
+      const itemNum = parseInt(itemMatch[2], 10);
+      const itemIdx = itemNum - 1;
+
+      post =
+        (await db.findOne('posts', { slug: postSlug })) ||
+        (await db.findOne('posts', { id: postSlug })) ||
+        (await db.findOne('posts', { id: `post-${postSlug}` }));
+
+      if (!product && post && post.items && Array.isArray(post.items) && post.items[itemIdx]) {
+        const item = post.items[itemIdx];
+        product = {
+          id: `prod-${cleanSlug}`,
+          slug: cleanSlug,
+          name: item.heading || `${post.title} #${itemNum}`,
+          url: item.url || `/go/${cleanSlug}`,
+          merchant: item.merchant || 'Amazon',
+          image: item.image || 'https://media.miregalo.us/media/medium_necklace1_b337bcdf8b/medium_necklace1_b337bcdf8b.jpg',
+          price: item.price || '',
+          currency: 'USD',
+          description: item.description_html || '<p>Producto recomendado para regalo.</p>',
+          tags: ['regalos', 'destacado'],
+          active: true,
+        };
+      }
+    }
+  } catch (e) {
+    console.error('[ProductDetailPage] resolveProduct failed:', (e as Error).message);
   }
 
   if (product) {
     if (product.image) {
-      product.image = product.image
-        .replace(/https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/')
-        .replace(/https?:\/\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/');
+      product.image = sanitizeImageUrl(product.image);
     }
     if (product.description) {
       product.description = product.description

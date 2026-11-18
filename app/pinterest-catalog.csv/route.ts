@@ -12,7 +12,7 @@ function parseNumericPrice(priceRaw?: string): number {
 
 function cleanPrice(priceRaw?: string, currencyRaw?: string): string {
   const num = parseNumericPrice(priceRaw);
-  const curr = currencyRaw || (priceRaw?.includes('€') ? 'EUR' : priceRaw?.includes('$') ? 'USD' : 'EUR');
+  const curr = currencyRaw === 'EUR' ? 'USD' : (currencyRaw || (priceRaw?.includes('$') ? 'USD' : priceRaw?.includes('€') ? 'EUR' : 'USD'));
   return `${num.toFixed(2)} ${curr}`;
 }
 
@@ -87,9 +87,9 @@ function detectProductGroups(slug: string, name: string, priceNum: number) {
     topic = 'deportes';
   }
 
-  let priceTier = '20_a_50_eur';
-  if (priceNum < 20) priceTier = 'menos_de_20_eur';
-  else if (priceNum > 50) priceTier = 'mas_de_50_eur';
+  let priceTier = '20_a_50_usd';
+  if (priceNum < 20) priceTier = 'menos_de_20_usd';
+  else if (priceNum > 50) priceTier = 'mas_de_50_usd';
 
   const itemMatch = (slug || '').match(/^(.+)-item-\d+$/i);
   const itemGroupId = itemMatch ? itemMatch[1].replace(/^prod-/i, '') : (slug || '').replace(/^prod-/i, '');

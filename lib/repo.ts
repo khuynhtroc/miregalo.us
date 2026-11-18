@@ -125,19 +125,31 @@ export async function getAuthorById(id: string | null) {
 
 /* ───────────────────────── Posts ───────────────────────── */
 
+const FALLBACK_VALID_IMAGE = 'https://media.miregalo.us/media/blog/uploads/2023/03/31085446/Halloween-Sweatshirt-Vintage.jpg';
+
+export function sanitizeImageUrl(url?: string): string {
+  if (!url || typeof url !== 'string') return '';
+  let u = url.trim();
+  if (u === '#' || u.includes('photo-1511253819057-1547ddb8fa53') || u.includes('photo-1511707171634-5f897ff02560')) {
+    return FALLBACK_VALID_IMAGE;
+  }
+  if (u.includes('blog-admin.loveable.ai')) {
+    return 'https://media.miregalo.us/media/blog/uploads/2023/09/29144413/Chill-Out-at-a-Spa-Together.jpg';
+  }
+  u = u
+    .replace(/^https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+    .replace(/^https?:\/\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
+    .replace(/^https?:\/\/cdn\.loveable\.us\//i, 'https://media.miregalo.us/media/');
+  return u;
+}
+
 function sanitizePostMedia<T extends Partial<Post>>(p: T): T {
   if (!p) return p;
   if (p.hero_image) {
-    p.hero_image = p.hero_image
-      .replace(/^https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
-      .replace(/^https?:\/\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
-      .replace(/^https?:\/\/cdn\.loveable\.us\//i, 'https://media.miregalo.us/media/');
+    p.hero_image = sanitizeImageUrl(p.hero_image);
   }
   if (p.og_image) {
-    p.og_image = p.og_image
-      .replace(/^https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
-      .replace(/^https?:\/\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
-      .replace(/^https?:\/\/cdn\.loveable\.us\//i, 'https://media.miregalo.us/media/');
+    p.og_image = sanitizeImageUrl(p.og_image);
   }
   if (p.content_html) {
     p.content_html = p.content_html
@@ -151,7 +163,10 @@ function sanitizePostMedia<T extends Partial<Post>>(p: T): T {
       .replace(/https?:\/\/blog\.loveable\.us\/([a-zA-Z0-9_-]+)\/?/gi, '/blog/regalos-$1/')
       .replace(/https?:\/\/blog-admin\.loveable\.ai[^\s"'<>]+/gi, '#')
       .replace(/https?:\/\/loveable\.us\/[^\s"'<>]+/gi, '#')
-      .replace(/https?:\/\/loveable\.ai\/[^\s"'<>]+/gi, '#');
+      .replace(/https?:\/\/loveable\.ai\/[^\s"'<>]+/gi, '#')
+      .replace(/<figure[^>]*>\s*<img[^>]+src=["']#["'][^>]*>[\s\S]*?<\/figure>/gi, '')
+      .replace(/<p[^>]*>\s*<img[^>]+src=["']#["'][^>]*>\s*<\/p>/gi, '')
+      .replace(/<img[^>]+src=["']#["'][^>]*>/gi, '');
   }
   if (p.intro_html) {
     p.intro_html = p.intro_html
@@ -160,17 +175,15 @@ function sanitizePostMedia<T extends Partial<Post>>(p: T): T {
       .replace(/\s+tamaños=["'][^"']*["']/gi, '')
       .replace(/https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/')
       .replace(/https?:\/\/loveable\.appspot\.com\//gi, 'https://media.miregalo.us/media/')
-      .replace(/https?:\/\/cdn\.loveable\.us\//gi, 'https://media.miregalo.us/media/');
+      .replace(/https?:\/\/cdn\.loveable\.us\//gi, 'https://media.miregalo.us/media/')
+      .replace(/<img[^>]+src=["']#["'][^>]*>/gi, '');
   }
   if (Array.isArray(p.items)) {
     p.items = p.items.map((it) => {
       if (!it.image) return it;
       return {
         ...it,
-        image: it.image
-          .replace(/^https?:\/\/storage\.googleapis\.com\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
-          .replace(/^https?:\/\/loveable\.appspot\.com\//i, 'https://media.miregalo.us/media/')
-          .replace(/^https?:\/\/cdn\.loveable\.us\//i, 'https://media.miregalo.us/media/'),
+        image: sanitizeImageUrl(it.image),
       };
     });
   }
@@ -254,14 +267,18 @@ export const getPublishedPost = cache(async (type: PostType | PostType[], slug: 
     return hit.val;
   }
   try {
-    for (const t of types) {
-      const p = await db.findOne('posts', { type: t, slug, status: 'published' });
-      if (p) {
-        const sanitized = sanitizePostMedia(p);
-        if (repoCache.__postBySlugCache.size > 200) repoCache.__postBySlugCache.clear();
-        repoCache.__postBySlugCache.set(key, { at: now, val: sanitized });
-        return sanitized;
-      }
+    const { rows } = await db.find('posts', {
+      eq: { slug, status: 'published' },
+      in: types.length > 1 ? { field: 'type', values: types } : undefined,
+      ...(types.length === 1 ? { eq: { slug, status: 'published', type: types[0] } } : {}),
+      limit: 1,
+    });
+    const p = rows[0];
+    if (p) {
+      const sanitized = sanitizePostMedia(p);
+      if (repoCache.__postBySlugCache.size > 200) repoCache.__postBySlugCache.clear();
+      repoCache.__postBySlugCache.set(key, { at: now, val: sanitized });
+      return sanitized;
     }
   } catch (e) {
     console.error('[repo] getPublishedPost failed:', (e as Error).message);
@@ -393,14 +410,20 @@ export async function getAllPublishedForSitemap() {
   if (repoCache.__sitemapPostsCache && now - repoCache.__sitemapPostsCache.at < 300_000) {
     return repoCache.__sitemapPostsCache.val;
   }
-  const { rows } = await db.find('posts', {
-    eq: { status: 'published' },
-    select: 'id,type,slug,title,hero_image,robots,canonical_url,published_at,updated_at,category_ids,excerpt',
-    order: [{ field: 'published_at', asc: false }],
-  });
-  const val = rows.map(sanitizePostMedia);
-  repoCache.__sitemapPostsCache = { at: now, val };
-  return val;
+  try {
+    const { rows } = await db.find('posts', {
+      eq: { status: 'published' },
+      select: 'id,type,slug,title,hero_image,robots,canonical_url,published_at,updated_at,category_ids,excerpt',
+      order: [{ field: 'published_at', asc: false }],
+    });
+    const val = rows.map(sanitizePostMedia);
+    repoCache.__sitemapPostsCache = { at: now, val };
+    return val;
+  } catch (e) {
+    console.error('[repo] getAllPublishedForSitemap failed:', (e as Error).message);
+    if (repoCache.__sitemapPostsCache) return repoCache.__sitemapPostsCache.val;
+    return [];
+  }
 }
 
 /** Resolve the set of category ids that a hub page aggregates. */
@@ -417,12 +440,23 @@ export async function hubFilter(hubSlug: string): Promise<{ type?: PostType; cat
 
 export async function getProductsByIds(ids: string[]): Promise<Map<string, Product>> {
   if (!ids.length) return new Map();
-  const { rows } = await db.find('products', { in: { field: 'id', values: ids } });
-  return new Map(rows.map((p) => [p.id, p]));
+  try {
+    const { rows } = await db.find('products', { in: { field: 'id', values: ids } });
+    return new Map(rows.map((p) => [p.id, { ...p, image: sanitizeImageUrl(p.image) }]));
+  } catch (e) {
+    console.error('[repo] getProductsByIds failed:', (e as Error).message);
+    return new Map();
+  }
 }
 
 export async function getProductBySlug(slug: string) {
-  return db.findOne('products', { slug });
+  try {
+    const p = await db.findOne('products', { slug });
+    return p ? { ...p, image: sanitizeImageUrl(p.image) } : null;
+  } catch (e) {
+    console.error('[repo] getProductBySlug failed:', (e as Error).message);
+    return null;
+  }
 }
 
 /* ───────────────────────── Redirects ───────────────────────── */
@@ -432,21 +466,36 @@ const g = globalThis as unknown as { __redirectCache?: { at: number; map: Map<st
 export async function getRedirectMap(): Promise<Map<string, Redirect>> {
   const now = Date.now();
   if (g.__redirectCache && now - g.__redirectCache.at < 300_000) return g.__redirectCache.map;
-  const { rows } = await db.find('redirects', {
-    eq: { active: true },
-    select: 'source,destination,status_code,active',
-    limit: 1000,
-  });
-  const map = new Map(rows.map((r) => [normalizePath(r.source), r]));
-  g.__redirectCache = { at: now, map };
-  return map;
+  try {
+    const { rows } = await db.find('redirects', {
+      eq: { active: true },
+      select: 'id,source,destination,code,active',
+      limit: 1000,
+    });
+    const map = new Map(rows.map((r) => [normalizePath(r.source), r]));
+    g.__redirectCache = { at: now, map };
+    return map;
+  } catch (e) {
+    console.error('[repo] getRedirectMap failed:', (e as Error).message);
+    if (g.__redirectCache) return g.__redirectCache.map;
+    return new Map();
+  }
 }
 
 export async function findRedirectByPath(path: string): Promise<Redirect | null> {
   const normalized = normalizePath(path);
-  const map = await getRedirectMap();
-  if (map.has(normalized)) return map.get(normalized) || null;
-  return db.findOne('redirects', { source: normalized, active: true });
+  try {
+    const map = await getRedirectMap();
+    if (map.has(normalized)) return map.get(normalized) || null;
+    const rawNoSlash = normalized.replace(/\/$/, '');
+    return (
+      (await db.findOne('redirects', { source: normalized, active: true })) ||
+      (rawNoSlash ? await db.findOne('redirects', { source: rawNoSlash, active: true }) : null)
+    );
+  } catch (e) {
+    console.error('[repo] findRedirectByPath failed:', (e as Error).message);
+    return null;
+  }
 }
 export function invalidateRedirectCache() {
   g.__redirectCache = undefined;
@@ -456,7 +505,7 @@ export function normalizePath(p: string): string {
   let s = p.trim();
   try {
     if (/^https?:\/\//i.test(s)) s = new URL(s).pathname;
-  } catch {}
+  } catch { }
   if (!s.startsWith('/')) s = '/' + s;
   if (!s.endsWith('/') && !/\.[a-z0-9]{2,5}$/i.test(s)) s += '/';
   return s.toLowerCase();
@@ -469,9 +518,15 @@ export const getCatalogUrls = cache(async (): Promise<CatalogUrl[]> => {
   if (repoCache.__catalogUrlsCache && now - repoCache.__catalogUrlsCache.at < 300_000) {
     return repoCache.__catalogUrlsCache.val;
   }
-  const { rows } = await db.find('catalog_urls', { order: [{ field: 'id', asc: true }] });
-  repoCache.__catalogUrlsCache = { at: now, val: rows };
-  return rows;
+  try {
+    const { rows } = await db.find('catalog_urls', { order: [{ field: 'id', asc: true }] });
+    repoCache.__catalogUrlsCache = { at: now, val: rows };
+    return rows;
+  } catch (e) {
+    console.error('[repo] getCatalogUrls failed:', (e as Error).message);
+    if (repoCache.__catalogUrlsCache) return repoCache.__catalogUrlsCache.val;
+    return [];
+  }
 });
 
 export async function getCatalogUrlByPath(path: string): Promise<CatalogUrl | null> {
@@ -486,17 +541,27 @@ export async function getCatalogUrlById(id: string): Promise<CatalogUrl | null> 
 }
 
 export async function getKeywordsForUrl(targetUrlIdOrPath: string): Promise<Keyword[]> {
-  const { rows } = await db.find('keywords', {});
-  return rows.filter(
-    (k) => k.target_url_id === targetUrlIdOrPath || normalizePath(k.target_path) === normalizePath(targetUrlIdOrPath)
-  );
+  try {
+    const { rows } = await db.find('keywords', {});
+    return rows.filter(
+      (k) => k.target_url_id === targetUrlIdOrPath || normalizePath(k.target_path) === normalizePath(targetUrlIdOrPath)
+    );
+  } catch (e) {
+    console.error('[repo] getKeywordsForUrl failed:', (e as Error).message);
+    return [];
+  }
 }
 
 /* ───────────────────────── Merchants ───────────────────────── */
 
 export const getMerchants = cache(async (): Promise<Merchant[]> => {
-  const { rows } = await db.find('merchants', { order: [{ field: 'name', asc: true }] });
-  return rows;
+  try {
+    const { rows } = await db.find('merchants', { order: [{ field: 'name', asc: true }] });
+    return rows;
+  } catch (e) {
+    console.error('[repo] getMerchants failed:', (e as Error).message);
+    return [];
+  }
 });
 
 export async function getMerchantById(id: string): Promise<Merchant | null> {
