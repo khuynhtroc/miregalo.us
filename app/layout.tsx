@@ -5,6 +5,8 @@ import { getSettings } from '@/lib/repo';
 import { orgSchema, websiteSchema } from '@/lib/seo';
 import { JsonLd } from '@/components/JsonLd';
 
+export const revalidate = 300; // ISR: revalidate at most every 5 minutes
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return {

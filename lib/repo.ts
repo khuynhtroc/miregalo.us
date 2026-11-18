@@ -20,13 +20,20 @@ const repoCache = globalThis as unknown as {
 
 export const getSettings = cache(async (): Promise<SiteSettings> => {
   const now = Date.now();
-  if (repoCache.__settingsCache && now - repoCache.__settingsCache.at < 60_000) {
+  if (repoCache.__settingsCache && now - repoCache.__settingsCache.at < 300_000) {
     return repoCache.__settingsCache.val;
   }
-  const stored = (await db.getSetting<Partial<SiteSettings>>('site')) ?? {};
-  const val = { ...DEFAULT_SETTINGS, ...stored };
-  repoCache.__settingsCache = { at: now, val };
-  return val;
+  try {
+    const stored = (await db.getSetting<Partial<SiteSettings>>('site')) ?? {};
+    const val = { ...DEFAULT_SETTINGS, ...stored };
+    repoCache.__settingsCache = { at: now, val };
+    return val;
+  } catch (e) {
+    console.error('[repo] getSettings failed, using defaults:', (e as Error).message);
+    // Return cached value if available (even if stale), or defaults
+    if (repoCache.__settingsCache) return repoCache.__settingsCache.val;
+    return { ...DEFAULT_SETTINGS };
+  }
 });
 
 /* ───────────────────────── Categories ───────────────────────── */
@@ -44,13 +51,19 @@ function sanitizeCategory(c: Category): Category {
 
 export const getCategories = cache(async (): Promise<Category[]> => {
   const now = Date.now();
-  if (repoCache.__categoriesCache && now - repoCache.__categoriesCache.at < 60_000) {
+  if (repoCache.__categoriesCache && now - repoCache.__categoriesCache.at < 300_000) {
     return repoCache.__categoriesCache.val;
   }
-  const { rows } = await db.find('categories', { order: [{ field: 'sort_order' }, { field: 'name' }] });
-  const val = rows.map(sanitizeCategory);
-  repoCache.__categoriesCache = { at: now, val };
-  return val;
+  try {
+    const { rows } = await db.find('categories', { order: [{ field: 'sort_order' }, { field: 'name' }] });
+    const val = rows.map(sanitizeCategory);
+    repoCache.__categoriesCache = { at: now, val };
+    return val;
+  } catch (e) {
+    console.error('[repo] getCategories failed:', (e as Error).message);
+    if (repoCache.__categoriesCache) return repoCache.__categoriesCache.val;
+    return [];
+  }
 });
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
@@ -68,26 +81,38 @@ export async function getCategoriesByGroup(group: Category['group']): Promise<Ca
 /** Article counts per category (published only). */
 export const getCategoryCounts = cache(async (): Promise<Record<string, number>> => {
   const now = Date.now();
-  if (repoCache.__catCountsCache && now - repoCache.__catCountsCache.at < 120_000) {
+  if (repoCache.__catCountsCache && now - repoCache.__catCountsCache.at < 300_000) {
     return repoCache.__catCountsCache.val;
   }
-  const { rows } = await db.find('posts', { eq: { status: 'published' }, select: 'id,category_ids' });
-  const counts: Record<string, number> = {};
-  for (const p of rows) for (const id of p.category_ids ?? []) counts[id] = (counts[id] ?? 0) + 1;
-  repoCache.__catCountsCache = { at: now, val: counts };
-  return counts;
+  try {
+    const { rows } = await db.find('posts', { eq: { status: 'published' }, select: 'id,category_ids' });
+    const counts: Record<string, number> = {};
+    for (const p of rows) for (const id of p.category_ids ?? []) counts[id] = (counts[id] ?? 0) + 1;
+    repoCache.__catCountsCache = { at: now, val: counts };
+    return counts;
+  } catch (e) {
+    console.error('[repo] getCategoryCounts failed:', (e as Error).message);
+    if (repoCache.__catCountsCache) return repoCache.__catCountsCache.val;
+    return {};
+  }
 });
 
 /* ───────────────────────── Authors ───────────────────────── */
 
 export const getAuthors = cache(async (): Promise<Author[]> => {
   const now = Date.now();
-  if (repoCache.__authorsCache && now - repoCache.__authorsCache.at < 120_000) {
+  if (repoCache.__authorsCache && now - repoCache.__authorsCache.at < 300_000) {
     return repoCache.__authorsCache.val;
   }
-  const val = (await db.find('authors', { order: [{ field: 'name' }] })).rows;
-  repoCache.__authorsCache = { at: now, val };
-  return val;
+  try {
+    const val = (await db.find('authors', { order: [{ field: 'name' }] })).rows;
+    repoCache.__authorsCache = { at: now, val };
+    return val;
+  } catch (e) {
+    console.error('[repo] getAuthors failed:', (e as Error).message);
+    if (repoCache.__authorsCache) return repoCache.__authorsCache.val;
+    return [];
+  }
 });
 
 export async function getAuthorBySlug(slug: string) {
@@ -187,17 +212,28 @@ export async function listPublishedPosts(opts: PostListOpts = {}): Promise<{ row
   if (opts.authorId) eq.author_id = opts.authorId;
   if (opts.featured !== undefined) eq.featured = opts.featured;
   if (opts.editorPick !== undefined) eq.editor_pick = opts.editorPick;
-  const res = await db.find('posts', {
-    eq,
-    in: Array.isArray(opts.type) ? { field: 'type', values: opts.type } : undefined,
-    contains: opts.categoryId ? { field: 'category_ids', value: opts.categoryId } : undefined,
-    overlaps: opts.categoryIds?.length ? { field: 'category_ids', values: opts.categoryIds } : undefined,
-    search: opts.q ? { fields: ['title', 'excerpt', 'focus_keyword'], term: opts.q } : undefined,
-    order: [{ field: 'published_at', asc: false }],
-    limit: perPage + (opts.excludeId ? 1 : 0),
-    offset: (page - 1) * perPage,
-    select: opts.full ? '*' : CARD_FIELDS,
-  });
+  let res;
+  try {
+    res = await db.find('posts', {
+      eq,
+      in: Array.isArray(opts.type) ? { field: 'type', values: opts.type } : undefined,
+      contains: opts.categoryId ? { field: 'category_ids', value: opts.categoryId } : undefined,
+      overlaps: opts.categoryIds?.length ? { field: 'category_ids', values: opts.categoryIds } : undefined,
+      search: opts.q ? { fields: ['title', 'excerpt', 'focus_keyword'], term: opts.q } : undefined,
+      order: [{ field: 'published_at', asc: false }],
+      limit: perPage + (opts.excludeId ? 1 : 0),
+      offset: (page - 1) * perPage,
+      select: opts.full ? '*' : CARD_FIELDS,
+    });
+  } catch (e) {
+    console.error('[repo] listPublishedPosts failed:', (e as Error).message);
+    // Return cached value if available, or empty
+    if (cacheKey && repoCache.__postListCache) {
+      const stale = repoCache.__postListCache.get(cacheKey);
+      if (stale) return stale.val;
+    }
+    return { rows: [], total: 0 };
+  }
   let rows = res.rows;
   if (opts.excludeId) rows = rows.filter((r) => r.id !== opts.excludeId).slice(0, perPage);
   const val = { rows: rows.map(sanitizePostMedia), total: res.total };
@@ -214,17 +250,24 @@ export const getPublishedPost = cache(async (type: PostType | PostType[], slug: 
   const key = `${types.join(',')}:${slug}`;
   if (!repoCache.__postBySlugCache) repoCache.__postBySlugCache = new Map();
   const hit = repoCache.__postBySlugCache.get(key);
-  if (hit && now - hit.at < 180_000) {
+  if (hit && now - hit.at < 300_000) {
     return hit.val;
   }
-  for (const t of types) {
-    const p = await db.findOne('posts', { type: t, slug, status: 'published' });
-    if (p) {
-      const sanitized = sanitizePostMedia(p);
-      if (repoCache.__postBySlugCache.size > 200) repoCache.__postBySlugCache.clear();
-      repoCache.__postBySlugCache.set(key, { at: now, val: sanitized });
-      return sanitized;
+  try {
+    for (const t of types) {
+      const p = await db.findOne('posts', { type: t, slug, status: 'published' });
+      if (p) {
+        const sanitized = sanitizePostMedia(p);
+        if (repoCache.__postBySlugCache.size > 200) repoCache.__postBySlugCache.clear();
+        repoCache.__postBySlugCache.set(key, { at: now, val: sanitized });
+        return sanitized;
+      }
     }
+  } catch (e) {
+    console.error('[repo] getPublishedPost failed:', (e as Error).message);
+    // Return stale cache if available
+    if (hit) return hit.val;
+    return null;
   }
   if (repoCache.__postBySlugCache.size > 200) repoCache.__postBySlugCache.clear();
   repoCache.__postBySlugCache.set(key, { at: now, val: null });
